@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata/
 [project]
 name = "ase_uhal"
-description = "Implementation of "Universal HyperActive Learning" compatible with the Atomic Simulation Environment (ASE)"
+description = "Implementation of 'Universal HyperActive Learning' compatible with the Atomic Simulation Environment (ASE)"
 dynamic = ["version"]
 readme = "README.md"
 authors = [
