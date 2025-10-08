@@ -1,0 +1,16 @@
+name: docs_ase_uhal
+channels:
+
+  - defaults
+dependencies:
+    # Base depends
+  - python
+  - pip
+  
+
+
+
+    # Pip-only installs
+  - pip:
+    - -e ../
+
