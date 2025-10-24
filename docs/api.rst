@@ -4,4 +4,5 @@ API Documentation
 .. autosummary::
    :toctree: autosummary
 
-   ase_uhal.canvas
+   ase_uhal.HALCalculator
+   ase_uhal.ACECommitteeCalculator
