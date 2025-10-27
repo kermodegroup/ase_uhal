@@ -29,6 +29,8 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         self.num_layers = num_layers
         self.invariants_only = invariants_only
 
+        self.torch_device = self.model.atomic_numbers.get_device()
+
         num_interactions = int(self.model.num_interactions)
 
         irreps_out = o3.Irreps(str(self.model.products[0].linear.irreps_out))
@@ -50,14 +52,14 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
 
         # Build an atoms object with a species which the model can handle
-        ats = Atoms(numbers=[self.model.atomic_numbers[0]], positions=[[0, 0, 0]])
+        ats = Atoms(numbers=[self.model.atomic_numbers.cpu().numpy()[0]], positions=[[0, 0, 0]])
 
         descriptor_size = self.get_descriptor_energy(ats).shape[0]
 
         super().__init__(committee_size, descriptor_size, prior_weight, energy_weight, forces_weight, None, # Stress weight
                  sqrt_prior, lowmem, random_seed)
         
-        self.sqrt_prior = torch.Tensor(self.sqrt_prior)
+        self.sqrt_prior = torch.Tensor(self.sqrt_prior).to(self.torch_device)
 
         self._jac = torch.func.jacfwd(self._descriptor_base, 0)
         
@@ -163,7 +165,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
             Q, R = torch.linalg.qr(sqrt_posterior)
 
         
-        z = torch.Tensor(self.rng.normal(loc=0, scale=1, size=(self.n_desc, self.n_comm)))
+        z = torch.Tensor(self.rng.normal(loc=0, scale=1, size=(self.n_desc, self.n_comm))).to(self.torch_device)
 
         self.committee_weights = torch.linalg.solve_triangular(R, z, upper=True).T # zero mean committee, so no mean term
 
@@ -195,7 +197,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
         d = self.get_descriptor_force(atoms)
 
-        return torch.tensordot(self.committee_weights, d, dims=([1], [0])).detach().numpy()
+        return torch.tensordot(self.committee_weights, d, dims=([1], [0])).cpu().numpy()
     
     def get_committee_stresses(self, atoms=None):
         '''
@@ -211,4 +213,4 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
             
         d = self.get_descriptor_stress(atoms)
 
-        return (self.committee_weights @ d).detach().numpy()
+        return (self.committee_weights @ d).cpu().numpy()
