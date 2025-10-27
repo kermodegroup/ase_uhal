@@ -52,7 +52,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
 
         # Build an atoms object with a species which the model can handle
-        ats = Atoms(numbers=[self.model.atomic_numbers.cpu().numpy()[0]], positions=[[0, 0, 0]])
+        ats = Atoms(numbers=[self.model.atomic_numbers.detach().cpu().numpy()[0]], positions=[[0, 0, 0]])
 
         descriptor_size = self.get_descriptor_energy(ats).shape[0]
 
@@ -182,7 +182,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
         d = self.get_descriptor_energy(atoms)
 
-        return (self.committee_weights @ d).cpu().numpy()
+        return (self.committee_weights @ d).detach().cpu().numpy()
     
     def get_committee_forces(self, atoms=None):
         '''
@@ -197,7 +197,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
         d = self.get_descriptor_force(atoms)
 
-        return torch.tensordot(self.committee_weights, d, dims=([1], [0])).cpu().numpy()
+        return torch.tensordot(self.committee_weights, d, dims=([1], [0])).detach().cpu().numpy()
     
     def get_committee_stresses(self, atoms=None):
         '''
@@ -213,4 +213,4 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
             
         d = self.get_descriptor_stress(atoms)
 
-        return (self.committee_weights @ d).cpu().numpy()
+        return (self.committee_weights @ d).detach().cpu().numpy()
