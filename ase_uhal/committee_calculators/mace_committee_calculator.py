@@ -60,8 +60,6 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
                  sqrt_prior, lowmem, random_seed)
         
         self.sqrt_prior = torch.Tensor(self.sqrt_prior).to(self.torch_device)
-
-        self._jac = torch.func.jacfwd(self._descriptor_base, 0)
         
 
     def _prep_atoms(self, atoms):
@@ -125,9 +123,8 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
     
     def get_descriptor_force(self, atoms):
          # Get the jacobian w.r.t the first argument of self._descriptor_base (i.e. positions)
-         #jacobian = torch.func.jacfwd(self._descriptor_base, 0)
-         #return jacobian(*self._prep_atoms(atoms))
-         return self._jac(*self._prep_atoms(atoms))
+         jacobian = torch.func.jacfwd(self._descriptor_base, 0)
+         return jacobian(*self._prep_atoms(atoms))
     
     def get_descriptor_stress(self, atoms):
          return super().get_descriptor_stress(atoms)
