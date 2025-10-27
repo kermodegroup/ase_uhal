@@ -1,3 +1,4 @@
+from ase.atoms import Atoms
 from .base_committee_calculator import BaseCommitteeCalculator
 import numpy as np
 
@@ -13,10 +14,10 @@ except ImportError:
 
 
 class MACECommitteeCalculator(BaseCommitteeCalculator):
-    def __init__(self, mace_calculator, committee_size, descriptor_size, prior_weight, energy_weight=None, forces_weight=None, stress_weight=None, 
+    implemented_properties = ['forces', 'energy', 'free_energy']
+    name = "MACECommitteeCalculator"
+    def __init__(self, mace_calculator, committee_size, prior_weight, energy_weight=None, forces_weight=None, 
                  sqrt_prior=None, lowmem=False, random_seed=None, num_layers=-1, invariants_only=True):
-        super().__init__(committee_size, descriptor_size, prior_weight, energy_weight, forces_weight, stress_weight, 
-                 sqrt_prior, lowmem, random_seed)
         
 
         assert has_torch, "PyTorch is required for MACE committees"
@@ -46,6 +47,20 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         self.num_invariant_features = num_invariant_features
         self.num_layers = num_layers
         self.to_keep = to_keep
+
+
+        # Build an atoms object with a species which the model can handle
+        ats = Atoms(numbers=[self.model.atomic_numbers[0]], positions=[[0, 0, 0]])
+
+        descriptor_size = self.get_descriptor_energy(ats).shape[0]
+
+        super().__init__(committee_size, descriptor_size, prior_weight, energy_weight, forces_weight, None, # Stress weight
+                 sqrt_prior, lowmem, random_seed)
+        
+        self.sqrt_prior = torch.Tensor(self.sqrt_prior)
+
+        self._jac = torch.func.jacfwd(self._descriptor_base, 0)
+        
 
     def _prep_atoms(self, atoms):
 
@@ -108,8 +123,92 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
     
     def get_descriptor_force(self, atoms):
          # Get the jacobian w.r.t the first argument of self._descriptor_base (i.e. positions)
-         jacobian = torch.func.jacfwd(self._descriptor_base, 0)
-         return jacobian(*self._prep_atoms(atoms))
+         #jacobian = torch.func.jacfwd(self._descriptor_base, 0)
+         #return jacobian(*self._prep_atoms(atoms))
+         return self._jac(*self._prep_atoms(atoms))
     
     def get_descriptor_stress(self, atoms):
          return super().get_descriptor_stress(atoms)
+    
+    def resample_committee(self, committee_size=None, regularisation=1e-6):
+        '''
+        Resample the committee, based on the states of self.likelihood and self.sqrt_prior
+        Populates self.committee_weights based on the newly sampled committee
+
+        Parameters
+        ----------
+        committee_size : int, optional
+            New size of the committee, if supplied.
+            By default, a committee of size self.n_comm is drawn
+
+        regularisation: float, optional
+            Regularisation strength used to ensure likelihood is positive definite in the low memory variant.
+            Used in a cholesky decomposition cholesky(likelihood + regularisation * np.eye(self.n_desc)) to obtain
+            a square root of the likelihood. Default is 1e-6
+
+
+        '''
+        if committee_size is not None:
+            self.n_comm = committee_size
+
+        if self._lowmem:
+            L_likelihood = torch.linalg.cholesky(self.likelihood + regularisation * np.eye(self.n_desc))
+
+            sqrt_posterior = L_likelihood + np.sqrt(self.prior_weight) * self.sqrt_prior
+
+            Q, R = torch.linalg.qr(sqrt_posterior)
+        
+        else:
+            sqrt_posterior = torch.vstack(self.likelihood + [self.sqrt_prior])
+            Q, R = torch.linalg.qr(sqrt_posterior)
+
+        
+        z = torch.Tensor(self.rng.normal(loc=0, scale=1, size=(self.n_desc, self.n_comm)))
+
+        self.committee_weights = torch.linalg.solve_triangular(R, z, upper=True).T # zero mean committee, so no mean term
+
+    def get_committee_energies(self, atoms=None):
+        '''
+        Get energy predictions by each member of the committee
+
+        Returns an array of length self.n_comm
+        
+        '''
+
+        if atoms is None:
+            atoms = self.atoms
+
+        d = self.get_descriptor_energy(atoms)
+
+        return (self.committee_weights @ d).detach().numpy()
+    
+    def get_committee_forces(self, atoms=None):
+        '''
+        Get force predictions by each member of the committee
+
+        Returns an array of shape (self.n_comm, Nats, 3)
+        
+        '''
+
+        if atoms is None:
+            atoms = self.atoms
+
+        d = self.get_descriptor_force(atoms)
+
+        return torch.tensordot(self.committee_weights, d, dims=([1], [0])).detach().numpy()
+    
+    def get_committee_stresses(self, atoms=None):
+        '''
+        Get stress predictions by each member of the committee
+
+        Returns an array of shape (self.n_comm, 9)
+
+        
+        '''
+
+        if atoms is None:
+            atoms = self.atoms
+            
+        d = self.get_descriptor_stress(atoms)
+
+        return (self.committee_weights @ d).detach().numpy()

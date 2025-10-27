@@ -1,16 +1,16 @@
 from abc import ABCMeta, abstractmethod
-from ase.calculators.calculator import BaseCalculator
+from ase.calculators.calculator import Calculator
 import numpy as np
 from scipy.linalg import solve_triangular
 
 
-class BaseCommitteeCalculator(BaseCalculator, metaclass=ABCMeta):
+class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
     implemented_properties = ['forces', 'energy', 'free_energy', 'stress']
     default_parameters = {}
     name = 'BaseCommitteeCalculator'
 
     def __init__(self, committee_size, descriptor_size, prior_weight, energy_weight=None, forces_weight=None, stress_weight=None, 
-                 sqrt_prior=None, lowmem=False, random_seed=None):
+                 sqrt_prior=None, lowmem=False, random_seed=None, **kwargs):
         '''
         Parameters
         ----------
@@ -42,6 +42,9 @@ class BaseCommitteeCalculator(BaseCalculator, metaclass=ABCMeta):
         random_seed : int or np.random.RandomState object
             Seed or random state to use for all random processes.
         '''
+
+        super().__init__(**kwargs)
+
         self.n_comm = committee_size
         self.n_desc = descriptor_size
 
@@ -136,30 +139,36 @@ class BaseCommitteeCalculator(BaseCalculator, metaclass=ABCMeta):
         '''
         pass
 
-    def get_committee_energies(self, atoms):
+    def get_committee_energies(self, atoms=None):
         '''
         Get energy predictions by each member of the committee
 
         Returns an array of length self.n_comm
         
         '''
+        if atoms is None:
+            atoms = self.atoms
 
         d = self.get_descriptor_energy(atoms)
 
         return self.committee_weights @ d
     
-    def get_committee_forces(self, atoms):
+    def get_committee_forces(self, atoms=None):
         '''
         Get force predictions by each member of the committee
 
         Returns an array of shape (self.n_comm, Nats, 3)
         
         '''
+        
+        if atoms is None:
+            atoms = self.atoms
+        
         d = self.get_descriptor_force(atoms)
 
         return self.committee_weights @ d
     
-    def get_committee_stresses(self, atoms):
+    def get_committee_stresses(self, atoms=None):
         '''
         Get stress predictions by each member of the committee
 
@@ -167,6 +176,10 @@ class BaseCommitteeCalculator(BaseCalculator, metaclass=ABCMeta):
 
         
         '''
+
+        if atoms is None:
+            atoms = self.atoms
+
         d = self.get_descriptor_stress(atoms)
 
         return self.committee_weights @ d
@@ -179,13 +192,13 @@ class BaseCommitteeCalculator(BaseCalculator, metaclass=ABCMeta):
         super().calculate(atoms, properties, system_changes)
 
         if "energy" in properties:
-            self.results["energy"] = np.mean(self.get_committee_energies())
+            self.results["energy"] = np.mean(self.get_committee_energies(atoms))
         
         if "forces" in properties:
-            self.results["forces"] = np.mean(self.get_committee_forces(), axis=0)
+            self.results["forces"] = np.mean(self.get_committee_forces(atoms), axis=0)
 
         if "stress" in properties:
-            self.results["stress"] = np.mean(self.get_committee_stresses(), axis=0)
+            self.results["stress"] = np.mean(self.get_committee_stresses(atoms), axis=0)
 
     def hal_calculate(self, atoms, properties, system_changes):
         '''
@@ -201,20 +214,20 @@ class BaseCommitteeCalculator(BaseCalculator, metaclass=ABCMeta):
         results = {}
 
         if "energy" in properties or "forces" in properties:
-            Es = self.get_committee_energies()
+            Es = self.get_committee_energies(atoms)
 
         if "energy" in properties:
             results["energy"] = np.std(Es)
 
         if "forces" in properties:
             Es -= np.mean(Es)
-            Fs = self.get_committee_forces()
+            Fs = self.get_committee_forces(atoms)
             Fs -= np.mean(Fs, axis=0)
 
             results["forces"] = np.mean([E * F for E, F in zip(Es, Fs)], axis=0)
 
         if "stress" in properties:
-            Ss = self.get_committee_stresses()
+            Ss = self.get_committee_stresses(atoms)
             Ss -= np.mean(Ss, axis=0)
 
             results["stresses"] = np.mean([E * S for E, S in zip(Es, Ss)], axis=0)
@@ -235,13 +248,13 @@ class BaseCommitteeCalculator(BaseCalculator, metaclass=ABCMeta):
         l = []
 
         if self.energy_weight is not None:
-            l.append(np.sqrt(self.energy_weight) ( self.get_descriptor_energy(atoms)))
+            l.append(np.sqrt(self.energy_weight) * self.get_descriptor_energy(atoms)[None, ...])
 
         if self.forces_weight is not None:
-            l.append(np.sqrt(self.forces_weight) ( self.get_descriptor_force(atoms)))
+            l.append(np.sqrt(self.forces_weight) * self.get_descriptor_force(atoms).reshape(self.n_desc, -1).T)
 
         if self.stress_weight is not None:
-            l.append(np.sqrt(self.stress_weight) ( self.get_descriptor_stress(atoms)))
+            l.append(np.sqrt(self.stress_weight) * self.get_descriptor_stress(atoms))
 
 
         if self._lowmem:
@@ -287,7 +300,6 @@ class BaseCommitteeCalculator(BaseCalculator, metaclass=ABCMeta):
             Q, R = np.linalg.qr(sqrt_posterior)
         
         else:
-
             sqrt_posterior = np.vstack(self.likelihood + [self.sqrt_prior])
             Q, R = np.linalg.qr(sqrt_posterior)
 

@@ -2,11 +2,12 @@
 ase-compatible HAL-style bias calculator, using the committee error as an energy bias.
 
 '''
-from ase.calculators.calculator import BaseCalculator
+from ase.calculators.calculator import Calculator
 import numpy as np
 from .committee_calculators.base_committee_calculator import BaseCommitteeCalculator
 
-class HALCalculator(BaseCalculator):
+
+class HALCalculator(Calculator):
     '''
     ASE-compatible Hyperactive Learning calculator
 
@@ -21,6 +22,8 @@ class HALCalculator(BaseCalculator):
     def __init__(self, mean_calc, committee_calc:BaseCommitteeCalculator, adaptive_tau=False, tau_rel=0.1, tau_hist=10, tau_delay=None, eps=0.2):
         '''
         '''
+
+        super().__init__()
         self.mean_calc = mean_calc
         self.committee_calc = committee_calc
         self.adapt_tau = adaptive_tau
@@ -30,7 +33,7 @@ class HALCalculator(BaseCalculator):
             self.tau_delay = tau_delay
         else:
             self.tau_delay = tau_hist
-        self.tau = None
+        self.tau = 0 # Default to no mixing, until specified by user, or changed by adaptive mode
         self.Fmean = None
         self.Fbias = None
         self.eps = eps
@@ -57,7 +60,7 @@ class HALCalculator(BaseCalculator):
 
         assert self.tau is not None
 
-        committee_results = self.committee_calculator.hal_calculate(atoms, properties, system_changes)
+        committee_results = self.committee_calc.hal_calculate(atoms, properties, system_changes)
 
         self.mean_calc.calculate(atoms, properties, system_changes)
 
@@ -75,8 +78,9 @@ class HALCalculator(BaseCalculator):
         Modifies self.tau if self.tau_delay < 0, otherwise decreases self.tau_delay by 1
         '''
         self.get_property("forces", atoms)
+        committee_results = self.committee_calc.hal_calculate(atoms, "forces")
         Fmean = np.mean(np.linalg.norm(self.mean_calc.properties["forces"], axis=-1))
-        Fbias = np.mean(np.linalg.norm(self.committee_calculator.results["forces"], axis=-1))
+        Fbias = np.mean(np.linalg.norm(committee_results["forces"], axis=-1))
 
         if self.Fmean is None or self.Fbias is None:
             self.Fmean = Fmean
