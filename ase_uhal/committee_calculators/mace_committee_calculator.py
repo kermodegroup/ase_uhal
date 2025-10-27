@@ -182,7 +182,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
         d = self.get_descriptor_energy(atoms)
 
-        return (self.committee_weights @ d).detach().numpy()
+        return (self.committee_weights @ d).cpu().numpy()
     
     def get_committee_forces(self, atoms=None):
         '''
