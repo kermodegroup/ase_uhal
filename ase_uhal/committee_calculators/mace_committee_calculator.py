@@ -29,7 +29,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         self.num_layers = num_layers
         self.invariants_only = invariants_only
 
-        self.torch_device = self.model.atomic_numbers.get_device()
+        self.torch_device = self.model.atomic_numbers.device
 
         num_interactions = int(self.model.num_interactions)
 
