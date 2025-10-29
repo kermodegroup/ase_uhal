@@ -1,5 +1,5 @@
 from ase.atoms import Atoms
-from .base_committee_calculator import BaseCommitteeCalculator
+from .base_committee_calculator import BaseCommitteeCalculator, Calculator
 import numpy as np
 
 try:
@@ -60,6 +60,9 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
                  sqrt_prior, lowmem, random_seed)
         
         self.sqrt_prior = torch.Tensor(self.sqrt_prior).to(self.torch_device)
+
+        self._desc_force = torch.func.jacfwd(self._descriptor_base, 0)
+        self._comm_force = torch.func.jacfwd(self._committee_energies, 0)
         
 
     def _prep_atoms(self, atoms):
@@ -118,13 +121,20 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
         return node_feats_out[:, :self.to_keep].sum(dim=0)
 
+    def _committee_energies(self, positions, attrs, edge_index, shifts):
+        d = self._descriptor_base(positions, attrs, edge_index, shifts)
+        return self.committee_weights @ d
+    
+    def _hal_energy(self, positions, attrs, edge_index, shifts):
+        return torch.std(self._committee_energies(positions, attrs, edge_index, shifts))
+
     def get_descriptor_energy(self, atoms):
          return self._descriptor_base(*self._prep_atoms(atoms))
     
     def get_descriptor_force(self, atoms):
          # Get the jacobian w.r.t the first argument of self._descriptor_base (i.e. positions)
-         jacobian = torch.func.jacfwd(self._descriptor_base, 0)
-         return jacobian(*self._prep_atoms(atoms))
+         #jacobian = torch.func.jacfwd(self._descriptor_base, 0)
+         return self._desc_force(*self._prep_atoms(atoms))
     
     def get_descriptor_stress(self, atoms):
          return super().get_descriptor_stress(atoms)
@@ -179,7 +189,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
         d = self.get_descriptor_energy(atoms)
 
-        return (self.committee_weights @ d).detach().cpu().numpy()
+        return (self._committee_energies(*self._prep_atoms(atoms))).detach().cpu().numpy()
     
     def get_committee_forces(self, atoms=None):
         '''
@@ -192,9 +202,8 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         if atoms is None:
             atoms = self.atoms
 
-        d = self.get_descriptor_force(atoms)
 
-        return torch.tensordot(self.committee_weights, d, dims=([1], [0])).detach().cpu().numpy()
+        return (self._comm_force(*self._prep_atoms(atoms))).detach().cpu().numpy()
     
     def get_committee_stresses(self, atoms=None):
         '''
@@ -211,3 +220,33 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         d = self.get_descriptor_stress(atoms)
 
         return (self.committee_weights @ d).detach().cpu().numpy()
+
+    def hal_calculate(self, atoms, properties, system_changes):
+        '''
+        Calculate the energy, force, and stress properties from the committee used for HAL
+
+        Energy is the std() of the committee energies
+        Forces and stresses are weighted averages, using weights of the energy predictions
+        Stresses
+        
+        '''
+        Calculator.calculate(self, atoms, properties, system_changes)
+
+        results = {}
+
+        if atoms is None:
+            atoms = self.atoms
+
+        props = self._prep_atoms(atoms)
+
+        E_hal = self._hal_energy(*props)
+
+        results["energy"] = E_hal.detach().cpu().numpy()
+
+        if "forces" in properties:
+            # derivative w.r.t positions
+            grad_outputs = [torch.ones_like(E_hal)]
+            Fs = torch.autograd.grad(outputs=[E_hal], inputs=[props[0]], grad_outputs=grad_outputs, allow_unused=True)[0]
+            results["forces"] = Fs.detach().cpu().numpy()
+
+        return results
