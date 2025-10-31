@@ -301,6 +301,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         Use MPI4Py to send a selected atoms object to all other processes, along with a 
         snapshot of the current energy, force, and stress weights
         
+        Skipped if not enabled
         '''
 
         data = [atoms.copy(), *self.weights]
@@ -310,8 +311,13 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
                 if i != self.rank:
                    self.comm.isend(data, dest=i) # Non-blocking broadcast to each other process
     
-    def _MPI_recieve_all_selections(self):
+    def _MPI_receive_all_selections(self):
+        '''
+        Use MPI4Py to receive all structures selected by other processes, along with the energy, force
+        and stress weights at the time the structures were selected
 
+        Skipped if MPI not enabled
+        '''
         if not (has_mpi and self.comm is not None):
             return # MPI not enabled, so skip this step
         
@@ -353,7 +359,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
 
 
         '''
-        self._MPI_recieve_all_selections() # Sync up with selections from other processes
+        self._MPI_receive_all_selections() # Sync up with selections from other processes
 
 
         if committee_size is not None:

@@ -157,7 +157,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
 
         '''
-        self._MPI_recieve_all_selections() # Sync up with selections from other processes
+        self._MPI_receive_all_selections() # Sync up with selections from other processes
         
         if committee_size is not None:
             self.n_comm = committee_size
