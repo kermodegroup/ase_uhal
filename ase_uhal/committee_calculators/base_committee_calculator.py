@@ -3,6 +3,12 @@ from ase.calculators.calculator import Calculator
 import numpy as np
 from scipy.linalg import solve_triangular
 
+try:
+    import mpi4py
+    has_mpi = True
+except ImportError:
+    has_mpi = False
+
 
 class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
     implemented_properties = ['forces', 'energy', 'free_energy', 'stress']
@@ -10,7 +16,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
     name = 'BaseCommitteeCalculator'
 
     def __init__(self, committee_size, descriptor_size, prior_weight, energy_weight=None, forces_weight=None, stress_weight=None, 
-                 sqrt_prior=None, lowmem=False, random_seed=None, **kwargs):
+                 sqrt_prior=None, lowmem=False, random_seed=None, mpi_comm=None, **kwargs):
         '''
         Parameters
         ----------
@@ -43,10 +49,24 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
             Seed or random state to use for all random processes.
         '''
 
+        self.comm = mpi_comm
+
+        if self.comm is not None:
+            if not has_mpi or type(self.comm) not in  [mpi4py.MPI.Comm, mpi4py.MPI.Intracomm]:
+                raise RuntimeError("mpi_comm argument passed without a valid MPI4Py Communicator")
+            
+            self.rank = self.comm.Get_rank()
+            self.comm_size = self.comm.Get_size()
+        else:
+            self.rank = None
+            self.comm_size = None
+
         super().__init__(**kwargs)
 
         self.n_comm = committee_size
         self.n_desc = descriptor_size
+
+        self.selected_structures = []
 
         self.weights = [None, None, None]
         self.energy_weight = energy_weight
@@ -63,9 +83,9 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         self._lowmem = lowmem
 
         if self._lowmem:
-            self.likelihood = np.zeros_like(self.prior)
+            self.likelihood = {key : np.zeros_like(self.prior) for key in ["energy", "force", "stress"]}
         else:
-            self.likelihood = []
+            self.likelihood = {key : [] for key in ["energy", "force", "stress"]}
 
         if random_seed is not None:
             if type(random_seed) == np.random.RandomState:
@@ -234,8 +254,37 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         
         return results
 
+    def __update_likelihood_core(self, atoms, energy_weight, force_weight, stress_weight):
+        l = {}
 
-    def update_likelihood(self, atoms):
+        if energy_weight is not None:
+            l["energy"] = np.sqrt(energy_weight) * self.get_descriptor_energy(atoms)[None, ...]
+
+        if force_weight is not None:
+            l["force"] = np.sqrt(force_weight) * self.get_descriptor_force(atoms).reshape(self.n_desc, -1).T
+
+        if stress_weight is not None:
+            l["stress"] = np.sqrt(stress_weight) * self.get_descriptor_stress(atoms)
+
+
+        if self._lowmem:
+            # Low memory variant
+            # Setup problem as Phi^T Phi + Prior
+
+            for key in ["energy", "force", "stress"]:
+                if key in l.keys():
+                    self.likelihood[key] += l[key].T @ l[key]
+        
+        else:
+            # Normal variant
+            # Assemble list of all observations
+            # Maintain as list to not shift results around in memory until needed.
+            for key in ["energy", "force", "stress"]:
+                if key in l.keys():
+                    self.likelihood[key].extend(l[key])
+
+
+    def _update_likelihood(self, atoms):
         '''
         Update the likelihood based on observations obtained from atoms
 
@@ -245,31 +294,46 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
             Atoms object to derive energy, force, and stress observations from
         
         '''
-        l = []
+        self.__update_likelihood_core(atoms, *self.weights)
 
-        if self.energy_weight is not None:
-            l.append(np.sqrt(self.energy_weight) * self.get_descriptor_energy(atoms)[None, ...])
-
-        if self.forces_weight is not None:
-            l.append(np.sqrt(self.forces_weight) * self.get_descriptor_force(atoms).reshape(self.n_desc, -1).T)
-
-        if self.stress_weight is not None:
-            l.append(np.sqrt(self.stress_weight) * self.get_descriptor_stress(atoms))
-
-
-        if self._lowmem:
-            # Low memory variant
-            # Setup problem as Phi^T Phi + Prior
-
-
-            l_full = np.vstack(l)
-            self.likelihood += l_full.T @ l_full
+    def _MPI_broadcast_selection(self, atoms):
+        '''
+        Use MPI4Py to send a selected atoms object to all other processes, along with a 
+        snapshot of the current energy, force, and stress weights
         
-        else:
-            # Normal variant
-            # Assemble list of all observations
-            # Maintain as list to not shift results around in memory until needed.
-            self.likelihood.extend(l)
+        '''
+
+        data = [atoms.copy(), *self.weights]
+
+        if has_mpi and self.comm is not None:
+            for i in range(self.comm_size):
+                if i != self.rank:
+                   self.comm.isend(data, dest=i) # Non-blocking broadcast to each other process
+    
+    def _MPI_recieve_all_selections(self):
+
+        if not (has_mpi and self.comm is not None):
+            return # MPI not enabled, so skip this step
+        
+        req = self.comm.irecv()
+
+        while req.get_status(): # True when message is pending
+            st, msg = req.test() # Recieve status and message via request
+
+
+            self.selected_structures.append(msg[0].copy()) # Add selected structure to list
+            self.__update_likelihood_core(*msg)
+
+            req.free() # Close and open a new request, for the new message
+            req = self.comm.irecv()
+
+        req.free()
+    
+    def select_structure(self, atoms):
+        self.selected_structures.append(atoms.copy())
+        self._update_likelihood(atoms)
+
+        self._MPI_broadcast_selection(atoms) # Send selected structure to all other processes, to be picked up later
 
     def resample_committee(self, committee_size=None, regularisation=1e-6):
         '''
@@ -289,18 +353,29 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
 
 
         '''
+        self._MPI_recieve_all_selections() # Sync up with selections from other processes
+
+
         if committee_size is not None:
             self.n_comm = committee_size
 
+
         if self._lowmem:
-            L_likelihood = np.linalg.cholesky(self.likelihood + regularisation * np.eye(self.n_desc))
+            L_likelihood = np.linalg.cholesky(np.sum([self.likelihood[key] for key in ["energy", "force", "stress"]]) 
+                                              + regularisation * np.eye(self.n_desc))
 
             sqrt_posterior = L_likelihood + np.sqrt(self.prior_weight) * self.sqrt_prior
 
             Q, R = np.linalg.qr(sqrt_posterior)
         
         else:
-            sqrt_posterior = np.vstack(self.likelihood + [self.sqrt_prior])
+            l_list = []
+
+            for key in ["energy", "force", "stress"]:
+                l_key = self.likelihood[key]
+                if len(l_key):
+                    l_list.extend(l_key)
+            sqrt_posterior = np.vstack(l_list + [self.sqrt_prior])
             Q, R = np.linalg.qr(sqrt_posterior)
 
         
