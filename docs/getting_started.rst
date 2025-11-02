@@ -1,9 +1,22 @@
 Getting Started
 ===============
 
+Installation
+------------
 
-You might choose to write an overview tutorial or set of tutorials.
+Installation of the main module can be achieved using pip from the top-level ase-uhal directory:
 
-.. code-block:: python
+.. code-block:: bash
     
-    import ase_uhal
+    pip install .
+
+For MACE-based biasing, the `mace-torch` Python package must be also installed. As a shortcut, this can be done using the `[mace]` optional dependancies of this package, e.g.
+
+.. code-block:: bash
+
+    pip install .[mace]
+
+For ACE-based biasing, ...
+
+Basic Usage
+-----------
