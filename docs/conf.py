@@ -50,8 +50,11 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
     'sphinx.ext.extlinks',
+    # 'sphinx.ext.imgmath',
+    'sphinx.ext.mathjax',
     'sphinx_design',
-    'sphinx_copybutton',    
+    'sphinx_copybutton',
+    'sphinxcontrib.bibtex',
 ]
 
 
@@ -60,6 +63,17 @@ napoleon_google_docstring = False
 napoleon_use_param = False
 napoleon_use_ivar = True
 
+bibtex_reference_style = "label"
+bibtex_default_style = 'plain'
+bibtex_bibfiles = ["user-guide/refs.bib"]
+
+#imgmath_image_format = 'svg'
+
+mathjax3_config = {'chtml': {
+    'displayAlign' : 'center'
+}}
+
+mathjax_path = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
