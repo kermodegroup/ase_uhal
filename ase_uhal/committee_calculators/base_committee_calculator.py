@@ -231,28 +231,24 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         '''
         super().calculate(atoms, properties, system_changes)
 
-        results = {}
-
         if "energy" in properties or "forces" in properties:
             Es = self.get_committee_energies(atoms)
 
         if "energy" in properties:
-            results["energy"] = np.std(Es)
+            self.results["hal_energy"] = np.std(Es)
 
         if "forces" in properties:
             Es -= np.mean(Es)
             Fs = self.get_committee_forces(atoms)
             Fs -= np.mean(Fs, axis=0)
 
-            results["forces"] = np.mean([E * F for E, F in zip(Es, Fs)], axis=0)
+            self.results["hal_forces"] = np.mean([E * F for E, F in zip(Es, Fs)], axis=0)
 
         if "stress" in properties:
             Ss = self.get_committee_stresses(atoms)
             Ss -= np.mean(Ss, axis=0)
 
-            results["stresses"] = np.mean([E * S for E, S in zip(Es, Ss)], axis=0)
-        
-        return results
+            self.results["hal_stresses"] = np.mean([E * S for E, S in zip(Es, Ss)], axis=0)
 
     def __update_likelihood_core(self, atoms, energy_weight, force_weight, stress_weight):
         l = {}

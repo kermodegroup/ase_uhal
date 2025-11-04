@@ -242,8 +242,6 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         '''
         Calculator.calculate(self, atoms, properties, system_changes)
 
-        results = {}
-
         if atoms is None:
             atoms = self.atoms
 
@@ -251,12 +249,10 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
         E_hal = self._hal_energy(*props)
 
-        results["energy"] = E_hal.detach().cpu().numpy()
+        self.results["hal_energy"] = E_hal.detach().cpu().numpy()
 
         if "forces" in properties:
             # derivative w.r.t positions
             grad_outputs = [torch.ones_like(E_hal)]
             Fs = torch.autograd.grad(outputs=[E_hal], inputs=[props[0]], grad_outputs=grad_outputs, allow_unused=True)[0]
-            results["forces"] = Fs.detach().cpu().numpy()
-
-        return results
+            self.results["hal_forces"] = Fs.detach().cpu().numpy()
