@@ -20,7 +20,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
     name = 'BaseCommitteeCalculator'
 
     def __init__(self, committee_size, descriptor_size, prior_weight, energy_weight=None, forces_weight=None, stress_weight=None, 
-                 sqrt_prior=None, lowmem=False, random_seed=None, mpi_comm=COMM_WORLD, **kwargs):
+                 sqrt_prior=None, lowmem=False, random_seed=None, regularisation=1e-4, mpi_comm=COMM_WORLD, **kwargs):
         '''
         Parameters
         ----------
@@ -51,12 +51,18 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         
         random_seed : int or np.random.RandomState object
             Seed or random state to use for all random processes.
+
+        regularisation: float, optional
+            Regularisation strength used to ensure likelihood is positive definite in the low memory variant.
+            Used in a cholesky decomposition cholesky(likelihood + regularisation * np.eye(self.n_desc)) to obtain
+            a square root of the likelihood. Default is 1e-4
+
         '''
 
         self.comm = mpi_comm
 
         if self.comm is not None:
-            if not has_mpi or type(self.comm) not in  [mpi4py.MPI.Comm, mpi4py.MPI.Intracomm]:
+            if not has_mpi or type(self.comm) not in  [MPI.Comm, MPI.Intracomm]:
                 raise RuntimeError("mpi_comm argument passed without a valid MPI4Py Communicator")
             
             self.rank = self.comm.Get_rank()
@@ -66,6 +72,8 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
             self.comm_size = None
 
         super().__init__(**kwargs)
+
+        self.regularisation = regularisation
 
         self.n_comm = committee_size
         self.n_desc = descriptor_size
@@ -87,7 +95,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         self._lowmem = lowmem
 
         if self._lowmem:
-            self.likelihood = {key : np.zeros_like(self.prior) for key in ["energy", "force", "stress"]}
+            self.likelihood = {key : np.zeros_like(self.sqrt_prior) for key in ["energy", "force", "stress"]}
         else:
             self.likelihood = {key : [] for key in ["energy", "force", "stress"]}
 
@@ -341,7 +349,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
 
         self._MPI_broadcast_selection(atoms) # Send selected structure to all other processes, to be picked up later
 
-    def resample_committee(self, committee_size=None, regularisation=1e-6):
+    def resample_committee(self, committee_size=None):
         '''
         Resample the committee, based on the states of self.likelihood and self.sqrt_prior
         Populates self.committee_weights based on the newly sampled committee
@@ -351,12 +359,6 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         committee_size : int, optional
             New size of the committee, if supplied.
             By default, a committee of size self.n_comm is drawn
-
-        regularisation: float, optional
-            Regularisation strength used to ensure likelihood is positive definite in the low memory variant.
-            Used in a cholesky decomposition cholesky(likelihood + regularisation * np.eye(self.n_desc)) to obtain
-            a square root of the likelihood. Default is 1e-6
-
 
         '''
         self._MPI_receive_all_selections() # Sync up with selections from other processes
@@ -368,7 +370,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
 
         if self._lowmem:
             L_likelihood = np.linalg.cholesky(np.sum([self.likelihood[key] for key in ["energy", "force", "stress"]]) 
-                                              + regularisation * np.eye(self.n_desc))
+                                              + self.regularisation * np.eye(self.n_desc))
 
             sqrt_posterior = L_likelihood + np.sqrt(self.prior_weight) * self.sqrt_prior
 

@@ -17,8 +17,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
     implemented_properties = ['forces', 'energy', 'free_energy']
     name = "MACECommitteeCalculator"
     def __init__(self, mace_calculator, committee_size, prior_weight, energy_weight=None, forces_weight=None, 
-                 sqrt_prior=None, lowmem=False, random_seed=None, num_layers=-1, invariants_only=True, mpi_comm=None, **kwargs):
-        
+                 sqrt_prior=None, lowmem=False, random_seed=None, num_layers=-1, invariants_only=True, regularisation=1e-4, mpi_comm=None, **kwargs):
 
         assert has_torch, "PyTorch is required for MACE committees"
 
@@ -57,14 +56,16 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         descriptor_size = self.get_descriptor_energy(ats).shape[0]
 
         super().__init__(committee_size, descriptor_size, prior_weight, energy_weight, forces_weight, None, # Stress weight
-                 sqrt_prior, lowmem, random_seed, mpi_comm, **kwargs)
+                 sqrt_prior, lowmem, random_seed, regularisation, mpi_comm, **kwargs)
         
         self.sqrt_prior = torch.Tensor(self.sqrt_prior).to(self.torch_device)
+        if self._lowmem:
+            for key in ["energy", "force", "stress"]:
+                self.likelihood[key] = torch.Tensor(self.likelihood[key])
 
         self._desc_force = torch.func.jacfwd(self._descriptor_base, 0)
         self._comm_force = torch.func.jacfwd(self._committee_energies, 0)
         
-
     def _prep_atoms(self, atoms):
 
         batch = self.mace_calc._atoms_to_batch(atoms).to_dict()
@@ -139,7 +140,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
     def get_descriptor_stress(self, atoms):
          return super().get_descriptor_stress(atoms)
     
-    def resample_committee(self, committee_size=None, regularisation=1e-6):
+    def resample_committee(self, committee_size=None):
         '''
         Resample the committee, based on the states of self.likelihood and self.sqrt_prior
         Populates self.committee_weights based on the newly sampled committee
@@ -150,12 +151,6 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
             New size of the committee, if supplied.
             By default, a committee of size self.n_comm is drawn
 
-        regularisation: float, optional
-            Regularisation strength used to ensure likelihood is positive definite in the low memory variant.
-            Used in a cholesky decomposition cholesky(likelihood + regularisation * np.eye(self.n_desc)) to obtain
-            a square root of the likelihood. Default is 1e-6
-
-
         '''
         self._MPI_receive_all_selections() # Sync up with selections from other processes
         
@@ -163,8 +158,8 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
             self.n_comm = committee_size
 
         if self._lowmem:
-            L_likelihood = torch.linalg.cholesky(torch.sum([self.likelihood[key] for key in ["energy", "force", "stress"]]) 
-                                                 + regularisation * np.eye(self.n_desc))
+            L_likelihood = torch.linalg.cholesky(sum([self.likelihood[key] for key in ["energy", "force", "stress"]]) 
+                                                 + self.regularisation * torch.eye(self.n_desc))
 
             sqrt_posterior = L_likelihood + np.sqrt(self.prior_weight) * self.sqrt_prior
 
