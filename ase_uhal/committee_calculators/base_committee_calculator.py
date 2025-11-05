@@ -4,10 +4,14 @@ import numpy as np
 from scipy.linalg import solve_triangular
 
 try:
-    import mpi4py
+    from mpi4py import MPI
     has_mpi = True
+
+    COMM_WORLD = MPI.COMM_WORLD
+
 except ImportError:
     has_mpi = False
+    COMM_WORLD = None
 
 
 class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
@@ -16,7 +20,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
     name = 'BaseCommitteeCalculator'
 
     def __init__(self, committee_size, descriptor_size, prior_weight, energy_weight=None, forces_weight=None, stress_weight=None, 
-                 sqrt_prior=None, lowmem=False, random_seed=None, mpi_comm=None, **kwargs):
+                 sqrt_prior=None, lowmem=False, random_seed=None, mpi_comm=COMM_WORLD, **kwargs):
         '''
         Parameters
         ----------
