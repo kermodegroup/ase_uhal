@@ -28,7 +28,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         self.num_layers = num_layers
         self.invariants_only = invariants_only
 
-        self.torch_device = self.model.atomic_numbers.device
+        self.torch_device = self.model.atomic_numbers.get_device()
 
         num_interactions = int(self.model.num_interactions)
 
@@ -61,7 +61,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         self.sqrt_prior = torch.Tensor(self.sqrt_prior).to(self.torch_device)
         if self._lowmem:
             for key in ["energy", "force", "stress"]:
-                self.likelihood[key] = torch.Tensor(self.likelihood[key])
+                self.likelihood[key] = torch.Tensor(self.likelihood[key]).to(self.torch_device)
 
         self._desc_force = torch.func.jacfwd(self._descriptor_base, 0)
         self._comm_force = torch.func.jacfwd(self._committee_energies, 0)
