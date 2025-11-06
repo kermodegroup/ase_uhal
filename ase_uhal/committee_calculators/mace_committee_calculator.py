@@ -158,8 +158,10 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
             self.n_comm = committee_size
 
         if self._lowmem:
+            reg = (self.regularisation * torch.eye(self.n_desc)).to(self.torch_device)
+
             L_likelihood = torch.linalg.cholesky(sum([self.likelihood[key] for key in ["energy", "force", "stress"]]) 
-                                                 + self.regularisation * torch.eye(self.n_desc))
+                                                 + reg)
 
             sqrt_posterior = L_likelihood + np.sqrt(self.prior_weight) * self.sqrt_prior
 
