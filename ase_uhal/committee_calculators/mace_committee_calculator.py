@@ -30,6 +30,9 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
         self.torch_device = self.model.atomic_numbers.get_device()
 
+        if self.torch_device < 0:
+            self.torch_device = "cpu"
+
         num_interactions = int(self.model.num_interactions)
 
         irreps_out = o3.Irreps(str(self.model.products[0].linear.irreps_out))
@@ -135,7 +138,11 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
     def get_descriptor_force(self, atoms):
          # Get the jacobian w.r.t the first argument of self._descriptor_base (i.e. positions)
          #jacobian = torch.func.jacfwd(self._descriptor_base, 0)
-         return self._desc_force(*self._prep_atoms(atoms))
+         
+         with torch.no_grad():
+            desc_force = self._desc_force(*self._prep_atoms(atoms))
+         
+         return desc_force
     
     def get_descriptor_stress(self, atoms):
          return super().get_descriptor_stress(atoms)
