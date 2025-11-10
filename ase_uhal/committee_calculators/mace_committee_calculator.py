@@ -132,7 +132,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
     def __manual_jac(self, f):
 
-        def _call(args):
+        def _call(*args):
 
             def single_grad(args, i):
                 desc_elem = f(*args)[i]
