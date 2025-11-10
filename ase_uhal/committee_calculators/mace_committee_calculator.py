@@ -166,8 +166,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
          # Get the jacobian w.r.t the first argument of self._descriptor_base (i.e. positions)
          #jacobian = torch.func.jacfwd(self._descriptor_base, 0)
          
-         with torch.no_grad():
-            desc_force = self._desc_force(*self._prep_atoms(atoms))
+         desc_force = self._desc_force(*self._prep_atoms(atoms))
          
          return desc_force
     
