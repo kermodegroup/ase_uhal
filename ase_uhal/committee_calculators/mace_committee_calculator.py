@@ -17,7 +17,8 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
     implemented_properties = ['forces', 'energy', 'free_energy']
     name = "MACECommitteeCalculator"
     def __init__(self, mace_calculator, committee_size, prior_weight, energy_weight=None, forces_weight=None, 
-                 sqrt_prior=None, lowmem=False, random_seed=None, num_layers=-1, invariants_only=True, regularisation=1e-4, mpi_comm=None, **kwargs):
+                 sqrt_prior=None, lowmem=False, random_seed=None, num_layers=-1, invariants_only=True, regularisation=1e-4, 
+                 mpi_comm=None, torch__chunksize=100, **kwargs):
 
         assert has_torch, "PyTorch is required for MACE committees"
 
@@ -66,8 +67,8 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
             for key in ["energy", "force", "stress"]:
                 self.likelihood[key] = torch.Tensor(self.likelihood[key]).to(self.torch_device)
 
-        self._desc_force = torch.func.jacfwd(self._descriptor_base, 0)
-        self._comm_force = torch.func.jacfwd(self._committee_energies, 0)
+        self._desc_force = torch.func.jacrev(self._descriptor_base, 0, chunk_size=torch__chunksize)
+        self._comm_force = torch.func.jacrev(self._committee_energies, 0, chunk_size=torch__chunksize)
         
     def _prep_atoms(self, atoms):
 
