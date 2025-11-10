@@ -67,8 +67,12 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
             for key in ["energy", "force", "stress"]:
                 self.likelihood[key] = torch.Tensor(self.likelihood[key]).to(self.torch_device)
 
-        self._desc_force = torch.func.jacrev(self._descriptor_base, 0, chunk_size=torch__chunksize)
-        self._comm_force = torch.func.jacrev(self._committee_energies, 0, chunk_size=torch__chunksize)
+        #self._desc_force = torch.func.jacrev(self._descriptor_base, 0, chunk_size=torch__chunksize)
+        #self._comm_force = torch.func.jacrev(self._committee_energies, 0, chunk_size=torch__chunksize)
+
+        # Use slower for loop manual jacobian to avoid torch Storage error
+        self._desc_force = self.__manual_jac(self._descriptor_base)
+        self._comm_force = self.__manual_jac(self._committee_energies)
         
     def _prep_atoms(self, atoms):
 
@@ -126,6 +130,28 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
         return node_feats_out[:, :self.to_keep].sum(dim=0)
 
+    def __manual_jac(self, f):
+
+        def _call(args):
+
+            def single_grad(args, i):
+                desc_elem = f(*args)[i]
+                grad_outputs = [torch.ones_like(desc_elem)]
+
+                grad = torch.autograd.grad(outputs=[desc_elem], inputs=[args[0]], grad_outputs=grad_outputs, allow_unused=True)[0]
+
+                return grad
+
+            desc_len = self.n_desc
+
+            jac = torch.zeros(desc_len, *args[0].shape)
+
+            for i in range(desc_len):
+                jac[i, :, :] = single_grad(args, i)
+
+            return jac
+        return _call
+    
     def _committee_energies(self, positions, attrs, edge_index, shifts):
         d = self._descriptor_base(positions, attrs, edge_index, shifts)
         return self.committee_weights @ d
