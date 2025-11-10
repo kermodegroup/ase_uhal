@@ -144,7 +144,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
             desc_len = self.n_desc
 
-            jac = torch.zeros(desc_len, *args[0].shape)
+            jac = torch.zeros(desc_len, *args[0].shape).to(self.torch_device)
 
             for i in range(desc_len):
                 jac[i, :, :] = single_grad(args, i)
