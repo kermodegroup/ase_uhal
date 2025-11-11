@@ -16,9 +16,8 @@ except ImportError:
 class MACECommitteeCalculator(BaseCommitteeCalculator):
     implemented_properties = ['forces', 'energy', 'free_energy']
     name = "MACECommitteeCalculator"
-    def __init__(self, mace_calculator, committee_size, prior_weight, energy_weight=None, forces_weight=None, 
-                 sqrt_prior=None, lowmem=False, random_seed=None, num_layers=-1, invariants_only=True, regularisation=1e-4, 
-                 mpi_comm=None, torch__chunksize=100, **kwargs):
+    def __init__(self, mace_calculator, committee_size, prior_weight,
+                 num_layers=-1, invariants_only=True, torch__chunksize=100, **kwargs):
 
         assert has_torch, "PyTorch is required for MACE committees"
 
@@ -59,8 +58,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
         descriptor_size = self.get_descriptor_energy(ats).shape[0]
 
-        super().__init__(committee_size, descriptor_size, prior_weight, energy_weight, forces_weight, None, # Stress weight
-                 sqrt_prior, lowmem, random_seed, regularisation, mpi_comm, **kwargs)
+        super().__init__(committee_size, descriptor_size, prior_weight, **kwargs)
         
         self.sqrt_prior = torch.Tensor(self.sqrt_prior).to(self.torch_device)
         if self._lowmem:

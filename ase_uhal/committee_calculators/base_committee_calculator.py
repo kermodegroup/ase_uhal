@@ -343,6 +343,14 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
 
         req.free()
     
+    def sync(self):
+         if not (has_mpi and self.comm is not None):
+            return # MPI not enabled, so skip this step
+         
+         self.comm.barrier() # MPI barrier to make sure all ranks are together
+         self._MPI_receive_all_selections()
+         self.comm.barrier() # 2nd barrier to ensure all messages are recieved
+    
     def select_structure(self, atoms):
         self.selected_structures.append(atoms.copy())
         self._update_likelihood(atoms)
