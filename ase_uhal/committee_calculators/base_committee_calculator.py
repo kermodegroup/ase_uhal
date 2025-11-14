@@ -15,7 +15,8 @@ except ImportError:
 
 
 class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
-    implemented_properties = ['forces', 'energy', 'free_energy', 'stress']
+    implemented_properties = ['energy', 'forces', 'stress', 'desc_energy', 'desc_forces', 'desc_stress', 
+                              'comm_energy', 'comm_forces', 'comm_stress', 'hal_energy', 'hal_forces', 'hal_stress']
     default_parameters = {}
     name = 'BaseCommitteeCalculator'
 
@@ -111,6 +112,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
 
         self.committee_weights = None
 
+
     @property
     def energy_weight(self):
         return self.weights[0]
@@ -144,32 +146,29 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
     
         self.weights[2] = weight
 
-    @abstractmethod
-    def get_descriptor_energy(self, atoms):
+    def get_descriptor_energy(self, atoms=None):
         '''
         Get "descriptor energy", which is the average of descriptor vectors in the structure
 
         Returns an array of length self.n_desc
         '''
-        pass
+        return self.get_property("desc_energy", atoms)
 
-    @abstractmethod
-    def get_descriptor_force(self, atoms):
+    def get_descriptor_force(self, atoms=None):
         '''
         Get "descriptor forces", which are the derivatives w.r.t atomic positions of the total descriptor energy
 
         Returns an array of shape (self.n_desc, Nats, 3)
         '''
-        pass
+        return self.get_property("desc_forces", atoms)
 
-    @abstractmethod
-    def get_descriptor_stress(self, atoms):
+    def get_descriptor_stress(self, atoms=None):
         '''
         Get "descriptor stresses", which are the stress analogues to the total descriptor energy
 
         Returns an array of shape (self.n_desc, 9)
         '''
-        pass
+        return self.get_property("desc_stress", atoms)
 
     def get_committee_energies(self, atoms=None):
         '''
@@ -178,12 +177,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         Returns an array of length self.n_comm
         
         '''
-        if atoms is None:
-            atoms = self.atoms
-
-        d = self.get_descriptor_energy(atoms)
-
-        return self.committee_weights @ d
+        return self.get_property("comm_energy", atoms)
     
     def get_committee_forces(self, atoms=None):
         '''
@@ -193,12 +187,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         
         '''
         
-        if atoms is None:
-            atoms = self.atoms
-        
-        d = self.get_descriptor_force(atoms)
-
-        return self.committee_weights @ d
+        return self.get_property("comm_forces", atoms)
     
     def get_committee_stresses(self, atoms=None):
         '''
@@ -206,61 +195,27 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
 
         Returns an array of shape (self.n_comm, 9)
 
-        
         '''
 
-        if atoms is None:
-            atoms = self.atoms
-
-        d = self.get_descriptor_stress(atoms)
-
-        return self.committee_weights @ d
+        return self.get_property("comm_stress", atoms)
     
-    def calculate(self, atoms, properties, system_changes):
+    def get_hal_energy(self, atoms=None):
         '''
-        Normal calculation, using committee averaged properties
+
+        '''
+        return self.get_property("hal_energy", atoms)
+    
+    def get_hal_forces(self, atoms=None):
+        '''
         
         '''
-        super().calculate(atoms, properties, system_changes)
-
-        if "energy" in properties:
-            self.results["energy"] = np.mean(self.get_committee_energies(atoms))
-        
-        if "forces" in properties:
-            self.results["forces"] = np.mean(self.get_committee_forces(atoms), axis=0)
-
-        if "stress" in properties:
-            self.results["stress"] = np.mean(self.get_committee_stresses(atoms), axis=0)
-
-    def hal_calculate(self, atoms, properties, system_changes):
+        return self.get_property("hal_forces", atoms)
+    
+    def get_hal_stress(self, atoms=None):
         '''
-        Calculate the energy, force, and stress properties from the committee used for HAL
-
-        Energy is the std() of the committee energies
-        Forces and stresses are weighted averages, using weights of the energy predictions
-        Stresses
         
         '''
-        super().calculate(atoms, properties, system_changes)
-
-        if "energy" in properties or "forces" in properties:
-            Es = self.get_committee_energies(atoms)
-
-        if "energy" in properties:
-            self.results["hal_energy"] = np.std(Es)
-
-        if "forces" in properties:
-            Es -= np.mean(Es)
-            Fs = self.get_committee_forces(atoms)
-            Fs -= np.mean(Fs, axis=0)
-
-            self.results["hal_forces"] = np.mean([E * F for E, F in zip(Es, Fs)], axis=0)
-
-        if "stress" in properties:
-            Ss = self.get_committee_stresses(atoms)
-            Ss -= np.mean(Ss, axis=0)
-
-            self.results["hal_stresses"] = np.mean([E * S for E, S in zip(Es, Ss)], axis=0)
+        return self.get_property("hal_stress", atoms)
 
     def __update_likelihood_core(self, atoms, energy_weight, force_weight, stress_weight):
         l = {}
