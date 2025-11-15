@@ -81,7 +81,11 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
 
         self.selected_structures = []
 
-        self.weights = [None, None, None]
+        self.weights = {
+             "energy": None,
+             "forces": None, 
+             "stress": None
+        }
         self.energy_weight = energy_weight
         self.forces_weight = forces_weight
         self.stress_weight = stress_weight
@@ -96,9 +100,9 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         self._lowmem = lowmem
 
         if self._lowmem:
-            self.likelihood = {key : np.zeros_like(self.sqrt_prior) for key in ["energy", "force", "stress"]}
+            self.likelihood = {key : np.zeros_like(self.sqrt_prior) for key in ["energy", "forces", "stress"]}
         else:
-            self.likelihood = {key : [] for key in ["energy", "force", "stress"]}
+            self.likelihood = {key : [] for key in ["energy", "forces", "stress"]}
 
         if random_seed is not None:
             if type(random_seed) == np.random.RandomState:
@@ -115,36 +119,36 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
 
     @property
     def energy_weight(self):
-        return self.weights[0]
+        return self.weights["energy"]
     
     @property
     def forces_weight(self):
-        return self.weights[1]
+        return self.weights["forces"]
     
     @property
     def stress_weight(self):
-        return self.weights[2]
+        return self.weights["stress"]
     
     @energy_weight.setter
     def energy_weight(self, weight):
         if weight is not None:
             assert weight > 0
 
-        self.weights[0] = weight
+        self.weights["energy"] = weight
 
     @forces_weight.setter
     def forces_weight(self, weight):
         if weight is not None:
             assert weight > 0
 
-        self.weights[1] = weight
+        self.weights["forces"] = weight
 
     @stress_weight.setter
     def stress_weight(self, weight):
         if weight is not None:
             assert weight > 0
     
-        self.weights[2] = weight
+        self.weights["stress"] = weight
 
     def get_descriptor_energy(self, atoms=None):
         '''
@@ -217,34 +221,26 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         '''
         return self.get_property("hal_stress", atoms)
 
-    def __update_likelihood_core(self, atoms, energy_weight, force_weight, stress_weight):
+    def __update_likelihood_core(self, atoms, weights):
         l = {}
 
-        if energy_weight is not None:
-            l["energy"] = np.sqrt(energy_weight) * self.get_descriptor_energy(atoms)[None, ...]
+        props = ["desc_" + key for key in weights.keys() if weights[key] is not None]
 
-        if force_weight is not None:
-            l["force"] = np.sqrt(force_weight) * self.get_descriptor_force(atoms).reshape(self.n_desc, -1).T
+        self.calculate(atoms, props, self.check_state(atoms))
 
-        if stress_weight is not None:
-            l["stress"] = np.sqrt(stress_weight) * self.get_descriptor_stress(atoms)
+        for key in weights.keys():
+            if weights[key] is not None:
+                l = np.sqrt(weights[key]) * self.results["desc_" + key].reshape(self.n_desc, -1).T
 
-
-        if self._lowmem:
-            # Low memory variant
-            # Setup problem as Phi^T Phi + Prior
-
-            for key in ["energy", "force", "stress"]:
-                if key in l.keys():
-                    self.likelihood[key] += l[key].T @ l[key]
-        
-        else:
-            # Normal variant
-            # Assemble list of all observations
-            # Maintain as list to not shift results around in memory until needed.
-            for key in ["energy", "force", "stress"]:
-                if key in l.keys():
-                    self.likelihood[key].extend(l[key])
+                if self._lowmem:
+                    # Low memory variant
+                    # Setup problem as Phi^T Phi + Prior
+                    self.likelihood[key] += l.T @ l
+                else:
+                    # Normal variant
+                    # Assemble list of all observations
+                    # Maintain as list to not shift results around in memory until needed.
+                    self.likelihood[key].append(l)
 
 
     def _update_likelihood(self, atoms):
@@ -257,7 +253,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
             Atoms object to derive energy, force, and stress observations from
         
         '''
-        self.__update_likelihood_core(atoms, *self.weights)
+        self.__update_likelihood_core(atoms, self.weights)
 
     def _MPI_broadcast_selection(self, atoms):
         '''
@@ -267,7 +263,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         Skipped if not enabled
         '''
 
-        data = [atoms.copy(), *self.weights]
+        data = [atoms.copy(), self.weights]
 
         if has_mpi and self.comm is not None:
             for i in range(self.comm_size):
@@ -332,7 +328,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
 
 
         if self._lowmem:
-            L_likelihood = np.linalg.cholesky(np.sum([self.likelihood[key] for key in ["energy", "force", "stress"]]) 
+            L_likelihood = np.linalg.cholesky(np.sum([self.likelihood[key] for key in ["energy", "forces", "stress"]]) 
                                               + self.regularisation * np.eye(self.n_desc))
 
             sqrt_posterior = L_likelihood + np.sqrt(self.prior_weight) * self.sqrt_prior
@@ -342,7 +338,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         else:
             l_list = []
 
-            for key in ["energy", "force", "stress"]:
+            for key in ["energy", "forces", "stress"]:
                 l_key = self.likelihood[key]
                 if len(l_key):
                     l_list.extend(l_key)

@@ -60,13 +60,14 @@ class HALCalculator(Calculator):
 
         assert self.tau is not None
 
-        self.committee_calc.hal_calculate(atoms, properties, system_changes)
+        self.committee_calc.calculate(atoms, ["hal_" + prop for prop in properties], system_changes)
 
         self.mean_calc.calculate(atoms, properties, system_changes)
 
         for prop in self.implemented_properties:
             if prop in properties:
-                self.results[prop] = self.mean_calc.results[prop] - self.tau * self.committee_calc.results["hal_" + prop]
+                # Use get_property as an interface to committee_calc, as torch-based comm calcs will use torch.Tensor in self.results 
+                self.results[prop] = self.mean_calc.results[prop] - self.tau * self.committee_calc.get_property("hal_" + prop, atoms)
 
     def update_tau(self, atoms=None):
         '''
@@ -77,9 +78,8 @@ class HALCalculator(Calculator):
         and the new values provided as arguments 
         Modifies self.tau if self.tau_delay < 0, otherwise decreases self.tau_delay by 1
         '''
-        self.get_property("forces", atoms)
-        Fmean = np.mean(np.linalg.norm(self.mean_calc.results["forces"], axis=-1))
-        Fbias = np.mean(np.linalg.norm(self.committee_calc.results["hal_forces"], axis=-1))
+        Fmean = np.mean(np.linalg.norm(self.get_property("forces", atoms), axis=-1))
+        Fbias = np.mean(np.linalg.norm(self.committee_calc.get_property("hal_forces", atoms), axis=-1))
 
         if self.Fmean is None or self.Fbias is None:
             self.Fmean = Fmean
@@ -98,8 +98,8 @@ class HALCalculator(Calculator):
 
     def get_hal_score(self, atoms=None):
         self.get_property("forces", atoms)
-        Fmean = np.linalg.norm(self.mean_calc.results["forces"], axis=-1)
-        Fbias = np.linalg.norm(self.committee_calc.results["hal_forces"], axis=-1)
+        Fmean = np.linalg.norm(self.get_property("forces", atoms), axis=-1)
+        Fbias = np.linalg.norm(self.committee_calc.get_property("hal_forces", atoms), axis=-1)
         
         F = Fbias / (Fmean + self.eps)
 
