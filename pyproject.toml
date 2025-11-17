@@ -39,6 +39,9 @@ mace = [
     "torch",
     "e3nn"
 ]
+docs = [
+    "sphinxcontrib-bibtex<2.0"
+]
 
 [tool.setuptools]
 # This subkey is a beta stage development and keys may change in the future, see https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html for more details
@@ -67,8 +70,9 @@ where = ["."]
 
 # Ref https://setuptools.pypa.io/en/latest/userguide/datafiles.html#package-data
 [tool.setuptools.package-data]
+"*" = ["*.jl"]
 ase_uhal = [
-    "py.typed"
+    "py.typed", "*.jl"
 ]
 
 [tool.versioningit]

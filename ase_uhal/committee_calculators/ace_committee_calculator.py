@@ -74,41 +74,34 @@ class ACECommitteeCalculator(BaseCommitteeCalculator):
         
         '''
         super().calculate(atoms, properties, system_changes)
-        all_props = [item for item in properties]
-
-        for prop in properties:
-            if "hal_" in prop: 
-                if "comm_" + prop.split("_")[1] not in properties:
-                    # HAL versions of properties require committee properties
-                    all_props.append("comm_" + prop)
 
         if "desc_energy" not in self.results.keys():
+            # System has changed, need to recalculate base descriptors
             E, F, V = self.jl.eval_basis(self._prep_atoms(atoms), self.model)
 
-            E = np.array(E); F = np.array(F); V = np.array(V)
+            E = np.array(E); F = np.array(F).reshape(270, -1, 3); V = np.array(V)
 
             self.results["desc_energy"] = np.array(E)
             self.results["desc_forces"] = np.array(F)
             self.results["desc_stress"] = np.array(V) / atoms.get_volume()
 
-
         for key in ["energy", "forces", "stress"]:
-            if key in all_props or "comm_" + key in all_props or "hal_" + key in all_props:
-                comm_prop = self.committee_weights @ self.results["desc_" + key]
+            if "comm_" + key in properties or key in properties or "hal_" + key in properties or key == "energy": 
+                # Always calculate energy properties, as committee energies 
+                # needed for force and stress HAL
+                comm_prop = np.tensordot(self.committee_weights, self.results["desc_" + key], axes=1)
                 self.results["comm_" + key] = comm_prop
 
                 self.results[key] = np.mean(comm_prop, axis=0)
 
-        if "hal_energy" in all_props:
-            self.results["hal_energy"] = np.std(self.results["comm_energy"], axis=0)
-        
-        if "hal_force" in all_props or "hal_stress" in all_props:
-            Es = self.results["comm_energy"] - self.results["energy"]
-            Fs = self.results["comm_forces"] - self.results["forces"]
-            Ss = self.results["comm_stress"] - self.results["stress"]
+                if key == "energy":
+                    self.results["hal_energy"] = np.std(self.results["comm_energy"], axis=0)
+                elif key in ["forces", "stress"]:
+                    Es = self.results["comm_energy"] - self.results["energy"]
 
-            if "hal_force" in all_props:
-                self.results["hal_forces"] = np.mean([E * F for E, F in zip(Es, Fs)], axis=0)
-
-            if "hal_stress" in all_props:
-                self.results["hal_stresses"] = np.mean([E * S for E, S in zip(Es, Ss)], axis=0)
+                    if key == "forces":
+                        Fs = self.results["comm_forces"] - self.results["forces"]
+                        self.results["hal_forces"] = np.mean([E * F for E, F in zip(Es, Fs)], axis=0)
+                    else:
+                        Ss = self.results["comm_stress"] - self.results["stress"]
+                        self.results["hal_stress"] = np.mean([E * S for E, S in zip(Es, Ss)], axis=0)
