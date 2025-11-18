@@ -1,7 +1,6 @@
 from ase.atoms import Atoms
 from .base_committee_calculator import BaseCommitteeCalculator, Calculator
 import numpy as np
-
 try:
     import torch
     from torch.autograd.functional import jacobian
@@ -150,9 +149,10 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
                 
         ### Energies
         # Always calculate, as we can use torch.autodiff later
-        self.results["desc_energy"] = self._descriptor_base(*struct)
+        if "desc_energy" not in self.results.keys():
+            self.results["desc_energy"] = self._descriptor_base(*struct)
 
-        self.results["comm_energy"] = self.committee_weights @ self.results["desc_energy"]
+            self.results["comm_energy"] = self.committee_weights @ self.results["desc_energy"]
         
         if "energy" in properties or "forces" in properties or "stress" in properties:
             self.results["energy"] = torch.mean(self.results["comm_energy"])
@@ -187,7 +187,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
             if "comm_forces" in self.results.keys() and "forces" in self.results.keys():
                 Es = self.results["comm_energy"] - self.results["energy"]
                 Fs = self.results["comm_forces"] - self.results["forces"]
-                F_hal = torch.mean([E * F for E, F in zip(Es, Fs)], dim=0)
+                F_hal = torch.tensordot(Es, Fs, dims=([0], [0])) / self.n_comm
             else:
                 F_hal = self._take_derivative_scalar(self.results["hal_energy"], positions)
             
