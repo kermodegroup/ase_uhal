@@ -16,8 +16,22 @@ class ace_hypers(NamedTuple):
 class ACECommitteeCalculator(BaseCommitteeCalculator):
     implemented_properties = ['energy', 'forces', 'stress', 'desc_energy', 'desc_forces', 'desc_stress', 
                               'comm_energy', 'comm_forces', 'comm_stress', 'hal_energy', 'hal_forces', 'hal_stress']
-    def __init__(self, ace_params, committee_size, prior_weight, energy_weight=None, forces_weight=None, stress_weight=None, 
-                 sqrt_prior=None, lowmem=False, random_seed=None):
+    def __init__(self, ace_params, committee_size, prior_weight, **kwargs):
+        '''
+        Parameters
+        ----------
+        ace_params: string or dict
+            If ace_params is a string: Use ACEpotentials.load_model to load the model json file given by ace_params
+            If ace_params is a dict: interpred ace_params as the hyperparameters dict for ACEpotentials.ace1_model
+                expects keys of elements (list of str), order (int), totaldegree (int), and rcut (float).
+        committee_size: int
+            Number of members in the linear committee
+        prior_weight: float
+            Weight corresponding to the prior matrix in the linear system
+        **kwargs: Keyword Args
+            Extra keywork arguments fed to ase_uhal.BaseCommitteeCalculator
+        
+        '''
             
         from julia import Main
 
@@ -42,8 +56,7 @@ class ACECommitteeCalculator(BaseCommitteeCalculator):
 
         descriptor_size = self.jl.length_basis(self.model)
 
-        super().__init__(committee_size, descriptor_size, prior_weight, energy_weight, forces_weight, stress_weight, 
-                 sqrt_prior, lowmem, random_seed)
+        super().__init__(committee_size, descriptor_size, prior_weight, **kwargs)
         
     @property
     def committee_weights(self):

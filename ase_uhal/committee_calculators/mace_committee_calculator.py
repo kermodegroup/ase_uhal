@@ -12,12 +12,38 @@ except ImportError:
     has_torch = False
 
 
+def hal_energy(self, atom_props):
+    return torch.std(self.get_property("comm_energy"))
+
+
 class MACECommitteeCalculator(BaseCommitteeCalculator):
     implemented_properties = ['energy', 'forces', 'stress', 'desc_energy', 'desc_forces', 'desc_stress', 
                               'comm_energy', 'comm_forces', 'comm_stress', 'hal_energy', 'hal_forces', 'hal_stress']
     name = "MACECommitteeCalculator"
     def __init__(self, mace_calculator, committee_size, prior_weight,
-                 num_layers=-1, invariants_only=True, torch_chunksize=100, **kwargs):
+                 num_layers=-1, invariants_only=True, bias_energy=hal_energy, **kwargs):
+        '''
+        
+        Parameters
+        ----------
+        mace_calculator: mace.calculators.MACECalculator object
+            MACE architecture to use to define a MACE descriptor
+        committee_size: int
+            Number of members in the linear committee
+        prior_weight: float
+            Weight corresponding to the prior matrix in the linear system
+        num_layers: int (default: -1)
+            Number of layers in the MACE model to keep for descriptor evaluation
+            Default of -1 uses all but the readout layer (equivalent to MACECalculator.get_descriptors() default)
+        invariants_only: bool
+            Whether to only keep the invariants partition of the descriptor vector, see MACECalculator.get_descriptors
+            for more details
+        bias_energy: function
+            Function which defines the biasing energy used in the HAL calculation. Takes arguments of self and 
+            atom_props, which is the result of calling self._prep_atoms(atoms). Use self.get_property() to obtain more properties
+        **kwargs: Keyword Args
+            Extra keywork arguments fed to ase_uhal.BaseCommitteeCalculator
+        '''
 
         assert has_torch, "PyTorch is required for MACE committees"
 
@@ -52,6 +78,9 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         self.num_layers = num_layers
         self.to_keep = to_keep
 
+        # Energy bias function
+        self._hal_energy = bias_energy
+
 
         # Build an atoms object with a species which the model can handle
         ats = Atoms(numbers=[self.model.atomic_numbers.detach().cpu().numpy()[0]], positions=[[0, 0, 0]])
@@ -66,6 +95,10 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
                 self.likelihood[key] = torch.Tensor(self.likelihood[key]).to(self.torch_device)
         
     def _prep_atoms(self, atoms):
+        '''
+        Convert ASE atoms object into a format suitable for MACE models
+        
+        '''
 
         batch = self.mace_calc._atoms_to_batch(atoms).to_dict()
 
@@ -74,6 +107,9 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         return ctx.positions, batch["node_attrs"], batch["edge_index"], batch["shifts"], ctx.displacement
 
     def _descriptor_base(self, positions, attrs, edge_index, shifts, displacement):
+        '''
+        Base MACE descriptor, based on results from self._prep_atoms
+        '''
 
         vectors, lengths = get_edge_vectors_and_lengths(
                     positions=positions,
@@ -122,9 +158,16 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         return node_feats_out[:, :self.to_keep].sum(dim=0)
 
     def _take_derivative_scalar(self, val, x):
+        '''
+        Take the derivative of the scalar val w.r.t x
+        '''
         return torch.autograd.grad(outputs=[val], inputs=[x], grad_outputs=[torch.ones_like(val)], allow_unused=True, retain_graph=True)[0]
     
     def _take_derivative_vector(self, val, x):
+        '''
+        Take the derivative of scalar val w.r.t x by looping over x
+        
+        '''
         N = val.size()
         jac = torch.zeros(N[0], *x.shape).to(self.torch_device)
         for i in range(N[0]):
@@ -136,7 +179,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         '''
         Calculation for descriptor properties, committee properties, normal properties, and HAL properties
 
-        Descriptor properties use a "desc_" prefix, committee properties use "comm_", HAL properties use "hal_".
+        Descriptor properties use a "desc_" prefix, committee properties use "comm_", HAL (bias) properties use "hal_".
         
         '''
         super().calculate(atoms, properties, system_changes)
@@ -159,7 +202,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
         
         if "hal_energy" in properties or "hal_forces" in properties or "hal_stress" in properties:   
-            self.results["hal_energy"] = torch.std(self.results["comm_energy"])
+            self.results["hal_energy"] = self._hal_energy(struct)
 
 
         ### Forces

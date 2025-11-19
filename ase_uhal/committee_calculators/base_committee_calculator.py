@@ -58,6 +58,12 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
             Used in a cholesky decomposition cholesky(likelihood + regularisation * np.eye(self.n_desc)) to obtain
             a square root of the likelihood. Default is 1e-4
 
+        mpi_comm: mpi4py Comm or IntraComm object, or None
+            MPI communicator. Defaults to COMM_WORLD if mpi4py detected, otherwise MPI is not used
+
+        **kwargs: Keyword Arguments
+            Extra keyword arguments sent to ase.calculators.calculator.Calculator
+
         '''
 
         self.comm = mpi_comm
