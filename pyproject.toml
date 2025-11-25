@@ -39,6 +39,9 @@ mace = [
     "torch",
     "e3nn"
 ]
+ace = [
+    "julia"
+]
 docs = [
     "sphinxcontrib-bibtex<2.0"
 ]

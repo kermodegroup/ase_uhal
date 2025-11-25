@@ -2,18 +2,11 @@ from .base_committee_calculator import BaseCommitteeCalculator
 import os
 import numpy as np
 from typing import NamedTuple
+from abc import ABCMeta, abstractmethod
 
 file_root = os.path.dirname(os.path.abspath(__file__))
 
-
-class ace_hypers(NamedTuple):
-    elements: str
-    order: int
-    totaldegree: int
-    rcut: float
-
-
-class ACECommitteeCalculator(BaseCommitteeCalculator):
+class BaseACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
     implemented_properties = ['energy', 'forces', 'stress', 'desc_energy', 'desc_forces', 'desc_stress', 
                               'comm_energy', 'comm_forces', 'comm_stress', 'hal_energy', 'hal_forces', 'hal_stress']
     def __init__(self, ace_params, committee_size, prior_weight, **kwargs):
@@ -58,16 +51,6 @@ class ACECommitteeCalculator(BaseCommitteeCalculator):
 
         super().__init__(committee_size, descriptor_size, prior_weight, **kwargs)
         
-    @property
-    def committee_weights(self):
-        return self._committee_weights
-    
-    @committee_weights.setter
-    def committee_weights(self, new_weights):
-        self._committee_weights = new_weights
-        if new_weights is not None:
-            self.jl.set_committee_b(self.model, [new_weights[i, :] for i in range(self.n_comm)])
-
     def _prep_atoms(self, atoms):
         '''
         Convert from ase atoms into the AtomsBase AbstractSystem, using ASEconvert
@@ -78,6 +61,18 @@ class ACECommitteeCalculator(BaseCommitteeCalculator):
         pbc = atoms.pbc
 
         return self.jl.convert_ats(numbers, positions, cell, pbc)
+    
+    @abstractmethod
+    def _bias_energy(self, comm_energy):
+        pass
+
+    @abstractmethod
+    def _bias_forces(self, comm_forces, comm_energy):
+        pass
+
+    @abstractmethod
+    def _bias_stress(self, comm_stress, comm_energy):
+        pass
     
     def calculate(self, atoms, properties, system_changes):
         '''
@@ -99,22 +94,36 @@ class ACECommitteeCalculator(BaseCommitteeCalculator):
             self.results["desc_stress"] = np.array(V) / atoms.get_volume()
 
         for key in ["energy", "forces", "stress"]:
-            if "comm_" + key in properties or key in properties or "hal_" + key in properties or key == "energy": 
+            if "comm_" + key in properties or key in properties or "bias_" + key in properties or key == "energy": 
                 # Always calculate energy properties, as committee energies 
-                # needed for force and stress HAL
+                # needed for force and stress bias calc
                 comm_prop = np.tensordot(self.committee_weights, self.results["desc_" + key], axes=1)
                 self.results["comm_" + key] = comm_prop
 
                 self.results[key] = np.mean(comm_prop, axis=0)
 
-                if key == "energy":
-                    self.results["hal_energy"] = np.std(self.results["comm_energy"], axis=0)
-                elif key in ["forces", "stress"]:
-                    Es = self.results["comm_energy"] - self.results["energy"]
+        if "bias_energy" in properties:
+            self.results["bias_energy"] = self._bias_energy(self.results["comm_energy"])
 
-                    if key == "forces":
-                        Fs = self.results["comm_forces"] - self.results["forces"]
-                        self.results["hal_forces"] = np.mean([E * F for E, F in zip(Es, Fs)], axis=0)
-                    else:
-                        Ss = self.results["comm_stress"] - self.results["stress"]
-                        self.results["hal_stress"] = np.mean([E * S for E, S in zip(Es, Ss)], axis=0)
+        if "bias_forces" in properties:
+            self.results["bias_forces"] = self._bias_forces(self.results["comm_forces"], self.results["comm_energy"])
+
+        if "bias_stress" in properties:
+            self.results["bias_stress"] = self._bias_stress(self.results["comm_stress"], self.results["comm_energy"])
+
+class ACEHALCalculator(BaseACECalculator):
+    name = "ACEHALCalculator"
+    def _bias_energy(self, comm_energy):
+        return np.std(comm_energy)
+    
+    def _bias_forces(self, comm_forces, comm_energy):
+        Es = comm_energy - np.mean(comm_energy)
+        Fs = comm_forces - np.mean(comm_forces, axis=0)
+
+        return np.mean([E * F for E, F in zip(Es, Fs)], axis=0)
+
+    def _bias_stress(self, comm_stress, comm_energy):
+        Es = comm_energy - np.mean(comm_energy)
+        Ss = comm_stress - np.mean(comm_stress, axis=0)
+
+        return np.mean([E * F for E, F in zip(Es, Ss)], axis=0)

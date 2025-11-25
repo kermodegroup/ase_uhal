@@ -1,7 +1,7 @@
 """Implementation of "Universal HyperActive Learning" compatible with the Atomic Simulation Environment (ASE)"""
 
 # Add imports here
-from .hal_calculator import HALCalculator, StructureSelector
-from .committee_calculators import ACECommitteeCalculator, MACECommitteeCalculator
+from .bias_calculator import BiasCalculator, StructureSelector
+from .committee_calculators import ACEHALCalculator, MACEHALCalculator
 
 from ._version import __version__

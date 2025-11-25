@@ -1,6 +1,7 @@
 from ase.atoms import Atoms
 from .base_committee_calculator import BaseCommitteeCalculator, Calculator
 import numpy as np
+from abc import ABCMeta, abstractmethod
 try:
     import torch
     from torch.autograd.functional import jacobian
@@ -11,17 +12,11 @@ try:
 except ImportError:
     has_torch = False
 
-
-def hal_energy(self, atom_props):
-    return torch.std(self.get_property("comm_energy"))
-
-
-class MACECommitteeCalculator(BaseCommitteeCalculator):
+class BaseMACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
     implemented_properties = ['energy', 'forces', 'stress', 'desc_energy', 'desc_forces', 'desc_stress', 
-                              'comm_energy', 'comm_forces', 'comm_stress', 'hal_energy', 'hal_forces', 'hal_stress']
-    name = "MACECommitteeCalculator"
+                              'comm_energy', 'comm_forces', 'comm_stress', 'bias_energy', 'bias_forces', 'bias_stress']
     def __init__(self, mace_calculator, committee_size, prior_weight,
-                 num_layers=-1, invariants_only=True, bias_energy=hal_energy, **kwargs):
+                 num_layers=-1, invariants_only=True, **kwargs):
         '''
         
         Parameters
@@ -38,9 +33,6 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         invariants_only: bool
             Whether to only keep the invariants partition of the descriptor vector, see MACECalculator.get_descriptors
             for more details
-        bias_energy: function
-            Function which defines the biasing energy used in the HAL calculation. Takes arguments of self and 
-            atom_props, which is the result of calling self._prep_atoms(atoms). Use self.get_property() to obtain more properties
         **kwargs: Keyword Args
             Extra keywork arguments fed to ase_uhal.BaseCommitteeCalculator
         '''
@@ -77,10 +69,6 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         self.num_invariant_features = num_invariant_features
         self.num_layers = num_layers
         self.to_keep = to_keep
-
-        # Energy bias function
-        self._hal_energy = bias_energy
-
 
         # Build an atoms object with a species which the model can handle
         ats = Atoms(numbers=[self.model.atomic_numbers.detach().cpu().numpy()[0]], positions=[[0, 0, 0]])
@@ -175,6 +163,10 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
             jac[i, :, :] = self._take_derivative_scalar(v, x)
         return jac
     
+    @abstractmethod
+    def _bias_energy(self, comm_energy):
+        pass
+    
     def calculate(self, atoms, properties, system_changes):
         '''
         Calculation for descriptor properties, committee properties, normal properties, and HAL properties
@@ -183,6 +175,7 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         
         '''
         super().calculate(atoms, properties, system_changes)
+
         struct = self._prep_atoms(atoms)
 
         positions = struct[0]
@@ -192,17 +185,22 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
                 
         ### Energies
         # Always calculate, as we can use torch.autodiff later
-        if "desc_energy" not in self.results.keys():
-            self.results["desc_energy"] = self._descriptor_base(*struct)
+        self.results["desc_energy"] = self._descriptor_base(*struct)
 
-            self.results["comm_energy"] = self.committee_weights @ self.results["desc_energy"]
+        self.results["comm_energy"] = self.committee_weights @ self.results["desc_energy"]
         
         if "energy" in properties or "forces" in properties or "stress" in properties:
             self.results["energy"] = torch.mean(self.results["comm_energy"])
 
         
-        if "hal_energy" in properties or "hal_forces" in properties or "hal_stress" in properties:   
-            self.results["hal_energy"] = self._hal_energy(struct)
+        if "bias_energy" in properties or "bias_forces" in properties or "bias_stress" in properties:   
+            self.results["bias_energy"] = self._bias_energy(self.results["comm_energy"])
+
+            if "bias_forces" in properties:
+                self.results["bias_forces"] = - self._take_derivative_scalar(self.results["bias_energy"], positions)
+            if "bias_stress" in properties:
+                self.results["bias_stress"] = - self._take_derivative_scalar(self.results["bias_energy"], displacement)[0, :, :] / volume
+
 
 
         ### Forces
@@ -226,16 +224,6 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
 
             self.results["forces"] = F
 
-        if "hal_forces" in properties:
-            if "comm_forces" in self.results.keys() and "forces" in self.results.keys():
-                Es = self.results["comm_energy"] - self.results["energy"]
-                Fs = self.results["comm_forces"] - self.results["forces"]
-                F_hal = torch.tensordot(Es, Fs, dims=([0], [0])) / self.n_comm
-            else:
-                F_hal = self._take_derivative_scalar(self.results["hal_energy"], positions)
-            
-            self.results["hal_forces"] = F_hal
-
         ### Stresses
         # Achieved similar to forces
         if "desc_stress" in properties:
@@ -256,18 +244,6 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
                 S = self._take_derivative_scalar(self.results["energy"], displacement)[0, :, :] / volume
 
             self.results["stress"] = S
-
-        if "hal_stress" in properties:
-            if "comm_stress" in self.results.keys() and "stress" in self.results.keys():
-                Es = self.results["comm_energy"] - self.results["energy"]
-                Ss = self.results["comm_stress"] - self.results["stress"]
-                print(Es.shape, Ss.shape)
-                S_hal = torch.tensordot(Es, Ss, dims=([0], [0])) / self.n_comm
-#                S_hal = torch.mean([E * S for E, S in zip(Es, Ss)], dim=0)
-            else:
-                S_hal = self._take_derivative_scalar(self.results["hal_energy"], displacement)[0, :, :] / volume
-            
-            self.results["hal_stress"] = S_hal
     
     def get_property(self, name, atoms=None, allow_calculation=True):
         '''
@@ -320,3 +296,9 @@ class MACECommitteeCalculator(BaseCommitteeCalculator):
         z = torch.Tensor(self.rng.normal(loc=0, scale=1, size=(self.n_desc, self.n_comm))).to(self.torch_device)
 
         self.committee_weights = torch.linalg.solve_triangular(R, z, upper=True).T # zero mean committee, so no mean term
+
+
+class MACEHALCalculator(BaseMACECalculator):
+    name = "MACEHALCalculator"
+    def _bias_energy(self, comm_energy):
+        return torch.std(comm_energy)

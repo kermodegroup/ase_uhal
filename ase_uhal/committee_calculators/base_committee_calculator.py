@@ -16,7 +16,7 @@ except ImportError:
 
 class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
     implemented_properties = ['energy', 'forces', 'stress', 'desc_energy', 'desc_forces', 'desc_stress', 
-                              'comm_energy', 'comm_forces', 'comm_stress', 'hal_energy', 'hal_forces', 'hal_stress']
+                              'comm_energy', 'comm_forces', 'comm_stress', 'bias_energy', 'bias_forces', 'bias_stress']
     default_parameters = {}
     name = 'BaseCommitteeCalculator'
 
@@ -209,23 +209,23 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
 
         return self.get_property("comm_stress", atoms)
     
-    def get_hal_energy(self, atoms=None):
+    def get_bias_energy(self, atoms=None):
         '''
 
         '''
-        return self.get_property("hal_energy", atoms)
+        return self.get_property("bias_energy", atoms)
     
-    def get_hal_forces(self, atoms=None):
+    def get_bias_forces(self, atoms=None):
         '''
         
         '''
-        return self.get_property("hal_forces", atoms)
+        return self.get_property("bias_forces", atoms)
     
-    def get_hal_stress(self, atoms=None):
+    def get_bias_stress(self, atoms=None):
         '''
         
         '''
-        return self.get_property("hal_stress", atoms)
+        return self.get_property("bias_stress", atoms)
 
     def __update_likelihood_core(self, atoms, weights):
         l = {}
@@ -305,8 +305,8 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
             return # MPI not enabled, so skip this step
          
          self.comm.barrier() # MPI barrier to make sure all ranks are together
-         self._MPI_receive_all_selections()
-         self.comm.barrier() # 2nd barrier to ensure all messages are recieved
+         self._MPI_receive_all_selections() # Process all MPI messages
+         self.comm.barrier() # 2nd barrier to ensure all messages are recieved on all ranks
     
     def select_structure(self, atoms):
         self.selected_structures.append(atoms.copy())

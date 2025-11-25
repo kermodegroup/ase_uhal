@@ -7,15 +7,15 @@ import numpy as np
 from .committee_calculators.base_committee_calculator import BaseCommitteeCalculator
 
 
-class HALCalculator(Calculator):
+class BiasCalculator(Calculator):
     '''
-    ASE-compatible Hyperactive Learning calculator
+    ASE-compatible Bias calculator with adaptive biasing
 
     Derived from a combination of ACEHAL.bias_calc.BiasCalculator and ACEHAL.bias_calc.TauRelController from ACEHAL
     https://github.com/ACEsuit/ACEHAL/blob/main/ACEHAL/bias_calc.py
     
     '''
-    implemented_properties = ['forces', 'energy', 'free_energy', 'stress']
+    implemented_properties = ['forces', 'energy', 'stress']
     default_parameters = {}
     name = 'HALCalculator'
 
@@ -60,14 +60,14 @@ class HALCalculator(Calculator):
 
         assert self.tau is not None
 
-        self.committee_calc.calculate(atoms, ["hal_" + prop for prop in properties], system_changes)
+        self.committee_calc.calculate(atoms, ["bias_" + prop for prop in properties], system_changes)
 
         self.mean_calc.calculate(atoms, properties, system_changes)
 
         for prop in self.implemented_properties:
             if prop in properties:
                 # Use get_property as an interface to committee_calc, as torch-based comm calcs will use torch.Tensor in self.results 
-                self.results[prop] = self.mean_calc.results[prop] - self.tau * self.committee_calc.get_property("hal_" + prop, atoms)
+                self.results[prop] = self.mean_calc.results[prop] - self.tau * self.committee_calc.get_property("bias_" + prop, atoms)
 
     def update_tau(self, atoms=None):
         '''
@@ -79,7 +79,7 @@ class HALCalculator(Calculator):
         Modifies self.tau if self.tau_delay < 0, otherwise decreases self.tau_delay by 1
         '''
         Fmean = np.mean(np.linalg.norm(self.get_property("forces", atoms), axis=-1))
-        Fbias = np.mean(np.linalg.norm(self.committee_calc.get_property("hal_forces", atoms), axis=-1))
+        Fbias = np.mean(np.linalg.norm(self.committee_calc.get_property("bias_forces", atoms), axis=-1))
 
         if self.Fmean is None or self.Fbias is None:
             self.Fmean = Fmean
@@ -97,9 +97,8 @@ class HALCalculator(Calculator):
             self.tau = self.tau_rel * (self.Fmean / self.Fbias)
 
     def get_hal_score(self, atoms=None):
-        self.get_property("forces", atoms)
         Fmean = np.linalg.norm(self.get_property("forces", atoms), axis=-1)
-        Fbias = np.linalg.norm(self.committee_calc.get_property("hal_forces", atoms), axis=-1)
+        Fbias = np.linalg.norm(self.committee_calc.get_property("bias_forces", atoms), axis=-1)
         
         F = Fbias / (Fmean + self.eps)
 
@@ -116,11 +115,11 @@ class StructureSelector():
     
     '''
 
-    def __init__(self, hal_calc, threshold="adaptive", auto_resample=True, delay=10, mixing=0.1, thresh_mul=1.2):
+    def __init__(self, bias_calc, threshold="adaptive", auto_resample=True, delay=10, mixing=0.1, thresh_mul=1.2):
         '''
         Parameters
         -----------
-        hal_calc: ase_uhal.HalCalculator object
+        bias_calc: ase_uhal.HalCalculator object
             HAL calculator used to run dynamics
 
         threshold: float or "adaptive" (default: "adaptive")
@@ -146,7 +145,7 @@ class StructureSelector():
 
 
         '''
-        self.hal_calc = hal_calc
+        self.bias_calc = bias_calc
 
         self.delay = delay
         self.mixing = mixing
@@ -188,20 +187,20 @@ class StructureSelector():
             self.threshold = self.thresh_mul * self._mixed_score
 
     def __call__(self):
-        score = self.hal_calc.get_hal_score()
+        score = self.bias_calc.get_hal_score()
 
 
         if score > self.threshold and score > self._prev_score:
             # Possibly at a peak above the threshold
-            self._atoms = self.hal_calc.atoms.copy()
+            self._atoms = self.bias_calc.atoms.copy()
             self._peak = True
         elif self._peak:
             # Was at a peak previously, now select that previous structure
 
-            self.hal_calc.committee_calc.select_structure(self._atoms)
+            self.bias_calc.committee_calc.select_structure(self._atoms)
 
             if self.auto_resample:
-                self.hal_calc.committee_calc.resample_committee()
+                self.bias_calc.committee_calc.resample_committee()
 
             self._peak = False
             self._atoms = None

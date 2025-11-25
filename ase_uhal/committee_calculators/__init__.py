@@ -1,2 +1,2 @@
-from .ace_committee_calculator import ACECommitteeCalculator
-from .mace_committee_calculator import MACECommitteeCalculator
+from .ace_committee_calculator import ACEHALCalculator
+from .mace_committee_calculator import MACEHALCalculator
