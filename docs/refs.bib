@@ -1,0 +1,40 @@
+@Article{ACEHAL,
+author={van der Oord, Cas
+and Sachs, Matthias
+and Kov{\'a}cs, D{\'a}vid P{\'e}ter
+and Ortner, Christoph
+and Cs{\'a}nyi, G{\'a}bor},
+title={Hyperactive learning for data-driven interatomic potentials},
+journal={npj Computational Materials},
+year={2023},
+month={Sep},
+day={13},
+volume={9},
+number={1},
+pages={168},
+abstract={Data-driven interatomic potentials have emerged as a powerful tool for approximating ab initio potential energy surfaces. The most time-consuming step in creating these interatomic potentials is typically the generation of a suitable training database. To aid this process hyperactive learning (HAL), an accelerated active learning scheme, is presented as a method for rapid automated training database assembly. HAL adds a biasing term to a physically motivated sampler (e.g. molecular dynamics) driving atomic structures towards uncertainty in turn generating unseen or valuable training configurations. The proposed HAL framework is used to develop atomic cluster expansion (ACE) interatomic potentials for the AlSi10 alloy and polyethylene glycol (PEG) polymer starting from roughly a dozen initial configurations. The HAL generated ACE potentials are shown to be able to determine macroscopic properties, such as melting temperature and density, with close to experimental accuracy.},
+issn={2057-3960},
+doi={10.1038/s41524-023-01104-6},
+url={https://doi.org/10.1038/s41524-023-01104-6}
+}
+
+@Article{mace-freeze,
+author={Radova, Mariia
+and Stark, Wojciech G.
+and Allen, Connor S.
+and Maurer, Reinhard J.
+and Bart{\'o}k, Albert P.},
+title={Fine-tuning foundation models of materials interatomic potentials with frozen transfer learning},
+journal={npj Computational Materials},
+year={2025},
+month={Jul},
+day={18},
+volume={11},
+number={1},
+pages={237},
+abstract={Machine-learned interatomic potentials are revolutionising atomistic materials simulations by providing accurate and scalable predictions within the scope covered by the training data. However, generation of an accurate and robust training data set remains a challenge, often requiring thousands of first-principles calculations to achieve high accuracy. Foundation models have started to emerge with the ambition to create universally applicable potentials across a wide range of materials. While foundation models can be robust and transferable, they do not yet achieve the accuracy required to predict reaction barriers, phase transitions, and material stability. This work demonstrates that foundation model potentials can reach chemical accuracy when fine-tuned using transfer learning with partially frozen weights and biases. For two challenging datasets on reactive chemistry at surfaces and stability and elastic properties of tertiary alloys, we show that frozen transfer learning with 10--20{\%} of the data (hundreds of datapoints) achieves similar accuracies to models trained from scratch (on thousands of datapoints). Moreover, we show that an equally accurate, but significantly more efficient surrogate model can be built using the transfer learned potential as the ground truth. In combination, we present a simulation workflow for machine learning potentials that improves data efficiency and computational efficiency.},
+issn={2057-3960},
+doi={10.1038/s41524-025-01727-x},
+url={https://doi.org/10.1038/s41524-025-01727-x}
+}
+

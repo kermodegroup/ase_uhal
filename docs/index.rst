@@ -20,7 +20,17 @@ Welcome to ase_uhal's documentation!
 
          To the Getting Started Guide
 
+    .. grid-item-card:: Theory
+      :margin: 0 3 0 0
       
+      Learn the theory of HAL, and the "Universal" extension.
+
+      .. button-link:: ./theory.html
+         :color: primary
+         :outline:
+         :expand:
+
+         To Theory
 
     .. grid-item-card::  User Guide
       :margin: 0 3 0 0
@@ -69,6 +79,7 @@ Welcome to ase_uhal's documentation!
    :titlesonly:
 
    getting_started
+   theory
    user_guide
    api
    developer_guide

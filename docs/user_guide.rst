@@ -1,6 +1,33 @@
 User Guide
 ===============
 
-This page details how to use ase_uhal. 
+Some prerequisite :ref:`theory` is assumed to fully understand this User Guide.
 
-:ref:`theory`
+Committee Calculators
+---------------------
+
+
+ACECommitteeCalculator
+++++++++++++++++++++++
+
+
+MACECommitteeCalculator
++++++++++++++++++++++++
+
+
+HAL Calculator
+--------------
+
+
+Structure Selector
+------------------
+
+
+
+Running Biased Dynamics
+-----------------------
+
+
+
+ase_uhal in parallel
+--------------------

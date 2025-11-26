@@ -64,8 +64,9 @@ napoleon_use_param = False
 napoleon_use_ivar = True
 
 bibtex_reference_style = "label"
-bibtex_default_style = 'plain'
-bibtex_bibfiles = ["user-guide/refs.bib"]
+bibtex_default_style = 'unsrt'
+#bibtex_default_style = 'plain'
+bibtex_bibfiles = ["refs.bib"]
 
 #imgmath_image_format = 'svg'
 
