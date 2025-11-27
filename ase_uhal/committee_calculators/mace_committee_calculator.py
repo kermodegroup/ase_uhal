@@ -1,18 +1,9 @@
 from ase.atoms import Atoms
-from .base_committee_calculator import BaseCommitteeCalculator, Calculator
+from .torch_committee_calculator import TorchCommitteeCalculator, TorchHALBiasPotential
 import numpy as np
 from abc import ABCMeta, abstractmethod
-try:
-    import torch
-    from torch.autograd.functional import jacobian
-    from mace.modules.utils import prepare_graph, get_edge_vectors_and_lengths, extract_invariant
-    from e3nn import o3
 
-    has_torch = True # True only if MACE/Torch optional deps are satisfied
-except ImportError:
-    has_torch = False
-
-class BaseMACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
+class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
     implemented_properties = ['energy', 'forces', 'stress', 'desc_energy', 'desc_forces', 'desc_stress', 
                               'comm_energy', 'comm_forces', 'comm_stress', 'bias_energy', 'bias_forces', 'bias_stress']
     def __init__(self, mace_calculator, committee_size, prior_weight,
@@ -34,10 +25,16 @@ class BaseMACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
             Whether to only keep the invariants partition of the descriptor vector, see MACECalculator.get_descriptors
             for more details
         **kwargs: Keyword Args
-            Extra keywork arguments fed to ase_uhal.BaseCommitteeCalculator
+            Extra keywork arguments fed to ase_uhal.TorchCommitteeCalculator
         '''
 
-        assert has_torch, "PyTorch is required for MACE committees"
+        from mace.modules.utils import prepare_graph, get_edge_vectors_and_lengths, extract_invariant
+        from e3nn import o3
+
+        self.prepare_graph = prepare_graph
+        self.get_edge_vectors_and_lengths = get_edge_vectors_and_lengths
+        self.extract_invariant = extract_invariant
+        self.o3 = o3
 
         self.mace_calc = mace_calculator
 
@@ -53,7 +50,7 @@ class BaseMACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
 
         num_interactions = int(self.model.num_interactions)
 
-        irreps_out = o3.Irreps(str(self.model.products[0].linear.irreps_out))
+        irreps_out = self.o3.Irreps(str(self.model.products[0].linear.irreps_out))
         l_max = irreps_out.lmax
         num_invariant_features = irreps_out.dim // (l_max + 1) ** 2
         per_layer_features = [irreps_out.dim for _ in range(num_interactions)]
@@ -70,18 +67,15 @@ class BaseMACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
         self.num_layers = num_layers
         self.to_keep = to_keep
 
+        super().__init__(committee_size, prior_weight, **kwargs)
+
+        
+    def _get_descriptor_length(self):
         # Build an atoms object with a species which the model can handle
         ats = Atoms(numbers=[self.model.atomic_numbers.detach().cpu().numpy()[0]], positions=[[0, 0, 0]])
 
-        descriptor_size = self._descriptor_base(*self._prep_atoms(ats)).shape[0]
-
-        super().__init__(committee_size, descriptor_size, prior_weight, **kwargs)
-        
-        self.sqrt_prior = torch.Tensor(self.sqrt_prior).to(self.torch_device)
-        if self._lowmem:
-            for key in ["energy", "force", "stress"]:
-                self.likelihood[key] = torch.Tensor(self.likelihood[key]).to(self.torch_device)
-        
+        return self._descriptor_base(*self._prep_atoms(ats)).shape[0]
+    
     def _prep_atoms(self, atoms):
         '''
         Convert ASE atoms object into a format suitable for MACE models
@@ -90,7 +84,7 @@ class BaseMACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
 
         batch = self.mace_calc._atoms_to_batch(atoms).to_dict()
 
-        ctx = prepare_graph(batch, compute_stress=True)
+        ctx = self.prepare_graph(batch, compute_stress=True)
 
         return ctx.positions, batch["node_attrs"], batch["edge_index"], batch["shifts"], ctx.displacement
 
@@ -99,7 +93,7 @@ class BaseMACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
         Base MACE descriptor, based on results from self._prep_atoms
         '''
 
-        vectors, lengths = get_edge_vectors_and_lengths(
+        vectors, lengths = self.get_edge_vectors_and_lengths(
                     positions=positions,
                     edge_index=edge_index,
                     shifts=shifts
@@ -132,10 +126,10 @@ class BaseMACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
             
             feats.append(node_feats)
 
-        node_feats_out = torch.cat(feats, dim=-1)
+        node_feats_out = self.torch.cat(feats, dim=-1)
 
         if self.invariants_only:
-                node_feats_out = extract_invariant(
+                node_feats_out = self.extract_invariant(
                     node_feats_out,
                     num_layers=self.num_layers,
                     num_features=self.num_invariant_features,
@@ -144,24 +138,6 @@ class BaseMACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
 
 
         return node_feats_out[:, :self.to_keep].sum(dim=0)
-
-    def _take_derivative_scalar(self, val, x):
-        '''
-        Take the derivative of the scalar val w.r.t x
-        '''
-        return torch.autograd.grad(outputs=[val], inputs=[x], grad_outputs=[torch.ones_like(val)], allow_unused=True, retain_graph=True)[0]
-    
-    def _take_derivative_vector(self, val, x):
-        '''
-        Take the derivative of scalar val w.r.t x by looping over x
-        
-        '''
-        N = val.size()
-        jac = torch.zeros(N[0], *x.shape).to(self.torch_device)
-        for i in range(N[0]):
-            v = val[i]
-            jac[i, :, :] = self._take_derivative_scalar(v, x)
-        return jac
     
     @abstractmethod
     def _bias_energy(self, comm_energy):
@@ -245,60 +221,6 @@ class BaseMACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
 
             self.results["stress"] = S
     
-    def get_property(self, name, atoms=None, allow_calculation=True):
-        '''
-        Overload of Calculator.get_property, converts from torch tensors to numpy arrays
-        Allows for torch tensors to be stored in self.results between calls to 
-        self.calculate
-        
-        '''
-        return super().get_property(name, atoms, allow_calculation).detach().cpu().numpy()
 
-    def resample_committee(self, committee_size=None):
-        '''
-        Resample the committee, based on the states of self.likelihood and self.sqrt_prior
-        Populates self.committee_weights based on the newly sampled committee
-
-        Parameters
-        ----------
-        committee_size : int, optional
-            New size of the committee, if supplied.
-            By default, a committee of size self.n_comm is drawn
-
-        '''
-        self._MPI_receive_all_selections() # Sync up with selections from other processes
-        
-        if committee_size is not None:
-            self.n_comm = committee_size
-
-        if self._lowmem:
-            reg = (self.regularisation * torch.eye(self.n_desc)).to(self.torch_device)
-
-            L_likelihood = torch.linalg.cholesky(sum([self.likelihood[key] for key in ["energy", "forces", "stress"]]) 
-                                                 + reg)
-
-            sqrt_posterior = L_likelihood + np.sqrt(self.prior_weight) * self.sqrt_prior
-
-            Q, R = torch.linalg.qr(sqrt_posterior)
-        
-        else:
-            l_list = []
-
-            for key in ["energy", "forces", "stress"]:
-                l_key = self.likelihood[key]
-                if len(l_key):
-                    l_list.extend(l_key)
-            
-            sqrt_posterior = torch.vstack(l_list + [self.sqrt_prior])
-            Q, R = torch.linalg.qr(sqrt_posterior)
-
-        
-        z = torch.Tensor(self.rng.normal(loc=0, scale=1, size=(self.n_desc, self.n_comm))).to(self.torch_device)
-
-        self.committee_weights = torch.linalg.solve_triangular(R, z, upper=True).T # zero mean committee, so no mean term
-
-
-class MACEHALCalculator(BaseMACECalculator):
+class MACEHALCalculator(BaseMACECalculator, TorchHALBiasPotential):
     name = "MACEHALCalculator"
-    def _bias_energy(self, comm_energy):
-        return torch.std(comm_energy)

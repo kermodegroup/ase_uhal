@@ -58,6 +58,9 @@ class BiasCalculator(Calculator):
         '''
         super().calculate(atoms, properties, system_changes)
 
+        if len(system_changes):
+            self.results = {}
+
         assert self.tau is not None
 
         self.committee_calc.calculate(atoms, ["bias_" + prop for prop in properties], system_changes)

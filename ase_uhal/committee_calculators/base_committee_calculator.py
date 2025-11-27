@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 from ase.calculators.calculator import Calculator
 import numpy as np
 from scipy.linalg import solve_triangular
@@ -355,3 +355,25 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         z = self.rng.normal(loc=0, scale=1, size=(self.n_desc, self.n_comm))
 
         self.committee_weights = solve_triangular(R, z, lower=False).T # zero mean committee, so no mean term
+
+    def calculate(self, atoms=None, properties=..., system_changes=...):
+        super().calculate(atoms, properties, system_changes)
+
+        if len(system_changes):
+            self.results = {}
+
+class HALBiasPotential(BaseCommitteeCalculator, metaclass=ABCMeta):
+    def _bias_energy(self, comm_energy):
+        return np.std(comm_energy)
+    
+    def _bias_forces(self, comm_forces, comm_energy):
+        Es = comm_energy - np.mean(comm_energy)
+        Fs = comm_forces - np.mean(comm_forces, axis=0)
+
+        return np.mean([E * F for E, F in zip(Es, Fs)], axis=0)
+
+    def _bias_stress(self, comm_stress, comm_energy):
+        Es = comm_energy - np.mean(comm_energy)
+        Ss = comm_stress - np.mean(comm_stress, axis=0)
+
+        return np.mean([E * F for E, F in zip(Es, Ss)], axis=0)

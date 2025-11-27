@@ -1,4 +1,4 @@
-from .base_committee_calculator import BaseCommitteeCalculator
+from .base_committee_calculator import BaseCommitteeCalculator, HALBiasPotential
 import os
 import numpy as np
 from typing import NamedTuple
@@ -111,19 +111,5 @@ class BaseACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
         if "bias_stress" in properties:
             self.results["bias_stress"] = self._bias_stress(self.results["comm_stress"], self.results["comm_energy"])
 
-class ACEHALCalculator(BaseACECalculator):
+class ACEHALCalculator(BaseACECalculator, HALBiasPotential):
     name = "ACEHALCalculator"
-    def _bias_energy(self, comm_energy):
-        return np.std(comm_energy)
-    
-    def _bias_forces(self, comm_forces, comm_energy):
-        Es = comm_energy - np.mean(comm_energy)
-        Fs = comm_forces - np.mean(comm_forces, axis=0)
-
-        return np.mean([E * F for E, F in zip(Es, Fs)], axis=0)
-
-    def _bias_stress(self, comm_stress, comm_energy):
-        Es = comm_energy - np.mean(comm_energy)
-        Ss = comm_stress - np.mean(comm_stress, axis=0)
-
-        return np.mean([E * F for E, F in zip(Es, Ss)], axis=0)
