@@ -122,3 +122,5 @@ ENV/
 */_version.py
 # Cookiecutter-CMS Test Artifacts
 /tests/CI_files
+
+/docs/generated/

@@ -25,7 +25,7 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
             Whether to only keep the invariants partition of the descriptor vector, see MACECalculator.get_descriptors
             for more details
         **kwargs: Keyword Args
-            Extra keywork arguments fed to ase_uhal.TorchCommitteeCalculator
+            Extra keywork arguments fed to :class:`~ase_uhal.committee_calculators.TorchCommitteeCalculator`
         '''
 
         from mace.modules.utils import prepare_graph, get_edge_vectors_and_lengths, extract_invariant

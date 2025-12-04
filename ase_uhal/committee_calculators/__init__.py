@@ -1,2 +1,4 @@
 from .ace_committee_calculator import ACEHALCalculator
 from .mace_committee_calculator import MACEHALCalculator
+from .base_committee_calculator import BaseCommitteeCalculator
+from .torch_committee_calculator import TorchCommitteeCalculator

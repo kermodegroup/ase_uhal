@@ -5,9 +5,9 @@ ase-compatible HAL-style bias calculator, using the committee error as an energy
 from ase.calculators.calculator import Calculator
 import numpy as np
 from .committee_calculators.base_committee_calculator import BaseCommitteeCalculator
+from abc import ABCMeta, abstractmethod
 
-
-class BiasCalculator(Calculator):
+class BaseBiasCalculator(Calculator, metaclass=ABCMeta):
     '''
     ASE-compatible Bias calculator with adaptive biasing
 
@@ -99,7 +99,15 @@ class BiasCalculator(Calculator):
         else:
             self.tau = self.tau_rel * (self.Fmean / self.Fbias)
 
-    def get_hal_score(self, atoms=None):
+    @abstractmethod
+    def get_score(self, atoms=None):
+        pass
+    
+class HALBiasCalculator(BaseBiasCalculator):
+    '''
+    Bias calculator with HAL scoring metric    
+    '''
+    def get_score(self, atoms=None):
         Fmean = np.linalg.norm(self.get_property("forces", atoms), axis=-1)
         Fbias = np.linalg.norm(self.committee_calc.get_property("bias_forces", atoms), axis=-1)
         
@@ -108,7 +116,6 @@ class BiasCalculator(Calculator):
         s = np.exp(F) / np.sum(np.exp(F)) # Apply softmax
 
         return np.max(s)
-    
 
 class StructureSelector():
     '''
@@ -190,7 +197,7 @@ class StructureSelector():
             self.threshold = self.thresh_mul * self._mixed_score
 
     def __call__(self):
-        score = self.bias_calc.get_hal_score()
+        score = self.bias_calc.get_score()
 
 
         if score > self.threshold and score > self._prev_score:

@@ -164,7 +164,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         '''
         return self.get_property("desc_energy", atoms)
 
-    def get_descriptor_force(self, atoms=None):
+    def get_descriptor_forces(self, atoms=None):
         '''
         Get "descriptor forces", which are the derivatives w.r.t atomic positions of the total descriptor energy
 

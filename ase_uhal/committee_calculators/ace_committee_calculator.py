@@ -1,7 +1,6 @@
 from .base_committee_calculator import BaseCommitteeCalculator, HALBiasPotential
 import os
 import numpy as np
-from typing import NamedTuple
 from abc import ABCMeta, abstractmethod
 
 file_root = os.path.dirname(os.path.abspath(__file__))
@@ -15,14 +14,23 @@ class BaseACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
         ----------
         ace_params: string or dict
             If ace_params is a string: Use ACEpotentials.load_model to load the model json file given by ace_params
-            If ace_params is a dict: interpred ace_params as the hyperparameters dict for ACEpotentials.ace1_model
-                expects keys of elements (list of str), order (int), totaldegree (int), and rcut (float).
+            If ace_params is a dict: interpret ace_params as the hyperparameters dict for ACEpotentials.ace1_model e.g.
+
+            .. code-block:: python
+            
+                ace_params = {elements : ["Si"], # Expects list of str 
+                              order : 3, # Expects an int
+                              totaldegree : 10, # Expects an int
+                              rcut : 5.0 # Expects a float
+                             }
+
+
         committee_size: int
             Number of members in the linear committee
         prior_weight: float
             Weight corresponding to the prior matrix in the linear system
         **kwargs: Keyword Args
-            Extra keywork arguments fed to ase_uhal.BaseCommitteeCalculator
+            Extra keywork arguments fed to :class:`~ase_uhal.committee_calculators.BaseCommitteeCalculator`
         
         '''
             

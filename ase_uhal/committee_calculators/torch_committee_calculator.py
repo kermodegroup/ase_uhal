@@ -11,6 +11,14 @@ class TorchCommitteeCalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
     torch_device = None
 
     def __init__(self, *args, **kwargs):
+        '''
+        Parameters
+        ----------
+
+        *args, **kwargs
+        Passed to :class:`~ase_uhal.committee_calculators.BaseCommitteeCalculator`
+        
+        '''
         assert self.torch_device is not None, "self.torch_device should be set by subclasses before calling TorchCommitteeCalculator.__init__()"
 
         import torch
