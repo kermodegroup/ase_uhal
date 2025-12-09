@@ -1,0 +1,144 @@
+import ase_uhal
+import pytest
+
+from mace.calculators import mace_mp
+from ase.build import bulk
+from ase_uhal import committee_calculators as comm
+import numpy as np
+
+ref_ats = bulk("Si", cubic=True)
+
+mpa = mace_mp("medium-mpa-0")
+
+shared_params = {
+    "committee_size" : 10,
+    "prior_weight" : 0.1,
+    "energy_weight" : 1,
+    "forces_weight" : 1,
+    "stress_weight" : 1
+}
+
+
+mace_params = shared_params.copy()
+mace_params.update({
+    "mace_calculator" : mpa,
+    "committee_size" : 10,
+})
+
+ace_params = shared_params.copy()
+ace_params.update({
+    "ace_params" : {
+        "elements" : ["Si"],
+        "order" : 3,
+        "totaldegree" : 10,
+        "rcut" : 5.0 
+    }
+})
+
+mace_calcs = [comm.MACEHALCalculator]
+ace_calcs = [comm.ACEHALCalculator]
+
+mace_data = {calc.__name__ : (calc, mace_params) for calc in mace_calcs}
+ace_data = {calc.__name__ : (calc, ace_params) for calc in ace_calcs}
+
+all_data = mace_data.copy()
+all_data.update(ace_data)
+
+@pytest.mark.parametrize("calc_name", all_data.keys())
+class TestCommitteeCalcs():
+
+    @pytest.mark.parametrize("property", ["desc_forces", "comm_forces", "forces", "bias_forces"])
+    def test_force_derivative(self, allclose, calc_name, property):
+        # Compare direct force predictions to a finite differences scheme
+        cls, params = all_data[calc_name]
+
+        p = property.split("_")
+        if len(p) > 1:
+            # prop_forces
+            prop = p[0] + "_"
+        else:
+            # forces
+            prop = ""
+
+        energy_prop = prop + "energy"
+        force_prop = prop + "forces"
+
+        if force_prop not in cls.implemented_properties or energy_prop not in cls.implemented_properties:
+            pytest.skip(f"{cls.__name__} does not implement both {energy_prop} and {force_prop}")
+        
+        calc = cls(**params)
+        calc.resample_committee()
+
+        ats = ref_ats.copy()
+
+        #E0 = calc.get_property(energy_prop, ats)
+
+        F_ref = calc.get_property(force_prop, ats)
+
+        F_diff = np.zeros_like(F_ref)
+
+        dx = 1e-12
+        for i in range(len(ats)):
+            for j in range(3):
+                ats = ref_ats.copy()
+                pos = ats.positions.copy()
+ 
+                pos[i, j] += dx
+                ats.set_positions(pos)
+                E1 = calc.get_property(energy_prop, ats)
+
+
+                pos[i, j] -= 2*dx
+                ats.set_positions(pos)
+                E2 = calc.get_property(energy_prop, ats)
+ 
+                F_diff[..., i, j] = -(E2 - E1) / (2*dx)
+        assert allclose(F_ref, F_diff, atol=1e-4)
+
+    @pytest.mark.parametrize("property", ["desc_stress", "comm_stress", "stress", "bias_stress"])
+    def test_stress_derivative(self, allclose, calc_name, property):
+        # Compare direct force predictions to a finite differences scheme
+        cls, params = all_data[calc_name]
+
+        p = property.split("_")
+        if len(p) > 1:
+            # prop_forces
+            prop = p[0] + "_"
+        else:
+            # forces
+            prop = ""
+
+        energy_prop = prop + "energy"
+        stress_prop = prop + "stress"
+
+        if stress_prop not in cls.implemented_properties or energy_prop not in cls.implemented_properties:
+            pytest.skip(f"{cls.__name__} does not implement both {energy_prop} and {stress_prop}")
+        
+        calc = cls(**params)
+        calc.resample_committee()
+
+        ats = ref_ats.copy()
+
+        #E0 = calc.get_property(energy_prop, ats)
+
+        S_ref = calc.get_property(stress_prop, ats)
+
+        S_diff = np.zeros_like(S_ref)
+
+        dx = 1e-12
+        for i in range(3):
+            for j in range(3):
+                ats = ref_ats.copy()
+                cell = ats.cell[:, :].copy()
+ 
+                cell[i, j] += dx
+                ats.set_cell(cell)
+                E1 = calc.get_property(energy_prop, ats)
+
+
+                cell[i, j] -= 2*dx
+                ats.set_cell(cell)
+                E2 = calc.get_property(energy_prop, ats)
+ 
+                S_diff[..., i, j] = -(E2 - E1) / (2*dx * ats.get_volume())
+        assert allclose(S_ref, S_diff, atol=1e-4)
