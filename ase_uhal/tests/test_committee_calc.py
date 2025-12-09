@@ -1,14 +1,22 @@
 import ase_uhal
 import pytest
 
-from mace.calculators import mace_mp
 from ase.build import bulk
 from ase_uhal import committee_calculators as comm
 import numpy as np
 
 ref_ats = bulk("Si", cubic=True)
+try:
+    from mace.calculators import mace_mp
+    mpa = mace_mp("medium-mpa-0")
+except ImportError:
+    mpa = None
 
-mpa = mace_mp("medium-mpa-0")
+try:
+    import julia
+    has_julia = True
+except ImportError:
+    has_julia = False
 
 shared_params = {
     "committee_size" : 10,
@@ -47,6 +55,26 @@ all_data.update(ace_data)
 @pytest.mark.parametrize("calc_name", all_data.keys())
 class TestCommitteeCalcs():
 
+    def set_up_calc(self, calc_name, required_properties=[]):
+        if "MACE" in calc_name:
+            if mpa is None:
+                pytest.skip("mace-torch module is not installed")
+        elif "ACE" in calc_name:
+            if not has_julia:
+                pytest.skip("Julia python module not installed")
+
+        cls, params = all_data[calc_name]
+
+        for prop in required_properties:
+            if prop not in cls.implemented_properties:
+                pytest.skip(f"{cls.__name__} does not implement {prop}")
+
+        calc = cls(**params)
+        calc.resample_committee()
+
+        return calc
+
+
     @pytest.mark.parametrize("property", ["desc_forces", "comm_forces", "forces", "bias_forces"])
     def test_force_derivative(self, allclose, calc_name, property):
         # Compare direct force predictions to a finite differences scheme
@@ -63,13 +91,8 @@ class TestCommitteeCalcs():
         energy_prop = prop + "energy"
         force_prop = prop + "forces"
 
-        if force_prop not in cls.implemented_properties or energy_prop not in cls.implemented_properties:
-            pytest.skip(f"{cls.__name__} does not implement both {energy_prop} and {force_prop}")
-        
-        calc = cls(**params)
-        calc.resample_committee()
-
         ats = ref_ats.copy()
+        calc = self.set_up_calc(calc_name, required_properties=[energy_prop, force_prop])
 
         #E0 = calc.get_property(energy_prop, ats)
 
@@ -98,8 +121,6 @@ class TestCommitteeCalcs():
     @pytest.mark.parametrize("property", ["desc_stress", "comm_stress", "stress", "bias_stress"])
     def test_stress_derivative(self, allclose, calc_name, property):
         # Compare direct force predictions to a finite differences scheme
-        cls, params = all_data[calc_name]
-
         p = property.split("_")
         if len(p) > 1:
             # prop_forces
@@ -110,14 +131,10 @@ class TestCommitteeCalcs():
 
         energy_prop = prop + "energy"
         stress_prop = prop + "stress"
-
-        if stress_prop not in cls.implemented_properties or energy_prop not in cls.implemented_properties:
-            pytest.skip(f"{cls.__name__} does not implement both {energy_prop} and {stress_prop}")
         
-        calc = cls(**params)
-        calc.resample_committee()
-
         ats = ref_ats.copy()
+
+        calc = self.set_up_calc(calc_name, required_properties=[energy_prop, stress_prop])
 
         #E0 = calc.get_property(energy_prop, ats)
 
