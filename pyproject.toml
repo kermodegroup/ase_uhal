@@ -31,10 +31,6 @@ dependencies = [
 #"Documentation" = "https://ase_uhal.readthedocs.io/"
 
 [project.optional-dependencies]
-test = [
-  "pytest>=6.1.2",
-  "pytest_allclose"
-]
 mace = [
     "mace-torch",
     "torch",
@@ -46,6 +42,13 @@ ace = [
 docs = [
     "sphinxcontrib-bibtex<2.0"
 ]
+
+test = [
+  "pytest>=6.1.2",
+  "pytest_allclose",
+  "ase_uhal[mace,ace]"
+]
+
 
 [tool.setuptools]
 # This subkey is a beta stage development and keys may change in the future, see https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html for more details
