@@ -47,6 +47,8 @@ jobs:
         uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.julia-version}}
+      
+      - name: Install julia Python module
         shell: bash
         run: |
           python -c "import julia; julia.install()"
