@@ -7,7 +7,7 @@ file_root = os.path.dirname(os.path.abspath(__file__))
 
 class BaseACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
     implemented_properties = ['energy', 'forces', 'stress', 'desc_energy', 'desc_forces', 'desc_stress', 
-                              'comm_energy', 'comm_forces', 'comm_stress', 'hal_energy', 'hal_forces', 'hal_stress']
+                              'comm_energy', 'comm_forces', 'comm_stress', 'bias_energy', 'bias_forces', 'bias_stress']
     def __init__(self, ace_params, committee_size, prior_weight, **kwargs):
         '''
         Parameters
@@ -18,10 +18,10 @@ class BaseACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
 
             .. code-block:: python
             
-                ace_params = {elements : ["Si"], # Expects list of str 
-                              order : 3, # Expects an int
-                              totaldegree : 10, # Expects an int
-                              rcut : 5.0 # Expects a float
+                ace_params = {"elements" : ["Si"], # Expects list of str 
+                              "order" : 3, # Expects an int
+                              "totaldegree" : 10, # Expects an int
+                              "rcut" : 5.0 # Expects a float
                              }
 
 
@@ -95,7 +95,7 @@ class BaseACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
             # System has changed, need to recalculate base descriptors
             E, F, V = self.jl.eval_basis(self._prep_atoms(atoms), self.model)
 
-            E = np.array(E); F = np.array(F).reshape(270, -1, 3); V = np.array(V)
+            E = np.array(E); F = np.array(F).reshape(self.n_desc, -1, 3); V = np.array(V)
 
             self.results["desc_energy"] = np.array(E)
             self.results["desc_forces"] = np.array(F)
@@ -119,5 +119,5 @@ class BaseACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
         if "bias_stress" in properties:
             self.results["bias_stress"] = self._bias_stress(self.results["comm_stress"], self.results["comm_energy"])
 
-class ACEHALCalculator(BaseACECalculator, HALBiasPotential):
+class ACEHALCalculator(HALBiasPotential, BaseACECalculator):
     name = "ACEHALCalculator"
