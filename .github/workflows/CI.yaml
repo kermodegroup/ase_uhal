@@ -23,8 +23,8 @@ jobs:
     name: Test on ${{ matrix.os }}, Python ${{ matrix.python-version }}, Julia ${{ matrix.julia-version }}
     runs-on: ${{ matrix.os }}
     strategy:
+      max-parallel: 5
       matrix:
-        max-parallel: ${{ 5 }}
         os: [macOS-latest, ubuntu-latest, windows-latest]
         python-version: ["3.11", "3.12", "3.13"]
         julia-version: ["1.10", "1.11", "1.12"]
