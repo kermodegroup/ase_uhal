@@ -74,7 +74,7 @@ jobs:
         shell: bash
 
         run: |
-          pytest -v --cov=ase_uhal --cov-report=xml --color=yes ase_uhal/tests/
+          python-jl -m pytest -v --cov=ase_uhal --cov-report=xml --color=yes ase_uhal/tests/
 
       - name: CodeCov
         uses: codecov/codecov-action@v5
