@@ -59,11 +59,11 @@ jobs:
         run: |
           python -m pip install .[test]
 
-      - name: Install julia Python module
+      - name: Install Julia dependencies
         shell: bash
         run: |
           export JULIA_PROJECT=. 
-          julia -e "import Pkg; Pkg.Registry.add(RegistrySpec(url="https://github.com/ACEsuit/ACEregistry")); Pkg.instantiate()"
+          julia -e "import Pkg; Pkg.Registry.add(RegistrySpec(url='https://github.com/ACEsuit/ACEregistry')); Pkg.instantiate()"
           python -c "import julia; julia.install()"
 
       - name: Run tests
