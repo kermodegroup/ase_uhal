@@ -68,7 +68,7 @@ jobs:
           Pkg.Registry.add(RegistrySpec(url="https://github.com/ACEsuit/ACEregistry"))
           Pkg.Registry.update()
           Pkg.instantiate()'
-          python -c "import julia; julia.install()"
+          python-jl -c "import julia; julia.install()"
 
       - name: Run tests
         shell: bash
