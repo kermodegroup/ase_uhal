@@ -62,7 +62,8 @@ jobs:
       - name: Install julia Python module
         shell: bash
         run: |
-          julia -e "import Pkg; Pkg.instantiate()"
+          export JULIA_PROJECT=. 
+          julia -e "import Pkg; Pkg.Registry.add(RegistrySpec(url="https://github.com/ACEsuit/ACEregistry")); Pkg.instantiate()"
           python -c "import julia; julia.install()"
 
       - name: Run tests
