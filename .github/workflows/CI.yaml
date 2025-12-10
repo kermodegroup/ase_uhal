@@ -63,7 +63,7 @@ jobs:
         shell: bash
         run: |
           export JULIA_PROJECT=. 
-          julia -e 'using Pkg; Pkg.Registry.add(RegistrySpec(url="https://github.com/ACEsuit/ACEregistry")); Pkg.instantiate()'
+          julia -e 'using Pkg; Pkg.Registry.add(RegistrySpec(url="https://github.com/ACEsuit/ACEregistry")); Pkg.Registry.update(); Pkg.instantiate()'
           python -c "import julia; julia.install()"
 
       - name: Run tests
