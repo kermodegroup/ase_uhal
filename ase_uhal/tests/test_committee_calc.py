@@ -90,8 +90,6 @@ class TestCommitteeCalcs():
         ats = ref_ats.copy()
         calc = self.set_up_calc(calc_name, required_properties=[energy_prop, force_prop])
 
-        #E0 = calc.get_property(energy_prop, ats)
-
         F_ref = calc.get_property(force_prop, ats)
 
         F_diff = np.zeros_like(F_ref)
@@ -131,8 +129,6 @@ class TestCommitteeCalcs():
         ats = ref_ats.copy()
 
         calc = self.set_up_calc(calc_name, required_properties=[energy_prop, stress_prop])
-
-        #E0 = calc.get_property(energy_prop, ats)
 
         S_ref = calc.get_property(stress_prop, ats)
 
