@@ -203,13 +203,13 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
         ### Stresses
         # Achieved similar to forces
         if "desc_stress" in properties:
-            self.results["desc_stress"] = self._take_derivative_vector(self.results["desc_energy"], displacement)[:, 0, :, :] / volume
+            self.results["desc_stress"] = -self._take_derivative_vector(self.results["desc_energy"], displacement)[:, 0, :, :] / volume
 
         if "comm_stress" in properties:
             if "desc_stress" in self.results.keys():
                 S_comm = self.torch.tensordot(self.committee_weights, self.results["desc_stress"], dims=([1], [0]))
             else:
-                S_comm = self._take_derivative_vector(self.results["comm_energy"], displacement)[:, 0, :, :] / volume
+                S_comm = -self._take_derivative_vector(self.results["comm_energy"], displacement)[:, 0, :, :] / volume
 
             self.results["comm_stress"] = S_comm
 
@@ -217,7 +217,7 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
             if "comm_stress" in self.results.keys():
                 S = self.torch.mean(self.results["comm_stress"], dim=0)
             else:
-                S = self._take_derivative_scalar(self.results["energy"], displacement)[0, :, :] / volume
+                S = -self._take_derivative_scalar(self.results["energy"], displacement)[0, :, :] / volume
 
             self.results["stress"] = S
     

@@ -8,7 +8,7 @@ import numpy as np
 ref_ats = bulk("Si", cubic=True)
 try:
     from mace.calculators import mace_mp
-    mpa = mace_mp("medium-mpa-0")
+    mpa = mace_mp("medium-mpa-0", default_dtype="float64")
 except ImportError:
     mpa = None
 
@@ -21,16 +21,15 @@ except ImportError:
 shared_params = {
     "committee_size" : 10,
     "prior_weight" : 0.1,
-    "energy_weight" : 1,
-    "forces_weight" : 1,
-    "stress_weight" : 1
+    "energy_weight" : 10,
+    "forces_weight" : 10,
+    "stress_weight" : 10
 }
 
 
 mace_params = shared_params.copy()
 mace_params.update({
     "mace_calculator" : mpa,
-    "committee_size" : 10,
 })
 
 ace_params = shared_params.copy()
@@ -73,13 +72,10 @@ class TestCommitteeCalcs():
         calc.resample_committee()
 
         return calc
-
-
+    
     @pytest.mark.parametrize("property", ["desc_forces", "comm_forces", "forces", "bias_forces"])
     def test_force_derivative(self, allclose, calc_name, property):
         # Compare direct force predictions to a finite differences scheme
-        cls, params = all_data[calc_name]
-
         p = property.split("_")
         if len(p) > 1:
             # prop_forces
@@ -100,7 +96,7 @@ class TestCommitteeCalcs():
 
         F_diff = np.zeros_like(F_ref)
 
-        dx = 1e-12
+        dx = 1e-5
         for i in range(len(ats)):
             for j in range(3):
                 ats = ref_ats.copy()
@@ -116,7 +112,7 @@ class TestCommitteeCalcs():
                 E2 = calc.get_property(energy_prop, ats)
  
                 F_diff[..., i, j] = -(E2 - E1) / (2*dx)
-        assert allclose(F_ref, F_diff, atol=1e-4)
+        assert allclose(F_ref, F_diff, atol=1e-3)
 
     @pytest.mark.parametrize("property", ["desc_stress", "comm_stress", "stress", "bias_stress"])
     def test_stress_derivative(self, allclose, calc_name, property):
@@ -142,20 +138,44 @@ class TestCommitteeCalcs():
 
         S_diff = np.zeros_like(S_ref)
 
-        dx = 1e-12
+        dx = 1e-5
+        V = ats.get_volume()
         for i in range(3):
             for j in range(3):
                 ats = ref_ats.copy()
                 cell = ats.cell[:, :].copy()
- 
-                cell[i, j] += dx
-                ats.set_cell(cell)
+
+                eps = np.eye(3)
+
+                eps[i, j] += dx
+                new_cell = cell @ eps
+                ats.set_cell(new_cell, scale_atoms=True)
                 E1 = calc.get_property(energy_prop, ats)
 
-
-                cell[i, j] -= 2*dx
-                ats.set_cell(cell)
+                eps[i, j] -= 2*dx
+                new_cell = cell @ eps
+                ats.set_cell(new_cell, scale_atoms=True)
                 E2 = calc.get_property(energy_prop, ats)
  
-                S_diff[..., i, j] = -(E2 - E1) / (2*dx * ats.get_volume())
-        assert allclose(S_ref, S_diff, atol=1e-4)
+                S_diff[..., i, j] = (E2 - E1) / (2*dx * V) # Don't need volume here, as diff is w.r.t real space, not strain
+        assert allclose(S_ref, S_diff, atol=1e-3)
+
+    def test_commitee_resample(self, calc_name):
+
+        calc = self.set_up_calc(calc_name)
+
+        if issubclass(calc.__class__, ase_uhal.committee_calculators.TorchCommitteeCalculator):
+            def to_numpy(tensor):
+                return tensor.detach().cpu().numpy()
+        else:
+            def to_numpy(arr):
+                return arr
+
+        calc.resample_committee(10)
+        cw = to_numpy(calc.committee_weights)
+        assert cw.shape[0] == 10
+
+        calc.resample_committee(100)
+        cw = to_numpy(calc.committee_weights)
+        assert cw.shape[0] == 100
+

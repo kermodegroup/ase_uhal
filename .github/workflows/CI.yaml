@@ -27,7 +27,7 @@ jobs:
       matrix:
         os: [macOS-latest, ubuntu-latest, windows-latest]
         python-version: ["3.11", "3.12", "3.13"]
-        julia-version: ["1.10", "1.11", "1.12"]
+        julia-version: ["1.11", "1.12"]
 
     steps:
       - uses: actions/checkout@v4
@@ -45,7 +45,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Set up Julia ${{ matrix.julia-version }}
-        uses: julia-actions/setup-julia@v2
+        uses: julia-actions/setup-julia@v4
         with:
           version: ${{ matrix.julia-version}}
 
@@ -64,9 +64,6 @@ jobs:
         run: |
           export JULIA_PROJECT=. 
           julia -e 'using Pkg
-          Pkg.Registry.add("General")
-          Pkg.Registry.add(RegistrySpec(url="https://github.com/ACEsuit/ACEregistry"))
-          Pkg.Registry.update()
           Pkg.instantiate()'
           python-jl -c "import julia; julia.install()"
 

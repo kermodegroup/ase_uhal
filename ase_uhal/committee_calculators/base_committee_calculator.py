@@ -370,10 +370,10 @@ class HALBiasPotential(BaseCommitteeCalculator, metaclass=ABCMeta):
         Es = comm_energy - np.mean(comm_energy)
         Fs = comm_forces - np.mean(comm_forces, axis=0)
 
-        return np.mean([E * F for E, F in zip(Es, Fs)], axis=0)
+        return np.mean([E * F for E, F in zip(Es, Fs)], axis=0) / self._bias_energy(comm_energy)
 
     def _bias_stress(self, comm_stress, comm_energy):
         Es = comm_energy - np.mean(comm_energy)
         Ss = comm_stress - np.mean(comm_stress, axis=0)
 
-        return np.mean([E * F for E, F in zip(Es, Ss)], axis=0)
+        return np.mean([E * S for E, S in zip(Es, Ss)], axis=0) / self._bias_energy(comm_energy)
