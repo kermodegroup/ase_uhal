@@ -67,7 +67,8 @@ jobs:
       - name: Install Julia dependencies
         shell: bash
         run: |
-          export JULIA_PROJECT=.
+          export PYTHON_JULIAPKG_EXE=$(which julia)
+          export PYTHON_JULIAPKG_PROJECT=juliapkg.json
           export PYTHON=$(which python)
           julia -e 'using Pkg
           Pkg.instantiate()'
