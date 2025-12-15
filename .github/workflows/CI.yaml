@@ -50,6 +50,13 @@ jobs:
         with:
           version: ${{ matrix.julia-version}}
 
+      - name: Set up environment
+        shell: bash
+        run: |
+          export PYTHON_JULIAPKG_EXE=$(which julia)
+          export PYTHON_JULIAPKG_PROJECT=juliapkg.json
+          export PYTHON=$(which python)
+
       - name: Testing Dependencies
         shell: bash
         run: |
@@ -67,11 +74,9 @@ jobs:
       - name: Install Julia dependencies
         shell: bash
         run: |
-          export PYTHON_JULIAPKG_EXE=$(which julia)
-          export PYTHON_JULIAPKG_PROJECT=juliapkg.json
-          export PYTHON=$(which python)
-          julia -e 'using Pkg
-          Pkg.instantiate()'
+          python -c "
+          import juliapkg
+          juliapkg.resolve()"
 
       - name: Run tests
         shell: bash
