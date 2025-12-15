@@ -43,6 +43,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
 
       - name: Set up Julia ${{ matrix.julia-version }}
         uses: julia-actions/setup-julia@v2
@@ -70,13 +71,6 @@ jobs:
           export PYTHON=$(which python)
           julia -e 'using Pkg
           Pkg.instantiate()'
-      - name: Save Julia depot cache
-        id: julia-cache-save
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            ${{ steps.julia-cache.outputs.cache-paths }}
-          key: ${{ steps.julia-cache.outputs.cache-key }}
 
       - name: Run tests
         shell: bash
