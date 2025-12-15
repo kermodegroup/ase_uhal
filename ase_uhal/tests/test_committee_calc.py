@@ -13,7 +13,7 @@ except ImportError:
     mpa = None
 
 try:
-    import julia
+    import juliacall
     has_julia = True
 except ImportError:
     has_julia = False
