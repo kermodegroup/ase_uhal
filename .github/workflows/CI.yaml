@@ -23,7 +23,7 @@ jobs:
     name: Test on ${{ matrix.os }}, Python ${{ matrix.python-version }}, Julia ${{ matrix.julia-version }}
     runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 5
+      max-parallel: 1
       matrix:
         os: [macOS-latest, ubuntu-latest, windows-latest]
         python-version: ["3.11", "3.12", "3.13"]
@@ -58,6 +58,10 @@ jobs:
         shell: bash
         run: |
           python -m pip install .[test]
+        
+      - name: Load Julia packages from cache
+        id: julia-cache
+        uses: julia-actions/cache@v2
 
       - name: Install Julia dependencies
         shell: bash
@@ -65,8 +69,16 @@ jobs:
           export JULIA_PROJECT=.
           export PYTHON=$(which python)
           julia -e 'using Pkg
-          Pkg.instantiate()'
+          Pkg.instantiate()
+          Pkg.add("PyCall")'
           python-jl -c "import julia; julia.install()"
+      - name: Save Julia depot cache
+        id: julia-cache-save
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ${{ steps.julia-cache.outputs.cache-paths }}
+          key: ${{ steps.julia-cache.outputs.cache-key }}
 
       - name: Run tests
         shell: bash
