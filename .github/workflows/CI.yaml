@@ -71,7 +71,7 @@ jobs:
           julia -e 'using Pkg
           Pkg.instantiate()
           Pkg.add("PyCall")'
-          python-jl -c "import julia; julia.install()"
+          python -c "import julia; julia.install()"
       - name: Save Julia depot cache
         id: julia-cache-save
         uses: actions/cache/save@v4
@@ -84,7 +84,7 @@ jobs:
         shell: bash
 
         run: |
-          python-jl -m pytest -v --cov=ase_uhal --cov-report=xml --color=yes ase_uhal/tests/
+          python -m pytest -v --cov=ase_uhal --cov-report=xml --color=yes ase_uhal/tests/
 
       - name: CodeCov
         uses: codecov/codecov-action@v5
