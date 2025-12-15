@@ -34,12 +34,12 @@ class BaseACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
         
         '''
             
-        from julia import Main
+        from juliacall import Main as jl
 
 
-        self.jl = Main
+        self.jl = jl
         # ACEpotentials, plus some utilities
-        self.jl.include(file_root + "/../data/_ace_utils.jl")
+        self.jl.seval('include("' + os.path.normpath(file_root + "/../data/_ace_utils.jl") + '")')
 
         if type(ace_params) == str:
             # assume filename
@@ -94,8 +94,6 @@ class BaseACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
         if "desc_energy" not in self.results.keys():
             # System has changed, need to recalculate base descriptors
             E, F, V = self.jl.eval_basis(self._prep_atoms(atoms), self.model)
-
-            E = np.array(E); F = np.array(F).reshape(self.n_desc, -1, 3); V = np.array(V)
 
             self.results["desc_energy"] = np.array(E)
             self.results["desc_forces"] = np.array(F)

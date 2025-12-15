@@ -21,8 +21,8 @@ classifiers = [
 requires-python = ">=3.8"
 # Declare any run-time dependencies that should be installed with the package.
 dependencies = [
-    "ase",
-]
+    "ase"
+    ]
 
 
 # Update the urls once the hosting is set up.
@@ -37,7 +37,7 @@ mace = [
     "e3nn"
 ]
 ace = [
-    "julia"
+    "juliacall"
 ]
 docs = [
     "sphinxcontrib-bibtex<2.0"

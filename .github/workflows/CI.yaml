@@ -69,9 +69,7 @@ jobs:
           export JULIA_PROJECT=.
           export PYTHON=$(which python)
           julia -e 'using Pkg
-          Pkg.instantiate()
-          Pkg.add("PyCall")'
-          python -c "import julia; julia.install()"
+          Pkg.instantiate()'
       - name: Save Julia depot cache
         id: julia-cache-save
         uses: actions/cache/save@v4

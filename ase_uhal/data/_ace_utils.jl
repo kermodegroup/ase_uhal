@@ -1,4 +1,4 @@
-using ACEpotentials, AtomsBase, Unitful
+using ACEpotentials, AtomsBase, Unitful, StaticArrays
 
 function load_ace_model(model_json)
     model, meta =  ACEpotentials.load_model(model_json) # load_potential in v0.6 version, load_model in v0.8+
@@ -33,6 +33,12 @@ end
 function eval_basis(atoms, model)
     E, F, V = ACEpotentials.Models.energy_forces_virial_basis(atoms, model)
 
-    return Unitful.ustrip.(E), Unitful.ustrip.(F), Unitful.ustrip.(V)
+    E = stack(Unitful.ustrip.(E))
+    F = stack(Unitful.ustrip.(F))
+    V = stack(Unitful.ustrip.(V))
 
+    F = permutedims(F, (3, 2, 1))
+    V = permutedims(V, (3, 1, 2))
+
+    return E, F, V
 end

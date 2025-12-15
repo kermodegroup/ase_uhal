@@ -176,7 +176,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         '''
         Get "descriptor stresses", which are the stress analogues to the total descriptor energy
 
-        Returns an array of shape (self.n_desc, 9)
+        Returns an array of shape (self.n_desc, 3, 3)
         '''
         return self.get_property("desc_stress", atoms)
 
@@ -203,7 +203,7 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
         '''
         Get stress predictions by each member of the committee
 
-        Returns an array of shape (self.n_comm, 9)
+        Returns an array of shape (self.n_comm, 3, 3)
 
         '''
 
@@ -247,7 +247,6 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
                     # Assemble list of all observations
                     # Maintain as list to not shift results around in memory until needed.
                     self.likelihood[key].append(l)
-
 
     def _update_likelihood(self, atoms):
         '''
