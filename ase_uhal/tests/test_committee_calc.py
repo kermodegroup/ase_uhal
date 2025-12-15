@@ -6,17 +6,18 @@ from ase_uhal import committee_calculators as comm
 import numpy as np
 
 ref_ats = bulk("Si", cubic=True)
-try:
-    from mace.calculators import mace_mp
-    mpa = mace_mp("medium-mpa-0", default_dtype="float64")
-except ImportError:
-    mpa = None
 
 try:
     import juliacall
     has_julia = True
 except ImportError:
     has_julia = False
+    
+try:
+    from mace.calculators import mace_mp
+    mpa = mace_mp("medium-mpa-0", default_dtype="float64")
+except ImportError:
+    mpa = None
 
 shared_params = {
     "committee_size" : 10,
