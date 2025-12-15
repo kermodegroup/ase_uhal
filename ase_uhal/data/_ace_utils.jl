@@ -1,4 +1,4 @@
-using ACEpotentials, AtomsBase, Unitful, StaticArrays
+using ACEpotentials, AtomsBase, Unitful
 
 function load_ace_model(model_json)
     model, meta =  ACEpotentials.load_model(model_json) # load_potential in v0.6 version, load_model in v0.8+
