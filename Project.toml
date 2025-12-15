@@ -1,5 +1,4 @@
 [deps]
 ACEpotentials = "3b96b61c-0fcc-4693-95ed-1ef9f35fcc53"
 AtomsBase = "a963bdd2-2df7-4f54-a1ee-49d51e6be12a"
-PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
