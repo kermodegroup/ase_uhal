@@ -54,8 +54,8 @@ jobs:
         shell: bash
         run: |
           export PYTHON_JULIAPKG_EXE=$(which julia)
-          export PYTHON_JULIAPKG_PROJECT=juliapkg.json
-          export PYTHON=$(which python)
+          export JULIA_PROJECT=.
+          export PYTHON_JULIAPKG_PROJECT=.
 
       - name: Testing Dependencies
         shell: bash
@@ -75,8 +75,8 @@ jobs:
         shell: bash
         run: |
           python -c "
-          import juliapkg
-          juliapkg.resolve()"
+          import ase_uhal
+          ase_uhal.install_ace_deps()"
 
       - name: Run tests
         shell: bash
