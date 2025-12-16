@@ -37,7 +37,8 @@ mace = [
     "e3nn"
 ]
 ace = [
-    "juliacall"
+    "juliacall",
+    "juliapkg"
 ]
 docs = [
     "sphinxcontrib-bibtex<2.0"

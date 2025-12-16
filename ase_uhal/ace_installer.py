@@ -1,7 +1,13 @@
 
 def install_ace_deps():
-    import juliapkg
-
+    try:
+        import juliapkg
+    except ImportError as e:
+        err_text = ("ase_uhal is not installed with ACE compatibility.\n"
+                  + " "*13 # Indentation
+                  + "Run `pip install ase_uhal[ace]` to resolve"
+        )
+        raise ImportError(err_text) from e
     juliapkg.add("Unitful")
     juliapkg.add("AtomsBase")
     # juliapkg does not yet seem to support >= specifiers
