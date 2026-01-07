@@ -14,4 +14,5 @@ def install_ace_deps():
     # Hack a >= using wildcard version bounds 0.10 - 0.* === [0.10.0, 1.0.0)
     juliapkg.add("ACEpotentials", version="0.10 - 0")
 
+    # resolve() tries to download and install packages which were missing or at incorrect versions
     juliapkg.resolve()

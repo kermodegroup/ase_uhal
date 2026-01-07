@@ -152,18 +152,22 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
         '''
         super().calculate(atoms, properties, system_changes)
 
-        struct = self._prep_atoms(atoms)
-
-        positions = struct[0]
-        displacement = struct[4]
-
         volume = atoms.get_volume()
-                
-        ### Energies
-        # Always calculate, as we can use torch.autodiff later
-        self.results["desc_energy"] = self._descriptor_base(*struct)
 
-        self.results["comm_energy"] = self.committee_weights @ self.results["desc_energy"]
+        ### Energy
+        if "desc_energy" not in self.results.keys():
+            struct = self._prep_atoms(atoms)
+
+            # Save these to self.results in case of later autodiff
+            self.results["_positions"] = struct[0]
+            self.results["_displacements"] = struct[4]
+
+            self.results["desc_energy"] = self._descriptor_base(*struct)
+
+            self.results["comm_energy"] = self.committee_weights @ self.results["desc_energy"]
+        
+        positions = self.results["_positions"]
+        displacement = self.results["_displacements"]
         
         if "energy" in properties or "forces" in properties or "stress" in properties:
             self.results["energy"] = self.torch.mean(self.results["comm_energy"])
@@ -172,54 +176,31 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
         if "bias_energy" in properties or "bias_forces" in properties or "bias_stress" in properties:   
             self.results["bias_energy"] = self._bias_energy(self.results["comm_energy"])
 
-            if "bias_forces" in properties:
-                self.results["bias_forces"] = - self._take_derivative_scalar(self.results["bias_energy"], positions)
-            if "bias_stress" in properties:
-                self.results["bias_stress"] = - self._take_derivative_scalar(self.results["bias_energy"], displacement)[0, :, :] / volume
-
-
-
         ### Forces
-        # Try to use previous results to save on recalculating autodiff gradients
         if "desc_forces" in properties:
-            self.results["desc_forces"] = self._take_derivative_vector(self.results["desc_energy"], positions)
+            self.results["desc_forces"] = -self._take_derivative_vector(self.results["desc_energy"], positions)
 
         if "comm_forces" in properties:
-            if "desc_forces" in self.results.keys():
-                F_comm = self.torch.tensordot(self.committee_weights, self.results["desc_forces"], dims=([1], [0]))
-            else:
-                F_comm = self._take_derivative_vector(self.results["comm_energy"], positions)
-
-            self.results["comm_forces"] = F_comm
+            self.results["comm_forces"] = -self._take_derivative_vector(self.results["comm_energy"], positions)
 
         if "forces" in properties:
-            if "comm_forces" in self.results.keys():
-                F = self.torch.mean(self.results["comm_forces"], dim=0)
-            else:
-                F = self._take_derivative_scalar(self.results["energy"], positions)
-
-            self.results["forces"] = F
+            self.results["forces"] = -self._take_derivative_scalar(self.results["energy"], positions)
+        
+        if "bias_forces" in properties:
+            self.results["bias_forces"] = -self._take_derivative_scalar(self.results["bias_energy"], positions)
 
         ### Stresses
-        # Achieved similar to forces
         if "desc_stress" in properties:
-            self.results["desc_stress"] = -self._take_derivative_vector(self.results["desc_energy"], displacement)[:, 0, :, :] / volume
+            self.results["desc_stress"] = self._take_derivative_vector(self.results["desc_energy"], displacement)[:, 0, :, :] / volume
 
         if "comm_stress" in properties:
-            if "desc_stress" in self.results.keys():
-                S_comm = self.torch.tensordot(self.committee_weights, self.results["desc_stress"], dims=([1], [0]))
-            else:
-                S_comm = -self._take_derivative_vector(self.results["comm_energy"], displacement)[:, 0, :, :] / volume
-
-            self.results["comm_stress"] = S_comm
+            self.results["comm_stress"] = self._take_derivative_vector(self.results["comm_energy"], displacement)[:, 0, :, :] / volume
 
         if "stress" in properties:
-            if "comm_stress" in self.results.keys():
-                S = self.torch.mean(self.results["comm_stress"], dim=0)
-            else:
-                S = -self._take_derivative_scalar(self.results["energy"], displacement)[0, :, :] / volume
-
-            self.results["stress"] = S
+            self.results["stress"] = self._take_derivative_scalar(self.results["energy"], displacement)[0, :, :] / volume
+        
+        if "bias_stress" in properties:
+            self.results["bias_stress"] = self._take_derivative_scalar(self.results["bias_energy"], displacement)[0, :, :] / volume
     
 
 class MACEHALCalculator(TorchHALBiasPotential, BaseMACECalculator):

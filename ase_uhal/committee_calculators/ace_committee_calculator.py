@@ -97,7 +97,7 @@ class BaseACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
 
             self.results["desc_energy"] = np.array(E)
             self.results["desc_forces"] = np.array(F)
-            self.results["desc_stress"] = np.array(V) / atoms.get_volume()
+            self.results["desc_stress"] = -np.array(V) / atoms.get_volume()
 
         for key in ["energy", "forces", "stress"]:
             if "comm_" + key in properties or key in properties or "bias_" + key in properties or key == "energy": 

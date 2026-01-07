@@ -6,6 +6,7 @@ from ase.calculators.calculator import Calculator
 import numpy as np
 from .committee_calculators.base_committee_calculator import BaseCommitteeCalculator
 from abc import ABCMeta, abstractmethod
+from ase.stress import voigt_6_to_full_3x3_stress
 
 class BaseBiasCalculator(Calculator, metaclass=ABCMeta):
     '''
@@ -15,7 +16,7 @@ class BaseBiasCalculator(Calculator, metaclass=ABCMeta):
     https://github.com/ACEsuit/ACEHAL/blob/main/ACEHAL/bias_calc.py
     
     '''
-    implemented_properties = ['forces', 'energy', 'stress']
+    implemented_properties = ['energy', 'forces', 'stress']
     default_parameters = {}
     name = 'HALCalculator'
 
@@ -69,8 +70,11 @@ class BaseBiasCalculator(Calculator, metaclass=ABCMeta):
 
         for prop in self.implemented_properties:
             if prop in properties:
+                mean_prop = self.mean_calc.results[prop]
+                if prop == "stress" and mean_prop.shape != (3, 3):
+                    mean_prop = voigt_6_to_full_3x3_stress(mean_prop)
                 # Use get_property as an interface to committee_calc, as torch-based comm calcs will use torch.Tensor in self.results 
-                self.results[prop] = self.mean_calc.results[prop] - self.tau * self.committee_calc.get_property("bias_" + prop, atoms)
+                self.results[prop] = mean_prop - self.tau * self.committee_calc.get_property("bias_" + prop, atoms)
 
     def update_tau(self, atoms=None):
         '''
