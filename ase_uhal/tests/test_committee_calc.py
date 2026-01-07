@@ -4,6 +4,7 @@ import pytest
 from ase.build import bulk
 from ase_uhal import committee_calculators as comm
 import numpy as np
+from .utils import finite_difference_forces, finite_difference_stress
 
 ref_ats = bulk("Si", cubic=True)
 
@@ -12,7 +13,7 @@ try:
     has_julia = True
 except ImportError:
     has_julia = False
-    
+
 try:
     from mace.calculators import mace_mp
     mpa = mace_mp("medium-mpa-0", default_dtype="float64")
@@ -89,29 +90,10 @@ class TestCommitteeCalcs():
         force_prop = prop + "forces"
 
         ats = ref_ats.copy()
+        ats.rattle(1e-1, seed=42)
         calc = self.set_up_calc(calc_name, required_properties=[energy_prop, force_prop])
 
-        F_ref = calc.get_property(force_prop, ats)
-
-        F_diff = np.zeros_like(F_ref)
-
-        dx = 1e-5
-        for i in range(len(ats)):
-            for j in range(3):
-                ats = ref_ats.copy()
-                pos = ats.positions.copy()
- 
-                pos[i, j] += dx
-                ats.set_positions(pos)
-                E1 = calc.get_property(energy_prop, ats)
-
-
-                pos[i, j] -= 2*dx
-                ats.set_positions(pos)
-                E2 = calc.get_property(energy_prop, ats)
- 
-                F_diff[..., i, j] = -(E2 - E1) / (2*dx)
-        assert allclose(F_ref, F_diff, atol=1e-3)
+        finite_difference_forces(calc, ats, allclose, energy_prop, force_prop)
 
     @pytest.mark.parametrize("property", ["desc_stress", "comm_stress", "stress", "bias_stress"])
     def test_stress_derivative(self, allclose, calc_name, property):
@@ -128,36 +110,17 @@ class TestCommitteeCalcs():
         stress_prop = prop + "stress"
         
         ats = ref_ats.copy()
+        cell = ats.cell[:, :].copy()
+        for i in range(3):
+            cell[i, i] += 0.3
+        ats.set_cell(cell, scale_atoms=True)
+        ats.rattle(1e-1, seed=42)
 
         calc = self.set_up_calc(calc_name, required_properties=[energy_prop, stress_prop])
 
-        S_ref = calc.get_property(stress_prop, ats)
+        finite_difference_stress(calc, ats, allclose, energy_prop, stress_prop, dx=1e-10, atol=1e-2)
 
-        S_diff = np.zeros_like(S_ref)
-
-        dx = 1e-5
-        V = ats.get_volume()
-        for i in range(3):
-            for j in range(3):
-                ats = ref_ats.copy()
-                cell = ats.cell[:, :].copy()
-
-                eps = np.eye(3)
-
-                eps[i, j] += dx
-                new_cell = cell @ eps
-                ats.set_cell(new_cell, scale_atoms=True)
-                E1 = calc.get_property(energy_prop, ats)
-
-                eps[i, j] -= 2*dx
-                new_cell = cell @ eps
-                ats.set_cell(new_cell, scale_atoms=True)
-                E2 = calc.get_property(energy_prop, ats)
- 
-                S_diff[..., i, j] = (E2 - E1) / (2*dx * V) # Don't need volume here, as diff is w.r.t real space, not strain
-        assert allclose(S_ref, S_diff, atol=1e-3)
-
-    def test_commitee_resample(self, calc_name):
+    def test_committee_resample(self, calc_name):
 
         calc = self.set_up_calc(calc_name)
 
