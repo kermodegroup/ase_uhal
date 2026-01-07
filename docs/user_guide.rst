@@ -9,6 +9,22 @@ Committee Calculators
 The committee calculators provide an interface to a given models descriptor (e.g. the ACE descriptor, or the ``mace.calculators.MACECalculator.get_descriptor()`` method)
 and allow for the construction of committees of linear models based on this descriptor.
 
+
+.. warning::
+
+    It is not recommended to use the committee calculators as "normal" ASE calculators, although they do function in that role. 
+    The "energy", "forces", and "stress" proprerties are implemented as the committee mean properties (so that the calculator functions more like
+    a conventional committee model), which should all be close to zero due to the use of zero-mean committees.
+
+    To access the biasing variant of each property, we define new "bias_energy", "bias_forces", and "bias_stress" properties. These can be easily obtained using
+    the ``get_property`` function, e.g.:
+
+    .. code:: python
+        
+        comm_calc = ACEHALCalculator(...)
+        E_bias = comm_calc.get_property("bias_energy", atoms)
+
+
 ase_uhal.committee_calculators.ACEHALCalculator
 ++++++++++++++++++++++++++++++++++++++++++++++++
 

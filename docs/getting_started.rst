@@ -38,13 +38,13 @@ This can easily be achieved through the following:
 .. code-block:: bash
 
     pip install ase_uhal[ace]
-    python -c "import ase_uhal; ase_uhal.install_julia_deps()"
+    python -c "import ase_uhal; ase_uhal.install_ace_deps()"
 
 Customising the Julia Environment
 ++++++++++++++++++++++++++++++++++
 The ACE/Julia compatibility is provided using the `juliapkg <https://github.com/JuliaPy/PyJuliaPkg>`__ Python module. This will generally attempt to install the required packages 
 as purely as possible (i.e. trying not to generate side effects in existing julia installs and projects), including installing the Julia Project.toml inside a Python
-virtual enviroment, if one exists and is activated when ``ase_uhal.install_julia_deps()`` is called.
+virtual enviroment, if one exists and is activated when ``ase_uhal.install_ace_deps()`` is called.
 
 By default, ``juliapkg`` will look for the ``julia`` exe in ``PATH``, and will use a blank Julia project regardless of whether ``JULIAPROJECT`` is set.
 We can however customise this using environment variables (taken from the ``juliapkg`` docs):
