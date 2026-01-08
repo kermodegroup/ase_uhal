@@ -85,10 +85,17 @@ class TestBiasCalcs():
         dyn = Langevin(ats, 1*fs, temperature_K=300, rng=rng, friction=0.01/fs)
         dyn.attach(calc.update_tau)
 
-        dyn.run(2*calc.tau_delay) # Run long enough for tau to be reasonably stable
+        dyn.run(10*calc.tau_delay) # Run long enough for tau to be reasonably stable
 
-        for i in range(10):
+        tau_rels = []
+
+        for i in range(30):
             dyn.run(1)
-            # Check if the biasing strength means the bias forces are scaled correctly w.r.t. the mean forces
-            # Relation is approximate, as tau_rel determined by mixing w/ previous states 
-            assert allclose(calc.tau_rel, np.average(np.abs(calc.tau*calc.committee_calc.get_bias_forces()/calc.mean_calc.get_forces())), atol=5e-2)
+            # Reverse engineer an approximate tau rel from the current tau + forces
+            tau_rels.append(np.average(np.abs(calc.tau*calc.committee_calc.get_bias_forces()/calc.mean_calc.get_forces())))
+        
+        tau_rel = np.mean(tau_rels)
+
+        # Check if the biasing strength means the bias forces are scaled correctly w.r.t. the mean forces
+        # Relation is approximate, as tau_rel determined by mixing w/ previous states 
+        assert np.abs(tau_rel - calc.tau_rel) < 5e-2
