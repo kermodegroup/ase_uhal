@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def finite_difference_forces(calc, atoms, allclose, energy_property="energy", force_property="forces", dx=1e-5, atol=1e-3):
+def finite_difference_forces(calc, atoms, allclose, energy_property="energy", force_property="forces", dx=1e-7, atol=1e-3):
     '''
     Calculate forces through finite differences of the property defined by energy property, and compare to the result of 
     force_property
@@ -26,7 +26,9 @@ def finite_difference_forces(calc, atoms, allclose, energy_property="energy", fo
             E2 = calc.get_property(energy_property, ats)
 
             F_diff[..., i, j] = (E2 - E1) / (2*dx)
-    assert allclose(F_ref, F_diff, atol=atol)
+    
+    F_scale = np.max(np.abs(F_ref))
+    assert allclose(F_ref/F_scale, F_diff/F_scale, atol=atol)
 
 
 def finite_difference_stress(calc, atoms, allclose, energy_property="energy", stress_property="stress", dx=1e-5, atol=1e-3):
@@ -59,4 +61,6 @@ def finite_difference_stress(calc, atoms, allclose, energy_property="energy", st
             E2 = calc.get_property(energy_property, ats)
 
             S_diff[..., i, j] = -(E2 - E1) / (2*dx * V)
-    assert allclose(S_ref, S_diff, atol=atol)
+
+    S_scale = np.max(np.abs(S_ref))
+    assert allclose(S_ref/S_scale, S_diff/S_scale, atol=atol)

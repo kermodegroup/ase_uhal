@@ -1,5 +1,5 @@
 from ase.atoms import Atoms
-from .torch_committee_calculator import TorchCommitteeCalculator, TorchHALBiasPotential
+from .torch_committee_calculator import TorchCommitteeCalculator
 import numpy as np
 from abc import ABCMeta, abstractmethod
 
@@ -68,7 +68,6 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
         self.to_keep = to_keep
 
         super().__init__(committee_size, prior_weight, **kwargs)
-
         
     def _get_descriptor_length(self):
         # Build an atoms object with a species which the model can handle
@@ -86,12 +85,29 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
 
         ctx = self.prepare_graph(batch, compute_stress=True)
 
-        return ctx.positions, batch["node_attrs"], batch["edge_index"], batch["shifts"], ctx.displacement
+        return ctx.positions, ctx.displacement, batch["node_attrs"], batch["edge_index"], batch["unit_shifts"], batch["cell"]
 
-    def _descriptor_base(self, positions, attrs, edge_index, shifts, displacement):
+    def _descriptor_base(self, positions, displacement, attrs, edge_index, unit_shifts, cell):
         '''
         Base MACE descriptor, based on results from self._prep_atoms
         '''
+        symmetric_displacement = 0.5 * (
+            displacement + displacement.transpose(-1, -2)
+        )  # From https://github.com/mir-group/nequip
+
+        positions = positions + self.torch.einsum(
+            "be,bec->bc", positions, symmetric_displacement
+        )
+
+        cell = cell.view(-1, 3, 3)
+
+        cell = cell + self.torch.matmul(cell, symmetric_displacement)
+
+        shifts = self.torch.einsum(
+            "be,bec->bc",
+            unit_shifts,
+            cell,
+        )
 
         vectors, lengths = self.get_edge_vectors_and_lengths(
                     positions=positions,
@@ -139,10 +155,71 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
 
         return node_feats_out[:, :self.to_keep].sum(dim=0)
     
+    def _desc_energy(self, *args):
+        return self._descriptor_base(*args)
+    
+    def _comm_energy(self, *args):
+
+        return self.committee_weights @ self._descriptor_base(*args)
+
+    def _energy(self, *args):
+        comm_energy = self._comm_energy(*args)
+        
+        return self.torch.mean(comm_energy)
+
     @abstractmethod
-    def _bias_energy(self, comm_energy):
+    def _bias_energy(self, *args):
         pass
     
+    def _desc_forces(self, *args):
+        return self.torch.func.jacfwd(self._descriptor_base, argnums=0)(*args)
+    
+    def _comm_forces(self, *args):
+        '''
+        Use Vector jacobian product to compute comm forces, to save memory overheads
+        '''
+
+        def f(positions):
+            return self._descriptor_base(positions, *args[1:])
+        
+        _, comm_force_func = self.torch.func.vjp(f, args[0])
+
+        def g(weights):
+            return comm_force_func(weights)[0]
+        
+        return self.torch.vmap(g)(self.committee_weights)
+    
+    def _forces(self, *args):
+        comm_forces = self._comm_forces(*args)
+
+        return self.torch.mean(comm_forces, dim=0)
+    
+    def _bias_forces(self, *args):
+        return self.torch.func.jacfwd(self._bias_energy, argnums=0)(*args)
+    
+    def _desc_stress(self, *args):
+        return self.torch.func.jacfwd(self._descriptor_base, argnums=1)(*args)
+    
+    def _comm_stress(self, *args):
+        def f(displacements):
+            return self._descriptor_base(args[0], displacements, *args[2:])
+        
+        _, comm_stress_func = self.torch.func.vjp(f, args[1])
+
+        def g(weights):
+            return comm_stress_func(weights)[0]
+        
+        return self.torch.vmap(g)(self.committee_weights)
+    
+    def _stress(self, *args):
+        comm_stress = self._comm_stress(*args)
+
+        return self.torch.mean(comm_stress, dim=0)
+    
+    def _bias_stress(self, *args):
+        return self.torch.func.jacfwd(self._bias_energy, argnums=1)(*args)
+
+
     def calculate(self, atoms, properties, system_changes):
         '''
         Calculation for descriptor properties, committee properties, normal properties, and HAL properties
@@ -153,55 +230,52 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
         super().calculate(atoms, properties, system_changes)
 
         volume = atoms.get_volume()
+        struct = self._prep_atoms(atoms)
 
         ### Energy
-        if "desc_energy" not in self.results.keys():
-            struct = self._prep_atoms(atoms)
-
-            # Save these to self.results in case of later autodiff
-            self.results["_positions"] = struct[0]
-            self.results["_displacements"] = struct[4]
-
+        if "desc_energy" in properties:
             self.results["desc_energy"] = self._descriptor_base(*struct)
 
-            self.results["comm_energy"] = self.committee_weights @ self.results["desc_energy"]
+        if "comm_energy" in properties:
+            self.results["comm_energy"] = self._comm_energy(*struct)
         
-        positions = self.results["_positions"]
-        displacement = self.results["_displacements"]
-        
-        if "energy" in properties or "forces" in properties or "stress" in properties:
-            self.results["energy"] = self.torch.mean(self.results["comm_energy"])
+        if "energy" in properties:
+            self.results["energy"] = self._energy(*struct)
 
-        
-        if "bias_energy" in properties or "bias_forces" in properties or "bias_stress" in properties:   
-            self.results["bias_energy"] = self._bias_energy(self.results["comm_energy"])
+        if "bias_energy" in properties:
+            self.results["bias_energy"] = self._bias_energy(*struct) 
 
         ### Forces
         if "desc_forces" in properties:
-            self.results["desc_forces"] = -self._take_derivative_vector(self.results["desc_energy"], positions)
+            self.results["desc_forces"] = -self._desc_forces(*struct)
 
         if "comm_forces" in properties:
-            self.results["comm_forces"] = -self._take_derivative_vector(self.results["comm_energy"], positions)
+            self.results["comm_forces"] = -self._comm_forces(*struct)
 
         if "forces" in properties:
-            self.results["forces"] = -self._take_derivative_scalar(self.results["energy"], positions)
+            self.results["forces"] = -self._forces(*struct)
         
         if "bias_forces" in properties:
-            self.results["bias_forces"] = -self._take_derivative_scalar(self.results["bias_energy"], positions)
+            self.results["bias_forces"] = -self._bias_forces(*struct)
 
         ### Stresses
         if "desc_stress" in properties:
-            self.results["desc_stress"] = self._take_derivative_vector(self.results["desc_energy"], displacement)[:, 0, :, :] / volume
+            self.results["desc_stress"] = self._desc_stress(*struct)[:, 0, :, :] / volume
 
         if "comm_stress" in properties:
-            self.results["comm_stress"] = self._take_derivative_vector(self.results["comm_energy"], displacement)[:, 0, :, :] / volume
+            self.results["comm_stress"] = self._comm_stress(*struct)[:, 0, :, :] / volume
 
         if "stress" in properties:
-            self.results["stress"] = self._take_derivative_scalar(self.results["energy"], displacement)[0, :, :] / volume
+            self.results["stress"] = self._stress(*struct)[0, :, :] / volume
         
         if "bias_stress" in properties:
-            self.results["bias_stress"] = self._take_derivative_scalar(self.results["bias_energy"], displacement)[0, :, :] / volume
-    
+            self.results["bias_stress"] = self._bias_stress(*struct)[0, :, :] / volume
 
-class MACEHALCalculator(TorchHALBiasPotential, BaseMACECalculator):
+
+class MACEHALCalculator(BaseMACECalculator):
     name = "MACEHALCalculator"
+
+    def _bias_energy(self, *args):
+        comm_energy = self._comm_energy(*args)
+
+        return self.torch.std(comm_energy)

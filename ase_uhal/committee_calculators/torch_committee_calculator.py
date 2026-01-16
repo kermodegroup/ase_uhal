@@ -40,24 +40,27 @@ class TorchCommitteeCalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
         '''
         pass
 
-    def _take_derivative_scalar(self, val, x):
+    def _take_derivative_scalar(self, val, x, retain_graph=False):
         '''
         Take the derivative of the scalar val w.r.t x
+
+        Fallback for approaches where torch.func isn't possible
         '''
-        return self.torch.autograd.grad(outputs=[val], inputs=[x], grad_outputs=[self.torch.ones_like(val)], allow_unused=True, retain_graph=True)[0]
+        return self.torch.autograd.grad(outputs=[val], inputs=[x], grad_outputs=[self.torch.ones_like(val)], 
+                                        allow_unused=True, retain_graph=retain_graph)[0]
     
     def _take_derivative_vector(self, val, x):
         '''
-        Take the derivative of scalar val w.r.t x by looping over x
+        Take the derivative of 1D vector val w.r.t x by looping over elements of val
         
+        Fallback for approaches where torch.func isn't possible
         '''
-        N = val.size()
-        jac = self.torch.zeros(N[0], *x.shape).to(self.torch_device)
-        for i in range(N[0]):
-            v = val[i]
-            jac[i, :, :] = self._take_derivative_scalar(v, x)
+        N = val.size()[0]
+        jac = self.torch.zeros(N, *x.shape).to(self.torch_device)
+        for i in range(N):
+            jac[i, ...] = self._take_derivative_scalar(val[i], x, retain_graph=i<(N - 1))
         return jac
-    
+
     def get_property(self, name, atoms=None, allow_calculation=True):
         '''
         Overload of Calculator.get_property, converts from torch tensors to numpy arrays
@@ -109,7 +112,3 @@ class TorchCommitteeCalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
         z = self.torch.Tensor(self.rng.normal(loc=0, scale=1, size=(self.n_desc, self.n_comm))).to(self.torch_device)
 
         self.committee_weights = self.torch.linalg.solve_triangular(R, z, upper=True).T # zero mean committee, so no mean term
-
-class TorchHALBiasPotential(TorchCommitteeCalculator, metaclass=ABCMeta):
-    def _bias_energy(self, comm_energy):
-        return self.torch.std(comm_energy)

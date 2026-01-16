@@ -66,11 +66,13 @@ class TestCommitteeCalcs():
 
         cls, params = all_data[calc_name]
 
+        rng = np.random.RandomState(42)
+
         for prop in required_properties:
             if prop not in cls.implemented_properties:
                 pytest.skip(f"{cls.__name__} does not implement {prop}")
 
-        calc = cls(**params)
+        calc = cls(**params, rng=rng)
         calc.resample_committee()
 
         return calc
@@ -93,7 +95,7 @@ class TestCommitteeCalcs():
         ats.rattle(1e-1, seed=42)
         calc = self.set_up_calc(calc_name, required_properties=[energy_prop, force_prop])
 
-        finite_difference_forces(calc, ats, allclose, energy_prop, force_prop)
+        finite_difference_forces(calc, ats, allclose, energy_prop, force_prop, dx=1e-5)
 
     @pytest.mark.parametrize("property", ["desc_stress", "comm_stress", "stress", "bias_stress"])
     def test_stress_derivative(self, allclose, calc_name, property):
@@ -111,14 +113,17 @@ class TestCommitteeCalcs():
         
         ats = ref_ats.copy()
         cell = ats.cell[:, :].copy()
+
+        rng = np.random.RandomState(42)
         for i in range(3):
-            cell[i, i] += 0.3
+            for j in range(3):
+                cell[i, j] += rng.rand() * 0.6 - 0.3
         ats.set_cell(cell, scale_atoms=True)
         ats.rattle(1e-1, seed=42)
 
         calc = self.set_up_calc(calc_name, required_properties=[energy_prop, stress_prop])
 
-        finite_difference_stress(calc, ats, allclose, energy_prop, stress_prop, dx=1e-10, atol=1e-2)
+        finite_difference_stress(calc, ats, allclose, energy_prop, stress_prop, dx=1e-6)
 
     def test_committee_resample(self, calc_name):
 
