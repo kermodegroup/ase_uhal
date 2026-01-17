@@ -8,6 +8,8 @@ def install_ace_deps():
                   + "Run `pip install ase_uhal[ace]` to resolve"
         )
         raise ImportError(err_text) from e
+    
+    juliapkg.resolve() # Initial resolve to make sure general registry exists
     juliapkg.add("Unitful")
     juliapkg.add("AtomsBase")
     # juliapkg does not yet seem to support >= specifiers
