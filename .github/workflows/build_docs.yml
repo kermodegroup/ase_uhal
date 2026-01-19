@@ -17,8 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: docker://pandoc/core:2.9
-      
       - uses: actions/checkout@v4
 
       - name: Additional info about the build
@@ -27,6 +25,11 @@ jobs:
           uname -a
           df -h
           ulimit -a
+
+      - name: Setup Pandoc
+        uses: r-lib/actions/setup-pandoc@v2
+        with:
+          pandoc-version: '2.2'
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
