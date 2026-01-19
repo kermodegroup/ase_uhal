@@ -51,10 +51,10 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.extlinks',
     # 'sphinx.ext.imgmath',
-    'sphinx.ext.mathjax',
     'sphinx_design',
     'sphinx_copybutton',
     'sphinxcontrib.bibtex',
+    'nbsphinx'
 ]
 
 

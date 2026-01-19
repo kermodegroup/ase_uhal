@@ -35,16 +35,14 @@ Welcome to ase_uhal's documentation!
     .. grid-item-card::  User Guide
       :margin: 0 3 0 0
       
-      An in-depth guide for users.
+      User Guide
 
-      .. button-link:: ./user_guide.html
+      .. button-link:: ./examples.html
          :color: primary
          :outline:
          :expand:
 
-         To the User Guide
-      
-      
+         To the Examples
 
     .. grid-item-card:: API Reference
       :margin: 0 3 0 0
@@ -57,8 +55,6 @@ Welcome to ase_uhal's documentation!
          :expand:
 
          To the API Reference.
-
-      
 
     .. grid-item-card::  Developer Guide
       :margin: 0 3 0 0
@@ -80,7 +76,7 @@ Welcome to ase_uhal's documentation!
 
    getting_started
    theory
-   user_guide
+   examples
    api
    developer_guide
 

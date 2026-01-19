@@ -41,7 +41,9 @@ ace = [
     "juliapkg"
 ]
 docs = [
-    "sphinxcontrib-bibtex<2.0"
+    "sphinxcontrib-bibtex<2.0",
+    "nbsphinx",
+    "ase_uhal[mace, ace]"
 ]
 
 test = [
