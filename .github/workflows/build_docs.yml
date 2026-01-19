@@ -12,19 +12,13 @@ on:
   pull_request:
     branches:
       - "main"
-
 jobs:
-  test:
-    name: Test on ${{ matrix.os }}, Python ${{ matrix.python-version }}, Julia ${{ matrix.julia-version }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      max-parallel: 1
-      matrix:
-        os: [ubuntu-latest]
-        python-version: ["3.12"]
-        julia-version: ["1.12"]
-
+  build_docs:
+    runs-on: ubuntu-latest
+    
     steps:
+      - uses: docker://pandoc/core:2.9
+      
       - uses: actions/checkout@v4
 
       - name: Additional info about the build
@@ -34,16 +28,16 @@ jobs:
           df -h
           ulimit -a
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.12
           cache: pip
 
-      - name: Set up Julia ${{ matrix.julia-version }}
+      - name: Set up Julia 1.12
         uses: julia-actions/setup-julia@v2
         with:
-          version: ${{ matrix.julia-version}}
+          version: 1.12
 
       - name: Set up environment
         shell: bash

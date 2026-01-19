@@ -54,8 +54,7 @@ extensions = [
     'sphinx_design',
     'sphinx_copybutton',
     'sphinxcontrib.bibtex',
-    'nbsphinx',
-    'pandoc'
+    'nbsphinx'
 ]
 
 nbsphinx_kernel_name = "python3"
