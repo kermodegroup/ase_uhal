@@ -46,6 +46,7 @@ docs = [
     "sphinxcontrib-bibtex>2.6",
     "nbsphinx",
     "ipython",
+    "ipykernel",
     "pandoc",
     "sphinx_design",
     "sphinx-copybutton",

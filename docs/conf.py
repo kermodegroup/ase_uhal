@@ -57,6 +57,7 @@ extensions = [
     'nbsphinx'
 ]
 
+nbsphinx_kernel_name = "python3"
 
 autosummary_generate = True
 napoleon_google_docstring = False
