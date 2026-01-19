@@ -41,8 +41,13 @@ ace = [
     "juliapkg"
 ]
 docs = [
-    "sphinxcontrib-bibtex<2.0",
+    "Sphinx",
+    "pydata-sphinx-theme",
+    "sphinxcontrib-bibtex>2.6",
     "nbsphinx",
+    "ipython",
+    "sphinx_design",
+    "sphinx-copybutton",
     "ase_uhal[mace, ace]"
 ]
 
