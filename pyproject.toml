@@ -47,7 +47,7 @@ docs = [
     "nbsphinx",
     "ipython",
     "ipykernel",
-    "pandoc",
+    "pypandoc",
     "sphinx_design",
     "sphinx-copybutton",
     "nglview",
