@@ -50,6 +50,7 @@ docs = [
     "pandoc",
     "sphinx_design",
     "sphinx-copybutton",
+    "nglview",
     "ase_uhal[mace, ace]"
 ]
 
