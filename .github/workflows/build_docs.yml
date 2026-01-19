@@ -1,7 +1,7 @@
 name: Build Docs
 
 permissions:
-  contents: read
+  contents: write
 
 on:
   # GitHub has started calling new repo's first branch "main" https://github.com/github/renaming
