@@ -1,0 +1,23 @@
+﻿ase\_uhal.StructureSelector
+===========================
+
+.. currentmodule:: ase_uhal
+
+.. autoclass:: StructureSelector
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~StructureSelector.__init__
+      ~StructureSelector.reset_threshold
+   
+   
+
+   
+   
+   

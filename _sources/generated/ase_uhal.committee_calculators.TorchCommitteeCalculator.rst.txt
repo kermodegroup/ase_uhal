@@ -1,0 +1,88 @@
+﻿ase\_uhal.committee\_calculators.TorchCommitteeCalculator
+=========================================================
+
+.. currentmodule:: ase_uhal.committee_calculators
+
+.. autoclass:: TorchCommitteeCalculator
+
+   
+   .. automethod:: __init__
+   .. automethod:: resample_committee
+   .. automethod:: select_structure
+   .. automethod:: sync
+   .. automethod:: get_descriptor_energy
+   .. automethod:: get_descriptor_forces
+   .. automethod:: get_descriptor_stress
+   .. automethod:: get_committee_energies
+   .. automethod:: get_committee_forces
+   .. automethod:: get_committee_stresses
+   .. automethod:: get_bias_energy
+   .. automethod:: get_bias_forces
+   .. automethod:: get_bias_stress
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TorchCommitteeCalculator.__init__
+      ~TorchCommitteeCalculator.band_structure
+      ~TorchCommitteeCalculator.calculate
+      ~TorchCommitteeCalculator.calculate_numerical_forces
+      ~TorchCommitteeCalculator.calculate_numerical_stress
+      ~TorchCommitteeCalculator.calculate_properties
+      ~TorchCommitteeCalculator.calculation_required
+      ~TorchCommitteeCalculator.check_state
+      ~TorchCommitteeCalculator.export_properties
+      ~TorchCommitteeCalculator.get_atoms
+      ~TorchCommitteeCalculator.get_bias_energy
+      ~TorchCommitteeCalculator.get_bias_forces
+      ~TorchCommitteeCalculator.get_bias_stress
+      ~TorchCommitteeCalculator.get_charges
+      ~TorchCommitteeCalculator.get_committee_energies
+      ~TorchCommitteeCalculator.get_committee_forces
+      ~TorchCommitteeCalculator.get_committee_stresses
+      ~TorchCommitteeCalculator.get_default_parameters
+      ~TorchCommitteeCalculator.get_descriptor_energy
+      ~TorchCommitteeCalculator.get_descriptor_forces
+      ~TorchCommitteeCalculator.get_descriptor_stress
+      ~TorchCommitteeCalculator.get_dipole_moment
+      ~TorchCommitteeCalculator.get_forces
+      ~TorchCommitteeCalculator.get_magnetic_moment
+      ~TorchCommitteeCalculator.get_magnetic_moments
+      ~TorchCommitteeCalculator.get_potential_energies
+      ~TorchCommitteeCalculator.get_potential_energy
+      ~TorchCommitteeCalculator.get_property
+      ~TorchCommitteeCalculator.get_stress
+      ~TorchCommitteeCalculator.get_stresses
+      ~TorchCommitteeCalculator.read
+      ~TorchCommitteeCalculator.read_atoms
+      ~TorchCommitteeCalculator.resample_committee
+      ~TorchCommitteeCalculator.reset
+      ~TorchCommitteeCalculator.select_structure
+      ~TorchCommitteeCalculator.set
+      ~TorchCommitteeCalculator.set_label
+      ~TorchCommitteeCalculator.sync
+      ~TorchCommitteeCalculator.todict
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TorchCommitteeCalculator.default_parameters
+      ~TorchCommitteeCalculator.directory
+      ~TorchCommitteeCalculator.discard_results_on_any_change
+      ~TorchCommitteeCalculator.energy_weight
+      ~TorchCommitteeCalculator.forces_weight
+      ~TorchCommitteeCalculator.ignored_changes
+      ~TorchCommitteeCalculator.implemented_properties
+      ~TorchCommitteeCalculator.label
+      ~TorchCommitteeCalculator.name
+      ~TorchCommitteeCalculator.stress_weight
+      ~TorchCommitteeCalculator.torch_device
+   
+   

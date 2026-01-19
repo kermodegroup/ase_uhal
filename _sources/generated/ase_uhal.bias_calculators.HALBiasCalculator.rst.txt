@@ -1,0 +1,69 @@
+﻿ase\_uhal.bias\_calculators.HALBiasCalculator
+=============================================
+
+.. currentmodule:: ase_uhal.bias_calculators
+
+.. autoclass:: HALBiasCalculator
+
+   
+   .. automethod:: __init__
+   .. automethod:: calculate
+   .. automethod:: update_tau
+   .. automethod:: get_score
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~HALBiasCalculator.__init__
+      ~HALBiasCalculator.band_structure
+      ~HALBiasCalculator.calculate
+      ~HALBiasCalculator.calculate_numerical_forces
+      ~HALBiasCalculator.calculate_numerical_stress
+      ~HALBiasCalculator.calculate_properties
+      ~HALBiasCalculator.calculation_required
+      ~HALBiasCalculator.check_state
+      ~HALBiasCalculator.export_properties
+      ~HALBiasCalculator.get_atoms
+      ~HALBiasCalculator.get_charges
+      ~HALBiasCalculator.get_default_parameters
+      ~HALBiasCalculator.get_dipole_moment
+      ~HALBiasCalculator.get_forces
+      ~HALBiasCalculator.get_magnetic_moment
+      ~HALBiasCalculator.get_magnetic_moments
+      ~HALBiasCalculator.get_potential_energies
+      ~HALBiasCalculator.get_potential_energy
+      ~HALBiasCalculator.get_property
+      ~HALBiasCalculator.get_score
+      ~HALBiasCalculator.get_stress
+      ~HALBiasCalculator.get_stresses
+      ~HALBiasCalculator.read
+      ~HALBiasCalculator.read_atoms
+      ~HALBiasCalculator.resample_committee
+      ~HALBiasCalculator.reset
+      ~HALBiasCalculator.select_structure
+      ~HALBiasCalculator.set
+      ~HALBiasCalculator.set_label
+      ~HALBiasCalculator.sync
+      ~HALBiasCalculator.todict
+      ~HALBiasCalculator.update_tau
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~HALBiasCalculator.default_parameters
+      ~HALBiasCalculator.directory
+      ~HALBiasCalculator.discard_results_on_any_change
+      ~HALBiasCalculator.ignored_changes
+      ~HALBiasCalculator.implemented_properties
+      ~HALBiasCalculator.label
+      ~HALBiasCalculator.mixing
+      ~HALBiasCalculator.name
+   
+   

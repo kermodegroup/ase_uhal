@@ -1,0 +1,807 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Basic Usage of ase_uhal &#8212; ase_uhal  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>window.MathJax = {"chtml": {"displayAlign": "center"}, "tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/basic_usage';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">ase_uhal  documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../theory.html">
+    Theory
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api.html">
+    API Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../developer_guide.html">
+    Developer Guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../theory.html">
+    Theory
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api.html">
+    API Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../developer_guide.html">
+    Developer Guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Basic Usage of ase_uhal</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="Basic-Usage-of-ase_uhal">
+<h1>Basic Usage of ase_uhal<a class="headerlink" href="#Basic-Usage-of-ase_uhal" title="Link to this heading">#</a></h1>
+<p>The ase_uhal package implements various tools for enabling HAL-style biased dynamics to accelerate active learning workflows.</p>
+<p>First, some imports:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Imports</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mace.calculators</span><span class="w"> </span><span class="kn">import</span> <span class="n">mace_mp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase.build</span><span class="w"> </span><span class="kn">import</span> <span class="n">bulk</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase.atoms</span><span class="w"> </span><span class="kn">import</span> <span class="n">Atoms</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase.md.langevin</span><span class="w"> </span><span class="kn">import</span> <span class="n">Langevin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">fs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span><span class="p">,</span> <span class="n">trange</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">docs_vis</span><span class="w"> </span><span class="kn">import</span> <span class="n">interactive_view</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/e3nn/o3/_wigner.py:10: UserWarning: Environment variable TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD detected, since the`weights_only` argument was not explicitly passed to `torch.load`, forcing weights_only=False.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), &#39;constants.pt&#39;))
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "60c5b7f0e2c14aa0ba3156ecfdeae4cb"}</script></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ase_uhal.bias_calculators</span><span class="w"> </span><span class="kn">import</span> <span class="n">HALBiasCalculator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase_uhal.committee_calculators</span><span class="w"> </span><span class="kn">import</span> <span class="n">MACEHALCalculator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase_uhal</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructureSelector</span>
+</pre></div>
+</div>
+</div>
+<section id="Committee-Calculators">
+<h2>Committee Calculators<a class="headerlink" href="#Committee-Calculators" title="Link to this heading">#</a></h2>
+<p>ase_uhal computes a biasing potential based on an error metric from a zero-mean committee of linear models based on a descriptor function. The first step is to generate this committee. This is managed by several variants of the committee calculator interface. Here, we use <code class="docutils literal notranslate"><span class="pre">MACEHALCalculator</span></code>, which implements a HAL-style biasing potential (based on the standard deviation of the committee energies) using MACE descriptor features (equivalent to <code class="docutils literal notranslate"><span class="pre">mace_calc.get_descriptor()</span></code>). We will take these
+features from the MPA medium foundation model:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mace_calc</span> <span class="o">=</span> <span class="n">mace_mp</span><span class="p">()</span> <span class="c1"># normal MACE MPA medium model calculator (from mace_torch)</span>
+
+<span class="n">comm_calc</span> <span class="o">=</span> <span class="n">MACEHALCalculator</span><span class="p">(</span><span class="n">mace_calc</span><span class="p">,</span>
+                                    <span class="n">committee_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                                    <span class="n">prior_weight</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="c1"># Weight of the prior in the linear system to find committee weights</span>
+                                    <span class="n">energy_weight</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">forces_weight</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="c1"># Weights on energy and force observations when sampling new structures</span>
+                                    <span class="n">lowmem</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="c1"># Use a lower memory strategy to fit the linear system</span>
+                                    <span class="n">rng</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
+
+<span class="n">comm_calc</span><span class="o">.</span><span class="n">resample_committee</span><span class="p">()</span> <span class="c1">#Build the initial committee</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Using medium MPA-0 model as default MACE-MP model, to use previous (before 3.10) default model please specify &#39;medium&#39; as model argument
+Downloading MACE model from &#39;https://github.com/ACEsuit/mace-mp/releases/download/mace_mpa_0/mace-mpa-0-medium.model&#39;
+Cached MACE model to /home/runner/.cache/mace/macempa0mediummodel
+Using Materials Project MACE for MACECalculator with /home/runner/.cache/mace/macempa0mediummodel
+Using float32 for MACECalculator, which is faster but less accurate. Recommended for MD. Use float64 for geometry optimization.
+Using head default out of [&#39;default&#39;]
+Default dtype float32 does not match model dtype float64, converting models to float32.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/mace/calculators/mace.py:197: UserWarning: Environment variable TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD detected, since the`weights_only` argument was not explicitly passed to `torch.load`, forcing weights_only=False.
+  torch.load(f=model_path, map_location=device)
+</pre></div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">MACEHALCalculator</span></code> object internally manages the committee state, and uses the standard ASE calculator interface. The committee is zero-mean by construction, so the energies, forces, and stresses calculated by the committee are not intended to be used as a standalone interatomic potential. We use special “bias_” properties (e.g. “bias_energy”) to differentiate properties of the committee which should be used for biasing.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ats</span> <span class="o">=</span> <span class="n">bulk</span><span class="p">(</span><span class="s2">&quot;Si&quot;</span><span class="p">,</span> <span class="n">cubic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ats</span><span class="o">.</span><span class="n">calc</span> <span class="o">=</span> <span class="n">comm_calc</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">ats</span><span class="o">.</span><span class="n">get_potential_energy</span><span class="p">(),</span> <span class="n">comm_calc</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="s2">&quot;bias_energy&quot;</span><span class="p">,</span> <span class="n">ats</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+-5.359317 33.059402
+</pre></div></div>
+</div>
+<p>It is important to also be able to update the committee once we have found a structure we want to add to the database. We can do this using the <code class="docutils literal notranslate"><span class="pre">select_structure()</span></code> method:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ats</span> <span class="o">=</span> <span class="n">bulk</span><span class="p">(</span><span class="s2">&quot;Si&quot;</span><span class="p">,</span> <span class="n">cubic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">comm_calc</span><span class="o">.</span><span class="n">select_structure</span><span class="p">(</span><span class="n">ats</span><span class="p">)</span> <span class="c1"># Adds a silicon bulk structure to the list of selected structures</span>
+
+<span class="c1"># Resample the committee, now incorporating information from the newly selected structure</span>
+<span class="n">comm_calc</span><span class="o">.</span><span class="n">resample_committee</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Selecting a structure does two main things. Firstly, it adds a copy of the structure to the <code class="docutils literal notranslate"><span class="pre">selected_structures</span></code> list of the calculator object, so that the selected structures can be easily retrieved later on (e.g. after the biased dynamics has finished). Secondly, it adds the features of the structure (descriptor evaluations and their gradients) to an internal linear system, so that future committee samples are conditioned on this new information.</p>
+<p>The second part is important, as it reduces the committee variance for structures close to the sampled structure. In this way, we learn to avoid the previously sampled space, and can more easily sample new regions.</p>
+</section>
+<section id="Bias-Calculators">
+<h2>Bias Calculators<a class="headerlink" href="#Bias-Calculators" title="Link to this heading">#</a></h2>
+<p>The bias calculators combine a standard ase-compatible calculator with a committee calculator described above. The result is a new ase calculator, where the energy force and stress properties are a weighted sum of the results from both component calculators:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}  \begin{equation}
+      E_\text{bias} = E_\text{Normal calc} + \tau E_\text{Committee calc}
+  \end{equation}\\The parameter :math:`\tau` describes the mixing strength, and can be either fixed or adaptively determined, in the same manner as the ACEHAL approach.\end{aligned}\end{align} \]</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hal_calc</span> <span class="o">=</span> <span class="n">HALBiasCalculator</span><span class="p">(</span><span class="n">mean_calc</span><span class="o">=</span><span class="n">mace_calc</span><span class="p">,</span> <span class="c1"># Mean function calculator (replaces the mean of an ACEHAL committee)</span>
+                         <span class="n">committee_calc</span><span class="o">=</span><span class="n">comm_calc</span><span class="p">,</span> <span class="c1"># Committee biasing calculator</span>
+                         <span class="n">adaptive_tau</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># Automatically control the biasing strength during dynamics</span>
+                         <span class="n">tau_rel</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="c1"># Target ratio of bias forces to mean forces</span>
+                         <span class="n">tau_hist</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="c1"># History length for force mixing to determine tau</span>
+                         <span class="n">tau_delay</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span> <span class="c1"># Number of mixing steps before tau should start to be changed</span>
+</pre></div>
+</div>
+</div>
+<p>As well as the potential mixing, the bias calculator also implements a selection metric, which can be based on both the biasing potential or the normal ASE calculator results. The <code class="docutils literal notranslate"><span class="pre">HALBiasCalculator</span></code> class implements the same selection metric ase ACEHAL, which is based on the ratio of forces from both calculators.</p>
+<p>We can now use the <code class="docutils literal notranslate"><span class="pre">HALBiasCalculator</span></code> as a normal ASE calculator by setting a tau value:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ats</span> <span class="o">=</span> <span class="n">bulk</span><span class="p">(</span><span class="s2">&quot;Si&quot;</span><span class="p">)</span>
+
+<span class="n">ats</span><span class="o">.</span><span class="n">calc</span> <span class="o">=</span> <span class="n">mace_calc</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MACE MPA Energy:&quot;</span><span class="p">,</span> <span class="n">ats</span><span class="o">.</span><span class="n">get_potential_energy</span><span class="p">())</span>
+
+<span class="n">ats</span><span class="o">.</span><span class="n">calc</span> <span class="o">=</span> <span class="n">hal_calc</span>
+<span class="n">hal_calc</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="mf">0.15</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Biased Energy:&quot;</span><span class="p">,</span> <span class="n">ats</span><span class="o">.</span><span class="n">get_potential_energy</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+MACE MPA Energy: -10.824769020080566
+Biased Energy: -10.857981
+</pre></div></div>
+</div>
+</section>
+<section id="Running-Biased-Dynamics">
+<h2>Running Biased Dynamics<a class="headerlink" href="#Running-Biased-Dynamics" title="Link to this heading">#</a></h2>
+<p>We will use the example of an oxygen interstitial atom in bulk silicon as a first example of using biased dynamics with ase_uhal. We start by constructing a supercell of Si, and adding an oxygen atom into the supercell.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Si</span> <span class="o">=</span> <span class="n">bulk</span><span class="p">(</span><span class="s2">&quot;Si&quot;</span><span class="p">,</span> <span class="n">cubic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">inter_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">])</span> <span class="o">*</span> <span class="n">Si</span><span class="o">.</span><span class="n">cell</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+<span class="n">ats</span> <span class="o">=</span> <span class="n">Si</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">Atoms</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="n">positions</span><span class="o">=</span><span class="p">[</span><span class="n">inter_pos</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">interactive_view</span><span class="p">(</span><span class="n">ats</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "c971349b440040e0a431b525ca9eb093"}</script></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup dynamics</span>
+<span class="n">ats</span><span class="o">.</span><span class="n">calc</span> <span class="o">=</span> <span class="n">hal_calc</span>
+<span class="n">hal_calc</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Reset tau to zero, so that it can be automatically determined</span>
+
+
+<span class="c1"># Setup MD</span>
+<span class="n">dyn</span> <span class="o">=</span> <span class="n">Langevin</span><span class="p">(</span><span class="n">ats</span><span class="p">,</span> <span class="mi">1</span><span class="o">*</span><span class="n">fs</span><span class="p">,</span> <span class="n">temperature_K</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">friction</span><span class="o">=</span><span class="mf">0.01</span> <span class="o">/</span> <span class="n">fs</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<p>In addition to the committee and bias calculators, ase_uhal also provides functionality for attaching common processes to dynamics, using observers, so that they can be automatically handled on the fly. This can be achieved using <code class="docutils literal notranslate"><span class="pre">dyn.attach(f,</span> <span class="pre">interval,</span> <span class="pre">*args)</span></code>, where <code class="docutils literal notranslate"><span class="pre">f</span></code> is the function to be executed, <code class="docutils literal notranslate"><span class="pre">interval</span></code> is the number of MD timesteps between each call to <code class="docutils literal notranslate"><span class="pre">f</span></code>, and <code class="docutils literal notranslate"><span class="pre">*args</span></code> are arguments to <code class="docutils literal notranslate"><span class="pre">f</span></code>.</p>
+<p>The bias calculators allow for the biasing constant <span class="math notranslate nohighlight">\(\tau\)</span> to be automatically determined, in a manner similar to the original ACEHAL implementation. This is directly attachable (e.g. <code class="docutils literal notranslate"><span class="pre">dyn.attach(hal_calc.update_tau,</span> <span class="pre">1)</span></code> or equivalently <code class="docutils literal notranslate"><span class="pre">dyn.attach(hal_calc.update_tau)</span></code>).</p>
+<section id="StructureSelector">
+<h3>StructureSelector<a class="headerlink" href="#StructureSelector" title="Link to this heading">#</a></h3>
+<p>StructureSelector is another attachable component which aims to automate the selection of new structures into the dataset, based on the selection scores calculated by the bias calculator. It is able to adabtively set a selection threshold by first computing a mixed score from all previous selection scores</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}  \begin{equation}
+      S_\text{mix}^{i} = (1 - \text{mixing}) \times S_\text{mix}^{i-1} + \text{mixing} \times S^{i}
+  \end{equation}\\and then setting the selection criterion to be some user-defined multiplier of this mixed score\end{aligned}\end{align} \]</div>
+<div class="math notranslate nohighlight">
+\[\begin{equation}
+    S_\text{Criterion}^{i} = \text{thresh\_mul} \times S_\text{mix}^{i}
+\end{equation}\]</div>
+<p>Once a score beats the selection criterion, the <code class="docutils literal notranslate"><span class="pre">StructureSelector</span></code> object will wait until a peak is detected (i.e. until the next selection score is lower) before making a selection. It can also automatically trigger the committee to be resampled based on the newly selected structure.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">selector</span> <span class="o">=</span> <span class="n">StructureSelector</span><span class="p">(</span><span class="n">bias_calc</span><span class="o">=</span><span class="n">hal_calc</span><span class="p">,</span>
+                             <span class="n">threshold</span><span class="o">=</span><span class="s2">&quot;adaptive&quot;</span><span class="p">,</span> <span class="c1"># Automatically determine threshold for wether score value is significant</span>
+                             <span class="n">auto_resample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># Aautomatically resample the committee after each selection</span>
+                             <span class="n">delay</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="c1"># Delay before threshold starts to be modified</span>
+                             <span class="n">mixing</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="c1"># Mixing parameter for score mixing</span>
+                             <span class="n">thresh_mul</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span> <span class="c1"># Multiplier on mixed scores</span>
+
+<span class="c1"># Attach observers to dynamics, to be automatically called during the run</span>
+<span class="n">dyn</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">hal_calc</span><span class="o">.</span><span class="n">update_tau</span><span class="p">)</span> <span class="c1"># Update tau every iteration</span>
+<span class="n">dyn</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># Calculate HAL score and look to select a structure every 2nd iteration</span>
+</pre></div>
+</div>
+</div>
+<p>To visualise the internal states of the bias calculator and <code class="docutils literal notranslate"><span class="pre">StructureSelector</span></code> objects, we also define a dummy observer which logs some key values into the atoms objects:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_dummy_observer</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">bias_calc</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">ats_list</span><span class="p">):</span>
+    <span class="c1"># For later plotting, save the full trajectory, and some details of the scores and constants</span>
+
+    <span class="c1"># Bolt current parameters into the info dict</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;hal_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">_prev_score</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;tau&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bias_calc</span><span class="o">.</span><span class="n">tau</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;thresh&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">threshold</span>
+
+    <span class="n">ats_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atoms</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+<span class="n">ats_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="n">dyn</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">_dummy_observer</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">ats</span><span class="p">,</span> <span class="n">hal_calc</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">ats_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Finally, we are ready to run some MD.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">nsteps</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="n">dyn</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">nsteps</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>And then we plot some of the internal state:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">scores</span> <span class="o">=</span> <span class="p">[</span><span class="n">atoms</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;hal_score&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">atoms</span> <span class="ow">in</span> <span class="n">ats_list</span><span class="p">]</span>
+<span class="n">taus</span> <span class="o">=</span> <span class="p">[</span><span class="n">atoms</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;tau&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">atoms</span> <span class="ow">in</span> <span class="n">ats_list</span><span class="p">]</span>
+<span class="n">thresholds</span> <span class="o">=</span> <span class="p">[</span><span class="n">atoms</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;thresh&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">atoms</span> <span class="ow">in</span> <span class="n">ats_list</span><span class="p">]</span>
+
+<span class="n">selections</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">score_peak</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ats_list</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thresholds</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="n">thresholds</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
+        <span class="n">score_peak</span> <span class="o">=</span> <span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">score_peak</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">selections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">score_peak</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+<span class="n">Ns</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ats_list</span><span class="p">))]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Taus&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;HAL score&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Ns</span><span class="p">,</span> <span class="n">taus</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Ns</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;HAL Score&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Ns</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Selection Threshold&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">selections</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">selections</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Selection Event&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;MD Step&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Selection Score&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\tau$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_basic_usage_24_0.png" src="../_images/examples_basic_usage_24_0.png" />
+</div>
+</div>
+<p>We see from the plot that after the selection event, the HAL scores rapidly decrease. This is because after selection the committee is resampled based on the new information that the selected structure adds, which decreases the variance of committee weights. The tau value rises because the automatic determination aims to balance the newly decreased committee bias forces with the “mean forces” from the normal MPA model.</p>
+<script type="application/vnd.jupyter.widget-state+json">
+{"state": {"0ec8844d3fdc447f81cf567797aa47a6": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "60c5b7f0e2c14aa0ba3156ecfdeae4cb": {"model_name": "ColormakerRegistryModel", "model_module": "nglview-js-widgets", "model_module_version": "3.1.5", "state": {"_dom_classes": [], "_model_module": "nglview-js-widgets", "_model_module_version": "3.1.5", "_model_name": "ColormakerRegistryModel", "_msg_ar": [], "_msg_q": [], "_ready": false, "_view_count": null, "_view_module": "nglview-js-widgets", "_view_module_version": "3.1.5", "_view_name": "ColormakerRegistryView", "layout": "IPY_MODEL_0ec8844d3fdc447f81cf567797aa47a6", "tabbable": null, "tooltip": null}}, "63cd9998318c41b5843e2689b9c71034": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": "300px", "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": "100%"}}, "c971349b440040e0a431b525ca9eb093": {"model_name": "NGLModel", "model_module": "nglview-js-widgets", "model_module_version": "3.1.5", "state": {"_camera_orientation": [], "_camera_str": "orthographic", "_dom_classes": [], "_gui_theme": null, "_ibtn_fullscreen": "IPY_MODEL_ffd41d59273648e097a943047df1a05d", "_igui": null, "_iplayer": "IPY_MODEL_c8653da84f434b42bfb017929a8561c6", "_model_module": "nglview-js-widgets", "_model_module_version": "3.1.5", "_model_name": "NGLModel", "_ngl_color_dict": {}, "_ngl_coordinate_resource": {}, "_ngl_full_stage_parameters": {}, "_ngl_msg_archive": [{"target": "Stage", "type": "call_method", "methodName": "loadFile", "reconstruc_color_scheme": false, "args": [{"type": "blob", "data": "CRYST1   10.860   10.860   10.860  90.00  90.00  90.00 P 1\nMODEL     1\nATOM      1   Si MOL     1       0.000   0.000   0.000  1.00  0.00          SI  \nATOM      2   Si MOL     1       1.357   1.357   1.357  1.00  0.00          SI  \nATOM      3   Si MOL     1       0.000   2.715   2.715  1.00  0.00          SI  \nATOM      4   Si MOL     1       1.357   4.072   4.072  1.00  0.00          SI  \nATOM      5   Si MOL     1       2.715   0.000   2.715  1.00  0.00          SI  \nATOM      6   Si MOL     1       4.072   1.357   4.072  1.00  0.00          SI  \nATOM      7   Si MOL     1       2.715   2.715   0.000  1.00  0.00          SI  \nATOM      8   Si MOL     1       4.072   4.072   1.357  1.00  0.00          SI  \nATOM      9   Si MOL     1       0.000   0.000   5.430  1.00  0.00          SI  \nATOM     10   Si MOL     1       1.357   1.357   6.787  1.00  0.00          SI  \nATOM     11   Si MOL     1       0.000   2.715   8.145  1.00  0.00          SI  \nATOM     12   Si MOL     1       1.357   4.072   9.502  1.00  0.00          SI  \nATOM     13   Si MOL     1       2.715   0.000   8.145  1.00  0.00          SI  \nATOM     14   Si MOL     1       4.072   1.357   9.502  1.00  0.00          SI  \nATOM     15   Si MOL     1       2.715   2.715   5.430  1.00  0.00          SI  \nATOM     16   Si MOL     1       4.072   4.072   6.787  1.00  0.00          SI  \nATOM     17   Si MOL     1       0.000   5.430   0.000  1.00  0.00          SI  \nATOM     18   Si MOL     1       1.357   6.787   1.357  1.00  0.00          SI  \nATOM     19   Si MOL     1       0.000   8.145   2.715  1.00  0.00          SI  \nATOM     20   Si MOL     1       1.357   9.502   4.072  1.00  0.00          SI  \nATOM     21   Si MOL     1       2.715   5.430   2.715  1.00  0.00          SI  \nATOM     22   Si MOL     1       4.072   6.787   4.072  1.00  0.00          SI  \nATOM     23   Si MOL     1       2.715   8.145   0.000  1.00  0.00          SI  \nATOM     24   Si MOL     1       4.072   9.502   1.357  1.00  0.00          SI  \nATOM     25   Si MOL     1       0.000   5.430   5.430  1.00  0.00          SI  \nATOM     26   Si MOL     1       1.357   6.787   6.787  1.00  0.00          SI  \nATOM     27   Si MOL     1       0.000   8.145   8.145  1.00  0.00          SI  \nATOM     28   Si MOL     1       1.357   9.502   9.502  1.00  0.00          SI  \nATOM     29   Si MOL     1       2.715   5.430   8.145  1.00  0.00          SI  \nATOM     30   Si MOL     1       4.072   6.787   9.502  1.00  0.00          SI  \nATOM     31   Si MOL     1       2.715   8.145   5.430  1.00  0.00          SI  \nATOM     32   Si MOL     1       4.072   9.502   6.787  1.00  0.00          SI  \nATOM     33   Si MOL     1       5.430   0.000   0.000  1.00  0.00          SI  \nATOM     34   Si MOL     1       6.787   1.357   1.357  1.00  0.00          SI  \nATOM     35   Si MOL     1       5.430   2.715   2.715  1.00  0.00          SI  \nATOM     36   Si MOL     1       6.787   4.072   4.072  1.00  0.00          SI  \nATOM     37   Si MOL     1       8.145   0.000   2.715  1.00  0.00          SI  \nATOM     38   Si MOL     1       9.502   1.357   4.072  1.00  0.00          SI  \nATOM     39   Si MOL     1       8.145   2.715   0.000  1.00  0.00          SI  \nATOM     40   Si MOL     1       9.502   4.072   1.357  1.00  0.00          SI  \nATOM     41   Si MOL     1       5.430   0.000   5.430  1.00  0.00          SI  \nATOM     42   Si MOL     1       6.787   1.357   6.787  1.00  0.00          SI  \nATOM     43   Si MOL     1       5.430   2.715   8.145  1.00  0.00          SI  \nATOM     44   Si MOL     1       6.787   4.072   9.502  1.00  0.00          SI  \nATOM     45   Si MOL     1       8.145   0.000   8.145  1.00  0.00          SI  \nATOM     46   Si MOL     1       9.502   1.357   9.502  1.00  0.00          SI  \nATOM     47   Si MOL     1       8.145   2.715   5.430  1.00  0.00          SI  \nATOM     48   Si MOL     1       9.502   4.072   6.787  1.00  0.00          SI  \nATOM     49   Si MOL     1       5.430   5.430   0.000  1.00  0.00          SI  \nATOM     50   Si MOL     1       6.787   6.787   1.357  1.00  0.00          SI  \nATOM     51   Si MOL     1       5.430   8.145   2.715  1.00  0.00          SI  \nATOM     52   Si MOL     1       6.787   9.502   4.072  1.00  0.00          SI  \nATOM     53   Si MOL     1       8.145   5.430   2.715  1.00  0.00          SI  \nATOM     54   Si MOL     1       9.502   6.787   4.072  1.00  0.00          SI  \nATOM     55   Si MOL     1       8.145   8.145   0.000  1.00  0.00          SI  \nATOM     56   Si MOL     1       9.502   9.502   1.357  1.00  0.00          SI  \nATOM     57   Si MOL     1       5.430   5.430   5.430  1.00  0.00          SI  \nATOM     58   Si MOL     1       6.787   6.787   6.787  1.00  0.00          SI  \nATOM     59   Si MOL     1       5.430   8.145   8.145  1.00  0.00          SI  \nATOM     60   Si MOL     1       6.787   9.502   9.502  1.00  0.00          SI  \nATOM     61   Si MOL     1       8.145   5.430   8.145  1.00  0.00          SI  \nATOM     62   Si MOL     1       9.502   6.787   9.502  1.00  0.00          SI  \nATOM     63   Si MOL     1       8.145   8.145   5.430  1.00  0.00          SI  \nATOM     64   Si MOL     1       9.502   9.502   6.787  1.00  0.00          SI  \nATOM     65    O MOL     1       2.715   1.357   1.357  1.00  0.00           O  \nENDMDL\n", "binary": false}], "kwargs": {"defaultRepresentation": true, "ext": "pdb"}}, {"target": "Widget", "type": "call_method", "methodName": "removeRepresentation", "reconstruc_color_scheme": false, "args": [0, 0], "kwargs": {}}, {"target": "Stage", "type": "call_method", "methodName": "loadFile", "reconstruc_color_scheme": false, "args": [{"type": "blob", "data": "CRYST1   10.860   10.860   10.860  90.00  90.00  90.00 P 1\nMODEL     1\nATOM      1   Si MOL     1       0.000   0.000   0.000  1.00  0.00          SI  \nATOM      2   Si MOL     1       1.357   1.357   1.357  1.00  0.00          SI  \nATOM      3   Si MOL     1       0.000   2.715   2.715  1.00  0.00          SI  \nATOM      4   Si MOL     1       1.357   4.072   4.072  1.00  0.00          SI  \nATOM      5   Si MOL     1       2.715   0.000   2.715  1.00  0.00          SI  \nATOM      6   Si MOL     1       4.072   1.357   4.072  1.00  0.00          SI  \nATOM      7   Si MOL     1       2.715   2.715   0.000  1.00  0.00          SI  \nATOM      8   Si MOL     1       4.072   4.072   1.357  1.00  0.00          SI  \nATOM      9   Si MOL     1       0.000   0.000   5.430  1.00  0.00          SI  \nATOM     10   Si MOL     1       1.357   1.357   6.787  1.00  0.00          SI  \nATOM     11   Si MOL     1       0.000   2.715   8.145  1.00  0.00          SI  \nATOM     12   Si MOL     1       1.357   4.072   9.502  1.00  0.00          SI  \nATOM     13   Si MOL     1       2.715   0.000   8.145  1.00  0.00          SI  \nATOM     14   Si MOL     1       4.072   1.357   9.502  1.00  0.00          SI  \nATOM     15   Si MOL     1       2.715   2.715   5.430  1.00  0.00          SI  \nATOM     16   Si MOL     1       4.072   4.072   6.787  1.00  0.00          SI  \nATOM     17   Si MOL     1       0.000   5.430   0.000  1.00  0.00          SI  \nATOM     18   Si MOL     1       1.357   6.787   1.357  1.00  0.00          SI  \nATOM     19   Si MOL     1       0.000   8.145   2.715  1.00  0.00          SI  \nATOM     20   Si MOL     1       1.357   9.502   4.072  1.00  0.00          SI  \nATOM     21   Si MOL     1       2.715   5.430   2.715  1.00  0.00          SI  \nATOM     22   Si MOL     1       4.072   6.787   4.072  1.00  0.00          SI  \nATOM     23   Si MOL     1       2.715   8.145   0.000  1.00  0.00          SI  \nATOM     24   Si MOL     1       4.072   9.502   1.357  1.00  0.00          SI  \nATOM     25   Si MOL     1       0.000   5.430   5.430  1.00  0.00          SI  \nATOM     26   Si MOL     1       1.357   6.787   6.787  1.00  0.00          SI  \nATOM     27   Si MOL     1       0.000   8.145   8.145  1.00  0.00          SI  \nATOM     28   Si MOL     1       1.357   9.502   9.502  1.00  0.00          SI  \nATOM     29   Si MOL     1       2.715   5.430   8.145  1.00  0.00          SI  \nATOM     30   Si MOL     1       4.072   6.787   9.502  1.00  0.00          SI  \nATOM     31   Si MOL     1       2.715   8.145   5.430  1.00  0.00          SI  \nATOM     32   Si MOL     1       4.072   9.502   6.787  1.00  0.00          SI  \nATOM     33   Si MOL     1       5.430   0.000   0.000  1.00  0.00          SI  \nATOM     34   Si MOL     1       6.787   1.357   1.357  1.00  0.00          SI  \nATOM     35   Si MOL     1       5.430   2.715   2.715  1.00  0.00          SI  \nATOM     36   Si MOL     1       6.787   4.072   4.072  1.00  0.00          SI  \nATOM     37   Si MOL     1       8.145   0.000   2.715  1.00  0.00          SI  \nATOM     38   Si MOL     1       9.502   1.357   4.072  1.00  0.00          SI  \nATOM     39   Si MOL     1       8.145   2.715   0.000  1.00  0.00          SI  \nATOM     40   Si MOL     1       9.502   4.072   1.357  1.00  0.00          SI  \nATOM     41   Si MOL     1       5.430   0.000   5.430  1.00  0.00          SI  \nATOM     42   Si MOL     1       6.787   1.357   6.787  1.00  0.00          SI  \nATOM     43   Si MOL     1       5.430   2.715   8.145  1.00  0.00          SI  \nATOM     44   Si MOL     1       6.787   4.072   9.502  1.00  0.00          SI  \nATOM     45   Si MOL     1       8.145   0.000   8.145  1.00  0.00          SI  \nATOM     46   Si MOL     1       9.502   1.357   9.502  1.00  0.00          SI  \nATOM     47   Si MOL     1       8.145   2.715   5.430  1.00  0.00          SI  \nATOM     48   Si MOL     1       9.502   4.072   6.787  1.00  0.00          SI  \nATOM     49   Si MOL     1       5.430   5.430   0.000  1.00  0.00          SI  \nATOM     50   Si MOL     1       6.787   6.787   1.357  1.00  0.00          SI  \nATOM     51   Si MOL     1       5.430   8.145   2.715  1.00  0.00          SI  \nATOM     52   Si MOL     1       6.787   9.502   4.072  1.00  0.00          SI  \nATOM     53   Si MOL     1       8.145   5.430   2.715  1.00  0.00          SI  \nATOM     54   Si MOL     1       9.502   6.787   4.072  1.00  0.00          SI  \nATOM     55   Si MOL     1       8.145   8.145   0.000  1.00  0.00          SI  \nATOM     56   Si MOL     1       9.502   9.502   1.357  1.00  0.00          SI  \nATOM     57   Si MOL     1       5.430   5.430   5.430  1.00  0.00          SI  \nATOM     58   Si MOL     1       6.787   6.787   6.787  1.00  0.00          SI  \nATOM     59   Si MOL     1       5.430   8.145   8.145  1.00  0.00          SI  \nATOM     60   Si MOL     1       6.787   9.502   9.502  1.00  0.00          SI  \nATOM     61   Si MOL     1       8.145   5.430   8.145  1.00  0.00          SI  \nATOM     62   Si MOL     1       9.502   6.787   9.502  1.00  0.00          SI  \nATOM     63   Si MOL     1       8.145   8.145   5.430  1.00  0.00          SI  \nATOM     64   Si MOL     1       9.502   9.502   6.787  1.00  0.00          SI  \nATOM     65    O MOL     1       2.715   1.357   1.357  1.00  0.00           O  \nENDMDL\n", "binary": false}], "kwargs": {"defaultRepresentation": false, "name": "", "ext": "pdb"}}, {"component_index": 1, "target": "compList", "type": "call_method", "methodName": "addRepresentation", "reconstruc_color_scheme": false, "args": ["spacefill"], "kwargs": {"sele": "all", "radiusType": "covalent", "radiusScale": 0.5}}, {"component_index": 0, "target": "compList", "type": "call_method", "methodName": "addRepresentation", "reconstruc_color_scheme": false, "args": ["unitcell"], "kwargs": {"sele": "all"}}, {"target": "Widget", "type": "call_method", "methodName": "updateRepresentationsByName", "reconstruc_color_scheme": false, "args": ["spacefill", 0], "kwargs": {"radiusType": "covalent", "radiusScale": 0.5}}, {"target": "Stage", "type": "call_method", "methodName": "setParameters", "reconstruc_color_scheme": false, "args": [], "kwargs": {"cameraType": "orthographic"}}, {"target": "Widget", "type": "call_method", "methodName": "setParameters", "reconstruc_color_scheme": false, "args": [{"clipDist": 0}], "kwargs": {}}, {"target": "Widget", "type": "call_method", "methodName": "setSize", "reconstruc_color_scheme": false, "args": ["100%", ""], "kwargs": {}}, {"target": "Widget", "type": "call_method", "methodName": "setSize", "reconstruc_color_scheme": false, "args": ["", "300px"], "kwargs": {}}, {"target": "Widget", "type": "call_method", "methodName": "executeCode", "reconstruc_color_scheme": false, "args": ["\n                    this.stage.mouseControls.add('hoverPick', (stage, pickingProxy) => {\n                        let tooltip = this.stage.tooltip;\n                        if(pickingProxy && pickingProxy.atom && !pickingProxy.bond){\n                            let atom = pickingProxy.atom;\n                            if (atom.structure.name.length > 0){\n                                tooltip.innerText = atom.atomname + \" atom: \" + atom.structure.name;\n                            } else {\n                                tooltip.innerText = atom.atomname + \" atom\";\n                            }\n                        } else if (pickingProxy && pickingProxy.bond){\n                            let bond = pickingProxy.bond;\n                            if (bond.structure.name.length > 0){\n                            tooltip.innerText = bond.atom1.atomname + \"-\" + bond.atom2.atomname + \" bond: \" + bond.structure.name;\n                            } else {\n                                tooltip.innerText = bond.atom1.atomname + \"-\" + bond.atom2.atomname + \" bond\";\n                            }\n                        } else if (pickingProxy && pickingProxy.unitcell){\n                            tooltip.innerText = \"Unit cell\";\n                        }\n                    });\n                    "], "kwargs": {}}], "_ngl_original_stage_parameters": {}, "_ngl_repr_dict": {}, "_ngl_serialize": false, "_ngl_version": "", "_ngl_view_id": [], "_player_dict": {}, "_scene_position": {}, "_scene_rotation": {}, "_synced_model_ids": [], "_synced_repr_model_ids": [], "_view_count": null, "_view_height": "", "_view_module": "nglview-js-widgets", "_view_module_version": "3.1.5", "_view_name": "NGLView", "_view_width": "", "background": "white", "frame": 0, "gui_style": null, "layout": "IPY_MODEL_63cd9998318c41b5843e2689b9c71034", "max_frame": 0, "n_components": 0, "picked": {}, "tabbable": null, "tooltip": null}}, "8dc9afe6e4e14495a346a4e680bf7e38": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "59ceda7ffbc1449c9b29df217480e0fa": {"model_name": "ImageModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ImageModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ImageView", "format": "png", "height": "", "layout": "IPY_MODEL_8dc9afe6e4e14495a346a4e680bf7e38", "tabbable": null, "tooltip": null, "width": "900.0"}, "buffers": [{"data": "", "encoding": "base64", "path": ["value"]}]}, "88c1c2d9af88475c860de9ef4211d7ed": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "15ac174eb6044d30997a4ae5a9993697": {"model_name": "DescriptionStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "DescriptionStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "description_width": ""}}, "7498ac29b4d34d03afcd96c4ff28790e": {"model_name": "PlayModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "PlayModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "PlayView", "description": "", "description_allow_html": false, "disabled": false, "interval": 100, "layout": "IPY_MODEL_88c1c2d9af88475c860de9ef4211d7ed", "max": 0, "min": 0, "playing": false, "repeat": false, "show_repeat": true, "step": 1, "style": "IPY_MODEL_15ac174eb6044d30997a4ae5a9993697", "tabbable": null, "tooltip": null, "value": 0}}, "32bda510e3774e8aba820632f47d6b9d": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "5a46416a1a1e4eaab1dcf46837e91ac2": {"model_name": "SliderStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "SliderStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "description_width": "", "handle_color": null}}, "ccb6962bae9f4f1180a17135cdfed41f": {"model_name": "IntSliderModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "IntSliderModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "IntSliderView", "behavior": "drag-tap", "continuous_update": true, "description": "", "description_allow_html": false, "disabled": false, "layout": "IPY_MODEL_32bda510e3774e8aba820632f47d6b9d", "max": 0, "min": 0, "orientation": "horizontal", "readout": true, "readout_format": "d", "step": 1, "style": "IPY_MODEL_5a46416a1a1e4eaab1dcf46837e91ac2", "tabbable": null, "tooltip": null, "value": 0}}, "ab6b0f2d44c44513bfad451ffebc2727": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "c8653da84f434b42bfb017929a8561c6": {"model_name": "HBoxModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_7498ac29b4d34d03afcd96c4ff28790e", "IPY_MODEL_ccb6962bae9f4f1180a17135cdfed41f"], "layout": "IPY_MODEL_ab6b0f2d44c44513bfad451ffebc2727", "tabbable": null, "tooltip": null}}, "e86efa78c34f4246a14f5294a999c90c": {"model_name": "LinkModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "LinkModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": null, "source": ["IPY_MODEL_7498ac29b4d34d03afcd96c4ff28790e", "value"], "target": ["IPY_MODEL_ccb6962bae9f4f1180a17135cdfed41f", "value"]}}, "b5982325c7a948748b8e60abb2723d2d": {"model_name": "LinkModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "LinkModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": null, "source": ["IPY_MODEL_7498ac29b4d34d03afcd96c4ff28790e", "value"], "target": ["IPY_MODEL_c971349b440040e0a431b525ca9eb093", "frame"]}}, "733900db7e5442d087caa4f48a36f6f5": {"model_name": "LinkModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "LinkModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": null, "source": ["IPY_MODEL_7498ac29b4d34d03afcd96c4ff28790e", "max"], "target": ["IPY_MODEL_c971349b440040e0a431b525ca9eb093", "max_frame"]}}, "36bea4e9f75c4169a3253498ee191ae4": {"model_name": "LinkModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "LinkModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": null, "source": ["IPY_MODEL_ccb6962bae9f4f1180a17135cdfed41f", "max"], "target": ["IPY_MODEL_c971349b440040e0a431b525ca9eb093", "max_frame"]}}, "7dd3e582d64148589bd9f8b1e8d07e97": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": "34px"}}, "0b374a8f29114469906485e7efbe9a8e": {"model_name": "ButtonStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ButtonStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "button_color": null, "font_family": null, "font_size": null, "font_style": null, "font_variant": null, "font_weight": null, "text_color": null, "text_decoration": null}}, "ffd41d59273648e097a943047df1a05d": {"model_name": "ButtonModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ButtonModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ButtonView", "button_style": "", "description": "", "disabled": false, "icon": "compress", "layout": "IPY_MODEL_7dd3e582d64148589bd9f8b1e8d07e97", "style": "IPY_MODEL_0b374a8f29114469906485e7efbe9a8e", "tabbable": null, "tooltip": null}}}, "version_major": 2, "version_minor": 0}
+</script></section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Committee-Calculators">Committee Calculators</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Bias-Calculators">Bias Calculators</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Running-Biased-Dynamics">Running Biased Dynamics</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#StructureSelector">StructureSelector</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/examples/basic_usage.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Thomas Rocke. Project structure based on the Computational Molecular Science Python Cookiecutter version 1.11.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,594 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Theory &#8212; ase_uhal  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>window.MathJax = {"chtml": {"displayAlign": "center"}, "tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'theory';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="User Guide" href="examples.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">ase_uhal  documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="getting_started.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Theory
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="examples.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="developer_guide.html">
+    Developer Guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="getting_started.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Theory
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="examples.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="developer_guide.html">
+    Developer Guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Theory</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="theory">
+<span id="id1"></span><h1>Theory<a class="headerlink" href="#theory" title="Link to this heading">#</a></h1>
+<section id="linear-mlips-bayesian-regression">
+<h2>Linear MLIPs &amp; Bayesian Regression<a class="headerlink" href="#linear-mlips-bayesian-regression" title="Link to this heading">#</a></h2>
+<p>A linear model is any model which can be expressed as <span class="math notranslate nohighlight">\(M(x, \theta) = f(x)\theta\)</span>, where <span class="math notranslate nohighlight">\(\theta\)</span> are model weights.
+For linear MLIP models, this <span class="math notranslate nohighlight">\(f(x)\)</span> is often the descriptor function (e.g. the ACE descriptor for ACE models).
+Often this is formulated on a per-atom basis, thus the energy of atom <span class="math notranslate nohighlight">\(i\)</span> is expressed as <span class="math notranslate nohighlight">\(E_i = d(x)\theta\)</span>.
+Here, it is more useful to formulate this in terms of a total energy,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}E_T &amp;= \sum_i E_i \\
+    &amp;= \left(\sum_i d(x_i)\right) \theta \\
+    &amp;= D(x) \theta\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(D(x)\)</span> can be thought of as an “energy descriptor”. Forces and stresses can be easily obtained by taking derivatives:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}F_i &amp;= \nabla_{r_i} E_T \\
+    &amp;= \left(\nabla_{r_i} D(x)\right) \theta\end{split}\]</div>
+<p>and thus <span class="math notranslate nohighlight">\(\nabla_{r_i} D(x)\)</span> can be though of as a “force descriptor” for the force on atom i.</p>
+<p>If we have a structure <span class="math notranslate nohighlight">\(\Pi\)</span> we would like to train on, linear MLIP models usually start by assembling a design matrix
+<span class="math notranslate nohighlight">\(\Phi\)</span>, which can be partitioned into sub-matrices by energy, force, and stress observations:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\Phi &amp;= \begin{pmatrix} \Phi_E \\ \Phi_F \\ \Phi_S\end{pmatrix}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Phi_{E} = w_E D(\Pi)\)</span>, <span class="math notranslate nohighlight">\(\Phi_{F;i} = w_F \nabla_{r_i}D(\Pi)\)</span>, etc… Here, <span class="math notranslate nohighlight">\(w_E\)</span> and <span class="math notranslate nohighlight">\(w_F\)</span> are weights
+on energy and force observations (to describe a relative importance of each). Including observations from multiple structures can
+again be achieved by constructing an augmented matrix</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\Phi = \begin{pmatrix} \Phi_0 \\ \Phi_1 \\ \vdots \\ \Phi_N \end{pmatrix}\end{split}\]</div>
+<p>Given a zero-mean prior, with prior covariance <span class="math notranslate nohighlight">\(P\)</span>, we can express the model weights as <span class="math notranslate nohighlight">\(\theta \sim \mathcal{N}(\mu_\theta, \Sigma_\theta)\)</span>,
+where</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\Sigma_\theta &amp;= \left(\Phi^T\Phi + P\right)^{-1} \\
+\mu_\theta &amp;= \Sigma_\theta^{-1} \Phi y\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(y\)</span> is a vector of energy, force, and stress observations for each structure.</p>
+<p>Typically we use the mean of the distribution <span class="math notranslate nohighlight">\(\mu_\theta\)</span> to inform the model weights, but we could also draw samples from the distribution
+to obtain a committee of models.</p>
+</section>
+<section id="acehal">
+<h2>ACEHAL<a class="headerlink" href="#acehal" title="Link to this heading">#</a></h2>
+<p>Hyperactive Learning (HAL), developed by Van der Oord et. al. <span id="id2">[<a class="reference internal" href="#id5" title="Cas van der Oord, Matthias Sachs, Dávid Péter Kovács, Christoph Ortner, and Gábor Csányi. Hyperactive learning for data-driven interatomic potentials. npj Computational Materials, 9(1):168, Sep 2023. URL: https://doi.org/10.1038/s41524-023-01104-6, doi:10.1038/s41524-023-01104-6.">1</a>]</span>, forms the basis of the approach used here.
+Their ACE-specific implimentation can be found on the <a class="reference external" href="https://github.com/ACEsuit/ACEHAL/tree/main">ACEHAL GitHub</a>.</p>
+<p>The basis of ACEHAL is to first form a committee of ACE models based on some dataset, and then define a biasing potential energy based
+on the standard deviation of the committee energy predictions. This gives a modified energy of</p>
+<div class="math notranslate nohighlight">
+\[E = E_\mu + \tau \sqrt{\frac{1}{N}\sum_j^N (E_j - E_\mu)^2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(E_\mu\)</span> is the energy predicted by the mean model (using weights of <span class="math notranslate nohighlight">\(\mu_\theta\)</span>), <span class="math notranslate nohighlight">\(E_j\)</span> is the energy prediction made by committee member <span class="math notranslate nohighlight">\(j\)</span>, and
+<span class="math notranslate nohighlight">\(\tau\)</span> is a biasing strength parameter. Bias forces can be obtained by taking the derivative of this bias potential with respect to each atomic position.</p>
+<p>Van der Oord et. al. also define a selection criterion based on the balance between bias forces (before multiplication with the biasing strength parameter <span class="math notranslate nohighlight">\(\tau\)</span>) and the
+“true” forces from the mean model:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}F_{s;i} &amp;= \frac{|F_{b;i}|}{|F_{\mu;i}| + \epsilon} \\
+s &amp;= \max\left(\frac{\mathrm{e}^{F_{s;i}}}{\sum_j \mathrm{e}^{F_{s;j}}}\right)\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(F_{\mu;i}\)</span> is the unbiased force on atom <span class="math notranslate nohighlight">\(i\)</span>, <span class="math notranslate nohighlight">\(F_{b;i}\)</span> is the biasing force on atom <span class="math notranslate nohighlight">\(i\)</span>, <span class="math notranslate nohighlight">\(\epsilon\)</span> is some small regularisation constant,
+and <span class="math notranslate nohighlight">\(s\)</span> is the overall score for the structure.</p>
+<p>Their HAL protocol proceeds by running molecular dynamics (MD) with the mean + bias model, and selecting structures once the score for that structure exceeds some fixed tolerance <span class="math notranslate nohighlight">\(s_\text{tol}\)</span>.
+After each structure is selected, the code uses some reference ASE calculator (usually DFT) to obtain ground truth energies, forces, and stresses, and then refits the committee based on the newly added structure.</p>
+</section>
+<section id="approximating-acehal">
+<h2>Approximating ACEHAL<a class="headerlink" href="#approximating-acehal" title="Link to this heading">#</a></h2>
+<p>One major drawback of the original HAL approach is the poor scaling with dataset size (due to the ACE refit taking longer), number of atomic species (as the ACE descriptor has poor scaling w.r.t number of species), and
+the fact that only a single structure can be selected between each call to the DFT code and model refit.</p>
+<p>The scaling w.r.t the number of species can be solved by using a descriptor which uses atomic embedding to not scale in complexity with the number of chemical species (e.g. MACE; see the next section for more details.)</p>
+<p>We can also reduce the impact of the other issues by trying to reduce the number of times we require calls to DFT or to model refits. One way of doing this is by making approximations to a full Bayesian treatment.</p>
+<p>From a true Baysian treatment, we obtain the posterior covariance</p>
+<div class="math notranslate nohighlight">
+\[\Sigma_\theta &amp;= \left(\Phi^T\Phi + P\right)^{-1}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Phi\)</span> is the design matrix formed from descriptor vectors and derivatives. We do not actually require any targets <span class="math notranslate nohighlight">\(y\)</span> (i.e. energy, force, and/or stress observations) in order to calculate the posterior covariance.
+The weights of a committee member can be found using</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\theta_j = \mu_\theta + \Psi z_j \\
+\Psi^T \Psi = \Sigma_\theta\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mu_\theta\)</span> are the mean model weights (which do require targets <span class="math notranslate nohighlight">\(y\)</span> to calculate), <span class="math notranslate nohighlight">\(\Psi\)</span> is a square root of the posterior covariance matrix,
+and <span class="math notranslate nohighlight">\(z_j\)</span> is a sample from a multivariate normal distribution with unit variance and zero mean.</p>
+<p>If we instead use a zero-mean committee (by removing the <span class="math notranslate nohighlight">\(\mu_\theta\)</span> term), it is clear we also lose the dependence on targets <span class="math notranslate nohighlight">\(y\)</span>.
+This allows the commmittee to be calculated without needing any DFT calculations, at the cost of losing the “true” potential energy surface.
+In the HAL framework, we still have the biasing potential, but no mean function.</p>
+<p>We can however use some existing MLIP model as the mean function. If this model is an ACE potential, and the zero-mean committee was constructed using the same ACE descriptor parameters,
+this is equivalent to the approximation that the mean function is constant between refits of the model in the HAL protocol.</p>
+<p>The advantage this approach brings is that we no longer need to run DFT between each selected structure (as we are able to update the now zero-mean committee without needing the DFT energy, forces, and stresses),
+which then allows us to select structures at a higher rate (in terms of real-time duration between each selection). Once we have a collection of selected structures, we can then also perform the DFT calculations
+for those structures in parallel (taking advantage of whatever High Performance Compute (HPC) resources are available), and then perform a single refit of the mean function model.
+This could then be used as a starting point for a new round of biased dynamics, and a new set of selected structures.</p>
+<p>The main drawback of this new approach is that we do not allow the mean function model to update as regularly. This means that the approach works best when the mean function model can provide a reasonable approximation
+of the true potential energy surface. Foundation models, such as the MACE MPA model, provide a near-univerally adequate starting point for such a task.</p>
+<section id="updating-the-linear-system">
+<h3>Updating the Linear System<a class="headerlink" href="#updating-the-linear-system" title="Link to this heading">#</a></h3>
+<p>If we have some initial design matrix <span class="math notranslate nohighlight">\(\Phi\)</span> of an existing dataset, and a design matrix <span class="math notranslate nohighlight">\(\Phi^*\)</span> corresponding to some structure(s) we’d like to add to the dataset, we can describe the updated posterior covariance
+in two main ways.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\left(\Sigma_\theta^*\right)^{-1} &amp;= \Phi^T\Phi + \Phi^{* T}\Phi^* + P \\
+&amp;= \begin{pmatrix}\Phi &amp; \Phi^* \end{pmatrix} \begin{pmatrix}\Phi \\ \Phi^* \end{pmatrix} + P\end{split}\]</div>
+<p>The first way constructs an augmented design matrix by appending the new design matrix to the old one. The advantage to this approach is numerical stability when we come to solve for the committee weights.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\left(\Sigma_\theta^*\right)^{-1} &amp;= \Phi^{* T}\Phi^* + \left(\Phi^T\Phi + P\right) \\
+&amp;= \Phi^{* T}\Phi^* + \Sigma_\theta^{-1}\end{split}\]</div>
+<p>The second way uses the old posterior covariance as a prior for the new linear system. This is much more memory efficient (assuming <span class="math notranslate nohighlight">\(N_\text{obs} \gg N_\text{desc}\)</span>), and also has the advantage that the old posterior covariance could be saved
+to a file for reuse. In this way, we are able to “distill” foundation model datasets into good priors for new linear systems, using the descriptor vector provided by that foundation model.</p>
+</section>
+<section id="descriptors-from-neural-network-models">
+<h3>Descriptors from Neural Network models<a class="headerlink" href="#descriptors-from-neural-network-models" title="Link to this heading">#</a></h3>
+<p>Neural Network models, such as MACE, can be viewed as a set of transformations on an original descriptor vector (though graph-based approaches do essentially perform some mixing between descriptors from neighbour atoms).
+We can therefore describe the result after each transformation (i.e. the set of node values at a hidden layer) as some new descriptor vector. We can then generate linear surrogate models based on MACE descriptor vectors, where
+we cleave the MACE architecture at some layer (by default, we cleave just before the energy readouts), and utilise a committee of such linear models to describe a HAL-style biasing potential.</p>
+<p>Unlike the ACE descriptor, these descriptor functions are model-dependent (and not just hyperparameter-dependent) which means the descriptor space is not conserved when the model is retrained. One solution to this is to freeze model weights
+during training (e.g. the MACE freeze approach <span id="id3">[<a class="reference internal" href="#id6" title="Mariia Radova, Wojciech G. Stark, Connor S. Allen, Reinhard J. Maurer, and Albert P. Bartók. Fine-tuning foundation models of materials interatomic potentials with frozen transfer learning. npj Computational Materials, 11(1):237, Jul 2025. URL: https://doi.org/10.1038/s41524-025-01727-x, doi:10.1038/s41524-025-01727-x.">2</a>]</span>)</p>
+<p class="rubric">References</p>
+<div class="docutils container" id="id4">
+<div role="list" class="citation-list">
+<div class="citation" id="id5" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>Cas van der Oord, Matthias Sachs, Dávid Péter Kovács, Christoph Ortner, and Gábor Csányi. Hyperactive learning for data-driven interatomic potentials. <em>npj Computational Materials</em>, 9(1):168, Sep 2023. URL: <a class="reference external" href="https://doi.org/10.1038/s41524-023-01104-6">https://doi.org/10.1038/s41524-023-01104-6</a>, <a class="reference external" href="https://doi.org/10.1038/s41524-023-01104-6">doi:10.1038/s41524-023-01104-6</a>.</p>
+</div>
+<div class="citation" id="id6" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<p>Mariia Radova, Wojciech G. Stark, Connor S. Allen, Reinhard J. Maurer, and Albert P. Bartók. Fine-tuning foundation models of materials interatomic potentials with frozen transfer learning. <em>npj Computational Materials</em>, 11(1):237, Jul 2025. URL: <a class="reference external" href="https://doi.org/10.1038/s41524-025-01727-x">https://doi.org/10.1038/s41524-025-01727-x</a>, <a class="reference external" href="https://doi.org/10.1038/s41524-025-01727-x">doi:10.1038/s41524-025-01727-x</a>.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="getting_started.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Getting Started</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="examples.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">User Guide</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-mlips-bayesian-regression">Linear MLIPs &amp; Bayesian Regression</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#acehal">ACEHAL</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approximating-acehal">Approximating ACEHAL</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#updating-the-linear-system">Updating the Linear System</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#descriptors-from-neural-network-models">Descriptors from Neural Network models</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/theory.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Thomas Rocke. Project structure based on the Computational Molecular Science Python Cookiecutter version 1.11.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

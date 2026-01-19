@@ -1,0 +1,69 @@
+﻿ase\_uhal.bias\_calculators.BaseBiasCalculator
+==============================================
+
+.. currentmodule:: ase_uhal.bias_calculators
+
+.. autoclass:: BaseBiasCalculator
+
+   
+   .. automethod:: __init__
+   .. automethod:: calculate
+   .. automethod:: update_tau
+   .. automethod:: get_score
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~BaseBiasCalculator.__init__
+      ~BaseBiasCalculator.band_structure
+      ~BaseBiasCalculator.calculate
+      ~BaseBiasCalculator.calculate_numerical_forces
+      ~BaseBiasCalculator.calculate_numerical_stress
+      ~BaseBiasCalculator.calculate_properties
+      ~BaseBiasCalculator.calculation_required
+      ~BaseBiasCalculator.check_state
+      ~BaseBiasCalculator.export_properties
+      ~BaseBiasCalculator.get_atoms
+      ~BaseBiasCalculator.get_charges
+      ~BaseBiasCalculator.get_default_parameters
+      ~BaseBiasCalculator.get_dipole_moment
+      ~BaseBiasCalculator.get_forces
+      ~BaseBiasCalculator.get_magnetic_moment
+      ~BaseBiasCalculator.get_magnetic_moments
+      ~BaseBiasCalculator.get_potential_energies
+      ~BaseBiasCalculator.get_potential_energy
+      ~BaseBiasCalculator.get_property
+      ~BaseBiasCalculator.get_score
+      ~BaseBiasCalculator.get_stress
+      ~BaseBiasCalculator.get_stresses
+      ~BaseBiasCalculator.read
+      ~BaseBiasCalculator.read_atoms
+      ~BaseBiasCalculator.resample_committee
+      ~BaseBiasCalculator.reset
+      ~BaseBiasCalculator.select_structure
+      ~BaseBiasCalculator.set
+      ~BaseBiasCalculator.set_label
+      ~BaseBiasCalculator.sync
+      ~BaseBiasCalculator.todict
+      ~BaseBiasCalculator.update_tau
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~BaseBiasCalculator.default_parameters
+      ~BaseBiasCalculator.directory
+      ~BaseBiasCalculator.discard_results_on_any_change
+      ~BaseBiasCalculator.ignored_changes
+      ~BaseBiasCalculator.implemented_properties
+      ~BaseBiasCalculator.label
+      ~BaseBiasCalculator.mixing
+      ~BaseBiasCalculator.name
+   
+   

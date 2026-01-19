@@ -1,0 +1,410 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "50902339",
+   "metadata": {},
+   "source": [
+    "# Basic Usage of ase_uhal\n",
+    "\n",
+    "The ase_uhal package implements various tools for enabling HAL-style biased dynamics to accelerate active learning workflows.\n",
+    "\n",
+    "First, some imports:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "36b5e815",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Imports\n",
+    "from mace.calculators import mace_mp\n",
+    "from ase.build import bulk\n",
+    "from ase.atoms import Atoms\n",
+    "import matplotlib.pyplot as plt\n",
+    "import numpy as np\n",
+    "from ase.md.langevin import Langevin\n",
+    "from ase.units import fs\n",
+    "from tqdm import tqdm, trange\n",
+    "from docs_vis import interactive_view"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "5804ebbb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from ase_uhal.bias_calculators import HALBiasCalculator\n",
+    "from ase_uhal.committee_calculators import MACEHALCalculator\n",
+    "from ase_uhal import StructureSelector"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a5fdd22d",
+   "metadata": {},
+   "source": [
+    "## Committee Calculators\n",
+    "ase_uhal computes a biasing potential based on an error metric from a zero-mean committee of linear models based on a descriptor function. The first step is to generate this committee. This is managed by several variants of the committee calculator interface. Here, we use `MACEHALCalculator`, which implements a HAL-style biasing potential (based on the standard deviation of the committee energies) using MACE descriptor features (equivalent to `mace_calc.get_descriptor()`). We will take these features from the MPA medium foundation model:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "753bb94b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mace_calc = mace_mp() # normal MACE MPA medium model calculator (from mace_torch)\n",
+    "\n",
+    "comm_calc = MACEHALCalculator(mace_calc, \n",
+    "                                    committee_size=20,\n",
+    "                                    prior_weight=0.1, # Weight of the prior in the linear system to find committee weights\n",
+    "                                    energy_weight=1, forces_weight=100, # Weights on energy and force observations when sampling new structures\n",
+    "                                    lowmem=False, # Use a lower memory strategy to fit the linear system\n",
+    "                                    rng=np.random.RandomState(42))\n",
+    "\n",
+    "comm_calc.resample_committee() #Build the initial committee "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e988df50",
+   "metadata": {},
+   "source": [
+    "The `MACEHALCalculator` object internally manages the committee state, and uses the standard ASE calculator interface. The committee is zero-mean by construction, so the energies, forces, and stresses calculated by the committee are not intended to be used as a standalone interatomic potential. We use special \"bias\\\\_\" properties (e.g. \"bias_energy\") to differentiate properties of the committee which should be used for biasing."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "e3159253",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ats = bulk(\"Si\", cubic=True)\n",
+    "ats.calc = comm_calc\n",
+    "\n",
+    "print(ats.get_potential_energy(), comm_calc.get_property(\"bias_energy\", ats))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "54bb0d80",
+   "metadata": {},
+   "source": [
+    "\n",
+    "It is important to also be able to update the committee once we have found a structure we want to add to the database. We can do this using the `select_structure()` method:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0b04d005",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ats = bulk(\"Si\", cubic=True)\n",
+    "comm_calc.select_structure(ats) # Adds a silicon bulk structure to the list of selected structures\n",
+    "\n",
+    "# Resample the committee, now incorporating information from the newly selected structure\n",
+    "comm_calc.resample_committee()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "df76de48",
+   "metadata": {},
+   "source": [
+    "Selecting a structure does two main things. Firstly, it adds a copy of the structure to the `selected_structures` list of the calculator object, so that the selected structures can be easily retrieved later on (e.g. after the biased dynamics has finished). Secondly, it adds the features of the structure (descriptor evaluations and their gradients) to an internal linear system, so that future committee samples are conditioned on this new information. \n",
+    "\n",
+    "The second part is important, as it reduces the committee variance for structures close to the sampled structure. In this way, we learn to avoid the previously sampled space, and can more easily sample new regions.\n",
+    "\n",
+    "## Bias Calculators\n",
+    "The bias calculators combine a standard ase-compatible calculator with a committee calculator described above. The result is a new ase calculator, where the energy force and stress properties are a weighted sum of the results from both component calculators:\n",
+    "\n",
+    "$$\\begin{equation}\n",
+    "    E_\\text{bias} = E_\\text{Normal calc} + \\tau E_\\text{Committee calc}\n",
+    "\\end{equation}$$\n",
+    "The parameter $\\tau$ describes the mixing strength, and can be either fixed or adaptively determined, in the same manner as the ACEHAL approach."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "1d7dafd8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "hal_calc = HALBiasCalculator(mean_calc=mace_calc, # Mean function calculator (replaces the mean of an ACEHAL committee)\n",
+    "                         committee_calc=comm_calc, # Committee biasing calculator\n",
+    "                         adaptive_tau=True, # Automatically control the biasing strength during dynamics\n",
+    "                         tau_rel=0.1, # Target ratio of bias forces to mean forces\n",
+    "                         tau_hist=10, # History length for force mixing to determine tau\n",
+    "                         tau_delay=30) # Number of mixing steps before tau should start to be changed"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "be4e8a70",
+   "metadata": {},
+   "source": [
+    "As well as the potential mixing, the bias calculator also implements a selection metric, which can be based on both the biasing potential or the normal ASE calculator results. The `HALBiasCalculator` class implements the same selection metric ase ACEHAL, which is based on the ratio of forces from both calculators.\n",
+    "\n",
+    "We can now use the `HALBiasCalculator` as a normal ASE calculator by setting a tau value:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "bba1e118",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ats = bulk(\"Si\")\n",
+    "\n",
+    "ats.calc = mace_calc\n",
+    "print(\"MACE MPA Energy:\", ats.get_potential_energy())\n",
+    "\n",
+    "ats.calc = hal_calc\n",
+    "hal_calc.tau = 0.15\n",
+    "\n",
+    "print(\"Biased Energy:\", ats.get_potential_energy())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "04483530",
+   "metadata": {},
+   "source": [
+    "## Running Biased Dynamics\n",
+    "\n",
+    "We will use the example of an oxygen interstitial atom in bulk silicon as a first example of using biased dynamics with ase_uhal. We start by constructing a supercell of Si, and adding an oxygen atom into the supercell."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a2ed34e1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Si = bulk(\"Si\", cubic=True)\n",
+    "\n",
+    "inter_pos = np.array([0.5, 0.25, 0.25]) * Si.cell[0, 0]\n",
+    "\n",
+    "ats = Si * (2, 2, 2) + Atoms(\"O\", positions=[inter_pos])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "574ea09a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "interactive_view(ats)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b3abd79d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Setup dynamics\n",
+    "ats.calc = hal_calc\n",
+    "hal_calc.tau = 0 # Reset tau to zero, so that it can be automatically determined\n",
+    "\n",
+    "\n",
+    "# Setup MD\n",
+    "dyn = Langevin(ats, 1*fs, temperature_K=300, friction=0.01 / fs)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4721b31e",
+   "metadata": {},
+   "source": [
+    "In addition to the committee and bias calculators, ase_uhal also provides functionality for attaching common processes to dynamics, using observers, so that they can be automatically handled on the fly. This can be achieved using `dyn.attach(f, interval, *args)`, where `f` is the function to be executed, `interval` is the number of MD timesteps between each call to `f`, and `*args` are arguments to `f`. \n",
+    "\n",
+    "The bias calculators allow for the biasing constant $\\tau$ to be automatically determined, in a manner similar to the original ACEHAL implementation. This is directly attachable (e.g. `dyn.attach(hal_calc.update_tau, 1)` or equivalently `dyn.attach(hal_calc.update_tau)`).\n",
+    "\n",
+    "### StructureSelector\n",
+    "StructureSelector is another attachable component which aims to automate the selection of new structures into the dataset, based on the selection scores calculated by the bias calculator. It is able to adabtively set a selection threshold by first computing a mixed score from all previous selection scores\n",
+    "$$\\begin{equation}\n",
+    "    S_\\text{mix}^{i} = (1 - \\text{mixing}) \\times S_\\text{mix}^{i-1} + \\text{mixing} \\times S^{i}\n",
+    "\\end{equation}$$\n",
+    "and then setting the selection criterion to be some user-defined multiplier of this mixed score\n",
+    "$$\\begin{equation}\n",
+    "    S_\\text{Criterion}^{i} = \\text{thresh\\_mul} \\times S_\\text{mix}^{i}\n",
+    "\\end{equation}$$\n",
+    "\n",
+    "Once a score beats the selection criterion, the `StructureSelector` object will wait until a peak is detected (i.e. until the next selection score is lower) before making a selection. It can also automatically trigger the committee to be resampled based on the newly selected structure."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ee4e5c46",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "selector = StructureSelector(bias_calc=hal_calc,\n",
+    "                             threshold=\"adaptive\", # Automatically determine threshold for wether score value is significant\n",
+    "                             auto_resample=True, # Aautomatically resample the committee after each selection\n",
+    "                             delay=10, # Delay before threshold starts to be modified\n",
+    "                             mixing=0.1, # Mixing parameter for score mixing\n",
+    "                             thresh_mul=1.5) # Multiplier on mixed scores\n",
+    "\n",
+    "# Attach observers to dynamics, to be automatically called during the run\n",
+    "dyn.attach(hal_calc.update_tau) # Update tau every iteration\n",
+    "dyn.attach(selector, 2) # Calculate HAL score and look to select a structure every 2nd iteration"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "574d8ac8",
+   "metadata": {},
+   "source": [
+    "To visualise the internal states of the bias calculator and `StructureSelector` objects, we also define a dummy observer which logs some key values into the atoms objects:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ee324e7c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\n",
+    "def _dummy_observer(atoms, bias_calc, selector, ats_list):\n",
+    "    # For later plotting, save the full trajectory, and some details of the scores and constants\n",
+    "\n",
+    "    # Bolt current parameters into the info dict\n",
+    "    atoms.info[\"hal_score\"] = selector._prev_score\n",
+    "    atoms.info[\"tau\"] = bias_calc.tau\n",
+    "    atoms.info[\"thresh\"] = selector.threshold\n",
+    "\n",
+    "    ats_list.append(atoms.copy())\n",
+    "\n",
+    "ats_list = []\n",
+    "\n",
+    "\n",
+    "dyn.attach(_dummy_observer, 2, ats, hal_calc, selector, ats_list)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e611712c",
+   "metadata": {},
+   "source": [
+    "Finally, we are ready to run some MD."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "8f304bf1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\n",
+    "nsteps = 100\n",
+    "\n",
+    "dyn.run(nsteps)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "afaa5c13",
+   "metadata": {},
+   "source": [
+    "And then we plot some of the internal state:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "f99b606a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "scores = [atoms.info[\"hal_score\"] for atoms in ats_list]\n",
+    "taus = [atoms.info[\"tau\"] for atoms in ats_list]\n",
+    "thresholds = [atoms.info[\"thresh\"] for atoms in ats_list]\n",
+    "\n",
+    "selections = []\n",
+    "\n",
+    "score_peak = -np.inf\n",
+    "\n",
+    "for i in range(len(ats_list)):\n",
+    "    if scores[i] > thresholds[i] and thresholds[i] < np.inf:\n",
+    "        score_peak = scores[i]\n",
+    "    elif score_peak > 0:\n",
+    "        selections.append(2*i)\n",
+    "        score_peak = -np.inf\n",
+    "\n",
+    "Ns = [2*i for i in range(len(ats_list))]\n",
+    "\n",
+    "fig, ax = plt.subplots(2, figsize=(8, 6))\n",
+    "\n",
+    "ax[0].set_title(\"Taus\")\n",
+    "ax[1].set_title(\"HAL score\")\n",
+    "\n",
+    "ax[0].plot(Ns, taus)\n",
+    "\n",
+    "ax[1].plot(Ns, scores, label=\"HAL Score\")\n",
+    "ax[1].plot(Ns, thresholds, label=\"Selection Threshold\")\n",
+    "\n",
+    "ax[0].axvline(selections, color=\"k\", linestyle=\"dashed\")\n",
+    "ax[1].axvline(selections, color=\"k\", linestyle=\"dashed\", label=\"Selection Event\")\n",
+    "\n",
+    "ax[1].legend()\n",
+    "ax[1].set_xlabel(\"MD Step\")\n",
+    "ax[1].set_ylabel(\"Selection Score\")\n",
+    "ax[0].set_ylabel(r\"$\\tau$\")\n",
+    "ax[1].set_yscale(\"log\")\n",
+    "\n",
+    "\n",
+    "plt.tight_layout()\n",
+    "\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "bbbdbc59",
+   "metadata": {},
+   "source": [
+    "We see from the plot that after the selection event, the HAL scores rapidly decrease. This is because after selection the committee is resampled based on the new information that the selected structure adds, which decreases the variance of committee weights. The tau value rises because the automatic determination aims to balance the newly decreased committee bias forces with the \"mean forces\" from the normal MPA model."
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.12"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

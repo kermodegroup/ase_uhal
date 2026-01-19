@@ -1,0 +1,88 @@
+﻿ase\_uhal.committee\_calculators.MACEHALCalculator
+==================================================
+
+.. currentmodule:: ase_uhal.committee_calculators
+
+.. autoclass:: MACEHALCalculator
+
+   
+   .. automethod:: __init__
+   .. automethod:: resample_committee
+   .. automethod:: select_structure
+   .. automethod:: sync
+   .. automethod:: get_descriptor_energy
+   .. automethod:: get_descriptor_forces
+   .. automethod:: get_descriptor_stress
+   .. automethod:: get_committee_energies
+   .. automethod:: get_committee_forces
+   .. automethod:: get_committee_stresses
+   .. automethod:: get_bias_energy
+   .. automethod:: get_bias_forces
+   .. automethod:: get_bias_stress
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MACEHALCalculator.__init__
+      ~MACEHALCalculator.band_structure
+      ~MACEHALCalculator.calculate
+      ~MACEHALCalculator.calculate_numerical_forces
+      ~MACEHALCalculator.calculate_numerical_stress
+      ~MACEHALCalculator.calculate_properties
+      ~MACEHALCalculator.calculation_required
+      ~MACEHALCalculator.check_state
+      ~MACEHALCalculator.export_properties
+      ~MACEHALCalculator.get_atoms
+      ~MACEHALCalculator.get_bias_energy
+      ~MACEHALCalculator.get_bias_forces
+      ~MACEHALCalculator.get_bias_stress
+      ~MACEHALCalculator.get_charges
+      ~MACEHALCalculator.get_committee_energies
+      ~MACEHALCalculator.get_committee_forces
+      ~MACEHALCalculator.get_committee_stresses
+      ~MACEHALCalculator.get_default_parameters
+      ~MACEHALCalculator.get_descriptor_energy
+      ~MACEHALCalculator.get_descriptor_forces
+      ~MACEHALCalculator.get_descriptor_stress
+      ~MACEHALCalculator.get_dipole_moment
+      ~MACEHALCalculator.get_forces
+      ~MACEHALCalculator.get_magnetic_moment
+      ~MACEHALCalculator.get_magnetic_moments
+      ~MACEHALCalculator.get_potential_energies
+      ~MACEHALCalculator.get_potential_energy
+      ~MACEHALCalculator.get_property
+      ~MACEHALCalculator.get_stress
+      ~MACEHALCalculator.get_stresses
+      ~MACEHALCalculator.read
+      ~MACEHALCalculator.read_atoms
+      ~MACEHALCalculator.resample_committee
+      ~MACEHALCalculator.reset
+      ~MACEHALCalculator.select_structure
+      ~MACEHALCalculator.set
+      ~MACEHALCalculator.set_label
+      ~MACEHALCalculator.sync
+      ~MACEHALCalculator.todict
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MACEHALCalculator.default_parameters
+      ~MACEHALCalculator.directory
+      ~MACEHALCalculator.discard_results_on_any_change
+      ~MACEHALCalculator.energy_weight
+      ~MACEHALCalculator.forces_weight
+      ~MACEHALCalculator.ignored_changes
+      ~MACEHALCalculator.implemented_properties
+      ~MACEHALCalculator.label
+      ~MACEHALCalculator.name
+      ~MACEHALCalculator.stress_weight
+      ~MACEHALCalculator.torch_device
+   
+   

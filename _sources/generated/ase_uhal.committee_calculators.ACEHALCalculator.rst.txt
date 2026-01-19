@@ -1,0 +1,87 @@
+﻿ase\_uhal.committee\_calculators.ACEHALCalculator
+=================================================
+
+.. currentmodule:: ase_uhal.committee_calculators
+
+.. autoclass:: ACEHALCalculator
+
+   
+   .. automethod:: __init__
+   .. automethod:: resample_committee
+   .. automethod:: select_structure
+   .. automethod:: sync
+   .. automethod:: get_descriptor_energy
+   .. automethod:: get_descriptor_forces
+   .. automethod:: get_descriptor_stress
+   .. automethod:: get_committee_energies
+   .. automethod:: get_committee_forces
+   .. automethod:: get_committee_stresses
+   .. automethod:: get_bias_energy
+   .. automethod:: get_bias_forces
+   .. automethod:: get_bias_stress
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ACEHALCalculator.__init__
+      ~ACEHALCalculator.band_structure
+      ~ACEHALCalculator.calculate
+      ~ACEHALCalculator.calculate_numerical_forces
+      ~ACEHALCalculator.calculate_numerical_stress
+      ~ACEHALCalculator.calculate_properties
+      ~ACEHALCalculator.calculation_required
+      ~ACEHALCalculator.check_state
+      ~ACEHALCalculator.export_properties
+      ~ACEHALCalculator.get_atoms
+      ~ACEHALCalculator.get_bias_energy
+      ~ACEHALCalculator.get_bias_forces
+      ~ACEHALCalculator.get_bias_stress
+      ~ACEHALCalculator.get_charges
+      ~ACEHALCalculator.get_committee_energies
+      ~ACEHALCalculator.get_committee_forces
+      ~ACEHALCalculator.get_committee_stresses
+      ~ACEHALCalculator.get_default_parameters
+      ~ACEHALCalculator.get_descriptor_energy
+      ~ACEHALCalculator.get_descriptor_forces
+      ~ACEHALCalculator.get_descriptor_stress
+      ~ACEHALCalculator.get_dipole_moment
+      ~ACEHALCalculator.get_forces
+      ~ACEHALCalculator.get_magnetic_moment
+      ~ACEHALCalculator.get_magnetic_moments
+      ~ACEHALCalculator.get_potential_energies
+      ~ACEHALCalculator.get_potential_energy
+      ~ACEHALCalculator.get_property
+      ~ACEHALCalculator.get_stress
+      ~ACEHALCalculator.get_stresses
+      ~ACEHALCalculator.read
+      ~ACEHALCalculator.read_atoms
+      ~ACEHALCalculator.resample_committee
+      ~ACEHALCalculator.reset
+      ~ACEHALCalculator.select_structure
+      ~ACEHALCalculator.set
+      ~ACEHALCalculator.set_label
+      ~ACEHALCalculator.sync
+      ~ACEHALCalculator.todict
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ACEHALCalculator.default_parameters
+      ~ACEHALCalculator.directory
+      ~ACEHALCalculator.discard_results_on_any_change
+      ~ACEHALCalculator.energy_weight
+      ~ACEHALCalculator.forces_weight
+      ~ACEHALCalculator.ignored_changes
+      ~ACEHALCalculator.implemented_properties
+      ~ACEHALCalculator.label
+      ~ACEHALCalculator.name
+      ~ACEHALCalculator.stress_weight
+   
+   

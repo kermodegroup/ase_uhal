@@ -1,0 +1,87 @@
+﻿ase\_uhal.committee\_calculators.BaseCommitteeCalculator
+========================================================
+
+.. currentmodule:: ase_uhal.committee_calculators
+
+.. autoclass:: BaseCommitteeCalculator
+
+   
+   .. automethod:: __init__
+   .. automethod:: resample_committee
+   .. automethod:: select_structure
+   .. automethod:: sync
+   .. automethod:: get_descriptor_energy
+   .. automethod:: get_descriptor_forces
+   .. automethod:: get_descriptor_stress
+   .. automethod:: get_committee_energies
+   .. automethod:: get_committee_forces
+   .. automethod:: get_committee_stresses
+   .. automethod:: get_bias_energy
+   .. automethod:: get_bias_forces
+   .. automethod:: get_bias_stress
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~BaseCommitteeCalculator.__init__
+      ~BaseCommitteeCalculator.band_structure
+      ~BaseCommitteeCalculator.calculate
+      ~BaseCommitteeCalculator.calculate_numerical_forces
+      ~BaseCommitteeCalculator.calculate_numerical_stress
+      ~BaseCommitteeCalculator.calculate_properties
+      ~BaseCommitteeCalculator.calculation_required
+      ~BaseCommitteeCalculator.check_state
+      ~BaseCommitteeCalculator.export_properties
+      ~BaseCommitteeCalculator.get_atoms
+      ~BaseCommitteeCalculator.get_bias_energy
+      ~BaseCommitteeCalculator.get_bias_forces
+      ~BaseCommitteeCalculator.get_bias_stress
+      ~BaseCommitteeCalculator.get_charges
+      ~BaseCommitteeCalculator.get_committee_energies
+      ~BaseCommitteeCalculator.get_committee_forces
+      ~BaseCommitteeCalculator.get_committee_stresses
+      ~BaseCommitteeCalculator.get_default_parameters
+      ~BaseCommitteeCalculator.get_descriptor_energy
+      ~BaseCommitteeCalculator.get_descriptor_forces
+      ~BaseCommitteeCalculator.get_descriptor_stress
+      ~BaseCommitteeCalculator.get_dipole_moment
+      ~BaseCommitteeCalculator.get_forces
+      ~BaseCommitteeCalculator.get_magnetic_moment
+      ~BaseCommitteeCalculator.get_magnetic_moments
+      ~BaseCommitteeCalculator.get_potential_energies
+      ~BaseCommitteeCalculator.get_potential_energy
+      ~BaseCommitteeCalculator.get_property
+      ~BaseCommitteeCalculator.get_stress
+      ~BaseCommitteeCalculator.get_stresses
+      ~BaseCommitteeCalculator.read
+      ~BaseCommitteeCalculator.read_atoms
+      ~BaseCommitteeCalculator.resample_committee
+      ~BaseCommitteeCalculator.reset
+      ~BaseCommitteeCalculator.select_structure
+      ~BaseCommitteeCalculator.set
+      ~BaseCommitteeCalculator.set_label
+      ~BaseCommitteeCalculator.sync
+      ~BaseCommitteeCalculator.todict
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~BaseCommitteeCalculator.default_parameters
+      ~BaseCommitteeCalculator.directory
+      ~BaseCommitteeCalculator.discard_results_on_any_change
+      ~BaseCommitteeCalculator.energy_weight
+      ~BaseCommitteeCalculator.forces_weight
+      ~BaseCommitteeCalculator.ignored_changes
+      ~BaseCommitteeCalculator.implemented_properties
+      ~BaseCommitteeCalculator.label
+      ~BaseCommitteeCalculator.name
+      ~BaseCommitteeCalculator.stress_weight
+   
+   
