@@ -202,6 +202,8 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
         return self.torch.func.jacfwd(self._bias_energy, argnums=0)(*args)
     
     def _desc_stress(self, *args):
+        desc_energy = self._descriptor_base(*args)
+        return self._take_derivative_vector(desc_energy, args[1])
         return self.torch.func.jacfwd(self._descriptor_base, argnums=1)(*args)
     
     def _comm_stress(self, *args):
@@ -221,6 +223,8 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
         return self.torch.mean(comm_stress, dim=0)
     
     def _bias_stress(self, *args):
+        bias_energy = self._bias_energy(*args)
+        return self._take_derivative_scalar(bias_energy, args[1])
         return self.torch.func.jacfwd(self._bias_energy, argnums=1)(*args)
 
 
