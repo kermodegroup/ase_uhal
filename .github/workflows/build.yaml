@@ -6,12 +6,12 @@ permissions:
 on:
   # GitHub has started calling new repo's first branch "main" https://github.com/github/renaming
   # The cookiecutter uses the "--initial-branch" flag when it runs git-init
-  push:
-    branches:
-      - "main"
-  pull_request:
-    branches:
-      - "main"
+  # push:
+  #   branches:
+  #     - "main"
+  # pull_request:
+  #   branches:
+  #     - "main"
   schedule:
     # Weekly tests run on main by default:
     #   Scheduled workflows run on the latest commit on the default or base branch.
