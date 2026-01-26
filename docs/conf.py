@@ -43,6 +43,7 @@ release = ''
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'nbsphinx',
     'sphinx.ext.autosummary',
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
@@ -54,7 +55,6 @@ extensions = [
     'sphinx_design',
     'sphinx_copybutton',
     'sphinxcontrib.bibtex',
-    'nbsphinx'
 ]
 
 nbsphinx_kernel_name = "python3"
