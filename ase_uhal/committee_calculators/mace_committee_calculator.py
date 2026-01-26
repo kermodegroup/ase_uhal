@@ -188,18 +188,19 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
     
         full_jac = self.torch.zeros(M, N, 3, dtype=positions.dtype, device=positions.device)
     
-        for start_idx in range(0, N, batch_size):
-            end_idx = min(start_idx + batch_size, N)
+        with self.torch.no_grad():
+            for start_idx in range(0, N, batch_size):
+                end_idx = min(start_idx + batch_size, N)
 
-            def f_partial(pos_section):
-                pos_copy = args[0].clone()
-                pos_copy[start_idx:end_idx] = pos_section
+                def f_partial(pos_section):
+                    pos_copy = args[0].clone()
+                    pos_copy[start_idx:end_idx] = pos_section
 
-                return self._descriptor_base(pos_copy, *args[1:])
-            
-            pos_section = args[0][start_idx:end_idx, :]
-            
-            full_jac[:, start_idx:end_idx, :] = self.torch.func.jacfwd(f_partial, argnums=0)(pos_section)
+                    return self._descriptor_base(pos_copy, *args[1:])
+                
+                pos_section = args[0][start_idx:end_idx, :]
+                
+                full_jac[:, start_idx:end_idx, :] = self.torch.func.jacfwd(f_partial, argnums=0)(pos_section)
         return full_jac
     
     def _comm_forces(self, *args):
