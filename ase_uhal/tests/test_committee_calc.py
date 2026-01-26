@@ -53,30 +53,29 @@ ace_data = {calc.__name__ : (calc, ace_params) for calc in ace_calcs}
 all_data = mace_data.copy()
 all_data.update(ace_data)
 
+def set_up_calc(calc_name, required_properties=[]):
+    if "MACE" in calc_name:
+        if mpa is None:
+            pytest.skip("mace-torch module is not installed")
+    elif "ACE" in calc_name:
+        if not has_julia:
+            pytest.skip("Julia python module not installed")
+
+    cls, params = all_data[calc_name]
+
+    rng = np.random.RandomState(42)
+
+    for prop in required_properties:
+        if prop not in cls.implemented_properties:
+            pytest.skip(f"{cls.__name__} does not implement {prop}")
+
+    calc = cls(**params, rng=rng)
+    calc.resample_committee()
+
+    return calc
+
 @pytest.mark.parametrize("calc_name", all_data.keys())
-class TestCommitteeCalcs():
-
-    def set_up_calc(self, calc_name, required_properties=[]):
-        if "MACE" in calc_name:
-            if mpa is None:
-                pytest.skip("mace-torch module is not installed")
-        elif "ACE" in calc_name:
-            if not has_julia:
-                pytest.skip("Julia python module not installed")
-
-        cls, params = all_data[calc_name]
-
-        rng = np.random.RandomState(42)
-
-        for prop in required_properties:
-            if prop not in cls.implemented_properties:
-                pytest.skip(f"{cls.__name__} does not implement {prop}")
-
-        calc = cls(**params, rng=rng)
-        calc.resample_committee()
-
-        return calc
-    
+class TestCommitteeCalcs():    
     @pytest.mark.parametrize("property", ["desc_forces", "comm_forces", "forces", "bias_forces"])
     def test_force_derivative(self, allclose, calc_name, property):
         # Compare direct force predictions to a finite differences scheme
@@ -93,7 +92,7 @@ class TestCommitteeCalcs():
 
         ats = ref_ats.copy()
         ats.rattle(1e-1, seed=42)
-        calc = self.set_up_calc(calc_name, required_properties=[energy_prop, force_prop])
+        calc = set_up_calc(calc_name, required_properties=[energy_prop, force_prop])
 
         finite_difference_forces(calc, ats, allclose, energy_prop, force_prop, dx=1e-5)
 
@@ -121,13 +120,13 @@ class TestCommitteeCalcs():
         ats.set_cell(cell, scale_atoms=True)
         ats.rattle(1e-1, seed=42)
 
-        calc = self.set_up_calc(calc_name, required_properties=[energy_prop, stress_prop])
+        calc = set_up_calc(calc_name, required_properties=[energy_prop, stress_prop])
 
         finite_difference_stress(calc, ats, allclose, energy_prop, stress_prop, dx=1e-6)
 
     def test_committee_resample(self, calc_name):
 
-        calc = self.set_up_calc(calc_name)
+        calc = set_up_calc(calc_name)
 
         if issubclass(calc.__class__, ase_uhal.committee_calculators.TorchCommitteeCalculator):
             def to_numpy(tensor):
@@ -144,3 +143,18 @@ class TestCommitteeCalcs():
         cw = to_numpy(calc.committee_weights)
         assert cw.shape[0] == 100
 
+@pytest.mark.parametrize("calc_name", mace_data.keys())
+@pytest.mark.parametrize("batch_size", [1, 2, 4]) # 8 atom test cell, batch_size=8 is default
+def test_mace_desc_batch_size(calc_name, batch_size, allclose):
+    calc = set_up_calc(calc_name, ["desc_forces"])
+
+    ats = ref_ats.copy()
+
+    # Reference quantity, at batch_size = len(ats)
+    ref_desc = calc.get_property("desc_forces", ats)
+
+    calc.batch_size = batch_size
+
+    batched_desc = calc.get_property("desc_forces", ats)
+
+    assert allclose(ref_desc, batched_desc)

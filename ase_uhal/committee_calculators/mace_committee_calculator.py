@@ -7,7 +7,7 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
     implemented_properties = ['energy', 'forces', 'stress', 'desc_energy', 'desc_forces', 'desc_stress', 
                               'comm_energy', 'comm_forces', 'comm_stress', 'bias_energy', 'bias_forces', 'bias_stress']
     def __init__(self, mace_calculator, committee_size, prior_weight,
-                 num_layers=-1, invariants_only=True, **kwargs):
+                 num_layers=-1, invariants_only=True, batch_size=None, **kwargs):
         '''
         
         Parameters
@@ -24,12 +24,17 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
         invariants_only: bool
             Whether to only keep the invariants partition of the descriptor vector, see MACECalculator.get_descriptors
             for more details
+        batch_size: int
+            Batch size to use for descriptor gradient evaluation. Lower batch size reduces overhead.
+            If batch_size > len(atoms), then len(atoms) is used as the batch size instead
         **kwargs: Keyword Args
             Extra keywork arguments fed to :class:`~ase_uhal.committee_calculators.TorchCommitteeCalculator`
         '''
 
         from mace.modules.utils import prepare_graph, get_edge_vectors_and_lengths, extract_invariant
         from e3nn import o3
+
+        self.batch_size = batch_size
 
         self.prepare_graph = prepare_graph
         self.get_edge_vectors_and_lengths = get_edge_vectors_and_lengths
@@ -172,9 +177,30 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
         pass
     
     def _desc_forces(self, *args):
-        desc_energy = self._descriptor_base(*args)
-        #return self.torch.func.jacfwd(self._descriptor_base, argnums=0)(*args)
-        return self._take_derivative_vector(desc_energy, args[0])
+        positions = args[0]
+        N = positions.shape[0]
+        M = self.n_desc
+
+        if self.batch_size is None or self.batch_size > N:
+            batch_size = N
+        else:
+            batch_size = self.batch_size
+    
+        full_jac = self.torch.zeros(M, N, 3, dtype=positions.dtype, device=positions.device)
+    
+        for start_idx in range(0, N, batch_size):
+            end_idx = min(start_idx + batch_size, N)
+
+            def f_partial(pos_section):
+                pos_copy = args[0].clone()
+                pos_copy[start_idx:end_idx] = pos_section
+
+                return self._descriptor_base(pos_copy, *args[1:])
+            
+            pos_section = args[0][start_idx:end_idx, :]
+            
+            full_jac[:, start_idx:end_idx, :] = self.torch.func.jacfwd(f_partial, argnums=0)(pos_section)
+        return full_jac
     
     def _comm_forces(self, *args):
         '''
