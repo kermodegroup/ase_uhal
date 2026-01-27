@@ -29,7 +29,7 @@ jobs:
       - name: Setup Pandoc
         uses: r-lib/actions/setup-pandoc@v2
         with:
-          pandoc-version: '2.2'
+          pandoc-version: '3.8.2'
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
