@@ -57,6 +57,8 @@ extensions = [
     'sphinxcontrib.bibtex',
 ]
 
+nbsphinx_execute = 'always'  # Change from 'auto' to 'always'
+
 nbsphinx_kernel_name = "python3"
 
 autosummary_generate = True

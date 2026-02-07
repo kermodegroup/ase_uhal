@@ -5,6 +5,7 @@ User Guide
    :maxdepth: 2
    :titlesonly:
 
+   examples/concept_demo
    examples/basic_usage
    examples/MPI
 
