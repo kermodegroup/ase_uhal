@@ -426,6 +426,8 @@
 <span class="c1"># Attach observers to dynamics, to be automatically called during the run</span>
 <span class="n">dyn</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">hal_calc</span><span class="o">.</span><span class="n">update_tau</span><span class="p">)</span>
 <span class="n">dyn</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># Resample the committee every 1000 MD steps, also checking for messages from other processes</span>
+<span class="n">dyn</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">comm_calc</span><span class="o">.</span><span class="n">resample_committee</span><span class="p">,</span> <span class="mi">1_000</span><span class="p">)</span>
 
 <span class="c1">### Run Dynamics</span>
 <span class="c1"># Runs each MD on different interstitial species in parallel</span>
