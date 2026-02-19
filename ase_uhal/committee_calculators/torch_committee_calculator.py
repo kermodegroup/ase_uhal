@@ -30,7 +30,7 @@ class TorchCommitteeCalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
 
         self.sqrt_prior = self.torch.Tensor(self.sqrt_prior).to(self.torch_device)
         if self._lowmem:
-            for key in ["energy", "force", "stress"]:
+            for key in ["energy", "forces", "stress"]:
                 self.likelihood[key] = self.torch.Tensor(self.likelihood[key]).to(self.torch_device)
 
     @abstractmethod
