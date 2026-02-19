@@ -1,6 +1,6 @@
 import numpy as np
 from ase.calculators.calculator import all_changes
-
+from extract_weights import extract_weights_nobservations
 
 def build_lin_systems(ds, weights, numbers, calc, compress_memory=False):
     '''
@@ -60,10 +60,10 @@ def build_lin_systems(ds, weights, numbers, calc, compress_memory=False):
         return energy_sys, force_sys, stress_sys
 
 
-def solve_lin_system(energy_sys=None, force_sys=None, stress_sys=None, prior=None):
+def solve_lin_system(energy_sys=None, force_sys=None, stress_sys=None, sqrt_prior=None):
     system = []
 
-    for sys in [energy_sys, force_sys, stress_sys, prior]:
+    for sys in [energy_sys, force_sys, stress_sys, sqrt_prior]:
         if sys is not None:
             system.append(sys)
 
@@ -75,3 +75,21 @@ def solve_lin_system(energy_sys=None, force_sys=None, stress_sys=None, prior=Non
     return R
 
 
+def distill_dataset(dataset, calc, energy_weight=None, forces_weight=None, stress_weight=None,
+                    energy_weight_key=None, forces_weight_key=None, stress_weight_key=None, sqrt_prior=None, compress_memory=False):
+    '''
+    Given a dataset and a committee calculator, use the calculator descriptor to assemble a linear system from the dataset with given energy, force, stress weights.
+    Then, solve for the posterior covariance of this system, which is equivalent to a new prior on any extensions to the dataset.
+    
+    '''
+    weights, numbers = extract_weights_nobservations(dataset, [energy_weight_key, forces_weight_key, stress_weight_key],
+                                  [energy_weight, forces_weight, stress_weight])
+    
+    systems = build_lin_systems(dataset, weights, numbers, calc, compress_memory)
+
+    if sqrt_prior is None:
+        sqrt_prior = calc.sqrt_prior
+
+    R = solve_lin_system(*systems, sqrt_prior=sqrt_prior)
+    return R
+    
