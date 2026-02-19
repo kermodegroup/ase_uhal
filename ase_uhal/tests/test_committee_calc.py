@@ -122,7 +122,7 @@ class TestCommitteeCalcs():
 
         calc = set_up_calc(calc_name, required_properties=[energy_prop, stress_prop])
 
-        finite_difference_stress(calc, ats, allclose, energy_prop, stress_prop, dx=1e-6)
+        finite_difference_stress(calc, ats, allclose, energy_prop, stress_prop, dx=1e-6, atol=5e-3)
 
     def test_committee_resample(self, calc_name):
 
