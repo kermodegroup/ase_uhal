@@ -7,7 +7,7 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
     implemented_properties = ['energy', 'forces', 'stress', 'desc_energy', 'desc_forces', 'desc_stress', 
                               'comm_energy', 'comm_forces', 'comm_stress', 'bias_energy', 'bias_forces', 'bias_stress']
     def __init__(self, mace_calculator, committee_size, prior_weight,
-                 num_layers=-1, invariants_only=True, batch_size=None, **kwargs):
+                 num_layers=-1, invariants_only=True, batch_size=16, **kwargs):
         '''
         
         Parameters
@@ -25,7 +25,7 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
             Whether to only keep the invariants partition of the descriptor vector, see MACECalculator.get_descriptors
             for more details
         batch_size: int
-            Batch size to use for descriptor gradient evaluation. Lower batch size reduces overhead.
+            Batch size to use for descriptor gradient evaluation. Lower batch size reduces memory overhead.
             If batch_size > len(atoms), then len(atoms) is used as the batch size instead
         **kwargs: Keyword Args
             Extra keywork arguments fed to :class:`~ase_uhal.committee_calculators.TorchCommitteeCalculator`
@@ -200,7 +200,8 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
                 
                 pos_section = args[0][start_idx:end_idx, :]
                 
-                full_jac[:, start_idx:end_idx, :] = self.torch.func.jacfwd(f_partial, argnums=0)(pos_section)
+                full_jac[:, start_idx:end_idx, :] = self.torch.autograd.functional.jacobian(f_partial, pos_section, 
+                                                                                            vectorize=True, strategy="forward-mode")
         return full_jac
     
     def _comm_forces(self, *args):

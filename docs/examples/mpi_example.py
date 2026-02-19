@@ -67,6 +67,8 @@ dyn = Langevin(ats, 1*fs, temperature_K=300, friction=0.01 / fs)
 # Attach observers to dynamics, to be automatically called during the run
 dyn.attach(hal_calc.update_tau)
 dyn.attach(selector, 2)
+# Resample the committee every 1000 MD steps, also checking for messages from other processes
+dyn.attach(comm_calc.resample_committee, 1_000)
 
 ### Run Dynamics
 # Runs each MD on different interstitial species in parallel
