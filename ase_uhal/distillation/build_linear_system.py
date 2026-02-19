@@ -7,7 +7,7 @@ def build_lin_systems(ds, weights, numbers, calc, compress_memory=False):
     Build 
     
     '''
-    N_obs = np.sum(numbers, axis=0)
+    N_obs = np.sum(numbers, axis=0).astype(int)
 
     energy_sys = None
     force_sys = None
@@ -43,11 +43,11 @@ def build_lin_systems(ds, weights, numbers, calc, compress_memory=False):
         
         if w[1] is not None:
             N_f = len(atoms) * 3
-            force_sys[i_F:i_F + N_f, :] = calc.get_descriptor_forces(atoms) * w[1]
+            force_sys[i_F:i_F + N_f, :] = calc.get_descriptor_forces(atoms).reshape(calc.n_desc, -1).T * w[1]
             i_F += N_f
         
         if w[2] is not None:
-            stress_sys[i_S:i_S + 9, :] = calc.get_descriptor_stress(atoms) * w[2]
+            stress_sys[i_S:i_S + 9, :] = calc.get_descriptor_stress(atoms).reshape(calc.n_desc, -1).T * w[2]
 
     if compress_memory:
         # Take QR decomposition from each system, to compress into a more memory-efficient (but less informative!) state
