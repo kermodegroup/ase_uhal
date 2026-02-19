@@ -230,9 +230,9 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
         return self.torch.func.jacfwd(self._bias_energy, argnums=0)(*args)
     
     def _desc_stress(self, *args):
-        desc_energy = self._descriptor_base(*args)
-        return self._take_derivative_vector(desc_energy, args[1])
-        return self.torch.func.jacfwd(self._descriptor_base, argnums=1)(*args)
+        def f(displacements):
+            return self._descriptor_base(args[0], displacements, *args[2:])
+        return self.torch.autograd.functional.jacobian(f, args[1], vectorize=True, strategy="forward-mode")
     
     def _comm_stress(self, *args):
         def f(displacements):
