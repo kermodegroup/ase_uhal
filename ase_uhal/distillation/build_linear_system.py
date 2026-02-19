@@ -75,19 +75,19 @@ def solve_lin_system(energy_sys=None, force_sys=None, stress_sys=None, sqrt_prio
     return R
 
 
-def distill_dataset(dataset, calc, energy_weight_key=None, forces_weight_key=None, stress_weight_key=None, sqrt_prior=None, compress_memory=False):
+def distill_dataset(dataset, calc, total_weight_key=None, energy_weight_key=None, forces_weight_key=None, stress_weight_key=None, sqrt_prior=None, compress_memory=False):
     '''
     Given a dataset and a committee calculator, use the calculator descriptor to assemble a linear system from the dataset with given energy, force, stress weights.
     Then, solve for the posterior covariance of this system, which is equivalent to a new prior on any extensions to the dataset.
     
     '''
-    weights, numbers = extract_weights_nobservations(dataset, [energy_weight_key, forces_weight_key, stress_weight_key],
-                                  [calc.energy_weight, calc.forces_weight, calc.stress_weight])
+    weights, numbers = extract_weights_nobservations(dataset, [total_weight_key, energy_weight_key, forces_weight_key, stress_weight_key],
+                                  [1.0, calc.energy_weight, calc.forces_weight, calc.stress_weight]) # Use 1.0 as the default total weight
     
     systems = build_lin_systems(dataset, weights, numbers, calc, compress_memory)
 
     if sqrt_prior is None:
-        sqrt_prior = calc.sqrt_prior
+        sqrt_prior = calc.sqrt_prior * calc.prior_weight
 
     R = solve_lin_system(*systems, sqrt_prior=sqrt_prior)
     return R

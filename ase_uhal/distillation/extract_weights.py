@@ -10,10 +10,10 @@ def extract_weights_nobservations_single(atoms, weight_keys, default_weights):
     weights = [item for item in default_weights] # copy the default weights
     numbers = np.zeros(3)
 
-    for i in range(3):
+    for i in range(4):
         if weight_keys[i] in atoms.info.keys():
-            weight_keys[i] = atoms.info[weight_keys[i]]
-            assert weight_keys[i] > 0
+            weights[i] = atoms.info[weight_keys[i]]
+            assert weights[i] > 0
 
     if weights[0] is not None:
         # Total weight is not None, therefore compute some observations
