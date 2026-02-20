@@ -1,1 +1,2 @@
-from .extract_weights import extract_weights_nobservations, extract_weights_nobservations_single, estimate_memory_spike
+from .extract_weights import estimate_memory_spike
+from .distillation import distill_dataset
