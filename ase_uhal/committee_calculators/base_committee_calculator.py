@@ -75,8 +75,8 @@ class BaseCommitteeCalculator(Calculator, metaclass=ABCMeta):
             self.rank = self.comm.Get_rank()
             self.comm_size = self.comm.Get_size()
         else:
-            self.rank = None
-            self.comm_size = None
+            self.rank = 0
+            self.comm_size = 1
 
         super().__init__(**kwargs)
 
