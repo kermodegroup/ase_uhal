@@ -232,7 +232,7 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
     def _desc_stress(self, *args):
         def f(displacements):
             return self._descriptor_base(args[0], displacements, *args[2:])
-        return self.torch.autograd.functional.jacobian(f, args[1], vectorize=True, strategy="forward-mode")
+        return self.torch.autograd.functional.jacobian(f, args[1])
     
     def _comm_stress(self, *args):
         def f(displacements):
