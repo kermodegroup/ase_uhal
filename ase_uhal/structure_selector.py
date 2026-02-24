@@ -48,7 +48,7 @@ class StructureSelector():
 
         if type(threshold) == str and threshold.lower() == "adaptive":
             self.adaptive = True
-            self.reset_threshold()
+            self.reset_scoring()
         else:
             self.adaptive = False
             self.threshold = threshold
