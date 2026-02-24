@@ -463,22 +463,25 @@ Modifies self.tau if self.tau_delay &lt; 0, otherwise decreases self.tau_delay b
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset</span></code>()</p></td>
 <td><p>Clear all information from old calculation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_structure</span></code>(ats)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_tau</span></code>()</p></td>
+<td><p>Sets the biasing strength to zero, and resets the internal tau mixing state</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_structure</span></code>(ats)</p></td>
 <td><p>Alias for self.committee_calc.select_structure</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code>(**kwargs)</p></td>
 <td><p>Set parameters like set(key1=value1, key2=value2, ...).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_label</span></code>(label)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_label</span></code>(label)</p></td>
 <td><p>Set label and convert label to directory and prefix.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sync</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sync</span></code>()</p></td>
 <td><p>Alias of self.committee_calc.sync()</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">todict</span></code>([skip_default])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">todict</span></code>([skip_default])</p></td>
 <td><p>Obtain a dictionary of parameter information</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#ase_uhal.bias_calculators.HALBiasCalculator.update_tau" title="ase_uhal.bias_calculators.HALBiasCalculator.update_tau"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_tau</span></code></a>([atoms])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ase_uhal.bias_calculators.HALBiasCalculator.update_tau" title="ase_uhal.bias_calculators.HALBiasCalculator.update_tau"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_tau</span></code></a>([atoms])</p></td>
 <td><p>Exponential mixing of mean force magnitude and mean biasing force magnitude (without the tau biasing constant)</p></td>
 </tr>
 </tbody>

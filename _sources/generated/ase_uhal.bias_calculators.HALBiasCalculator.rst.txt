@@ -42,6 +42,7 @@
       ~HALBiasCalculator.read_atoms
       ~HALBiasCalculator.resample_committee
       ~HALBiasCalculator.reset
+      ~HALBiasCalculator.reset_tau
       ~HALBiasCalculator.select_structure
       ~HALBiasCalculator.set
       ~HALBiasCalculator.set_label

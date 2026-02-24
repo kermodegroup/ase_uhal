@@ -42,6 +42,7 @@
       ~BaseBiasCalculator.read_atoms
       ~BaseBiasCalculator.resample_committee
       ~BaseBiasCalculator.reset
+      ~BaseBiasCalculator.reset_tau
       ~BaseBiasCalculator.select_structure
       ~BaseBiasCalculator.set
       ~BaseBiasCalculator.set_label
