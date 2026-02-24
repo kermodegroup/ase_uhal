@@ -34,6 +34,9 @@ class BaseBiasCalculator(Calculator, metaclass=ABCMeta):
             self.tau_delay = tau_delay
         else:
             self.tau_delay = tau_hist
+        
+        self._tau_delay = self.tau_delay
+
         self.tau = 0 # Default to no mixing, until specified by user, or changed by adaptive mode
         self.Fmean = None
         self.Fbias = None
@@ -95,13 +98,23 @@ class BaseBiasCalculator(Calculator, metaclass=ABCMeta):
             self.Fmean = (1-self.mixing) * self.Fmean + self.mixing * Fmean
             self.Fbias = (1-self.mixing) * self.Fbias + self.mixing * Fbias
         
-        if self.tau_delay > 0:
+        if self._tau_delay > 0:
             # Positive delay means tau should not yet be updated
             # Updates to self.Fmean and self.Fbias needed to ensure 
             # smooth averaging when tau can be changed
-            self.tau_delay -= 1
+            self._tau_delay -= 1
         else:
             self.tau = self.tau_rel * (self.Fmean / self.Fbias)
+
+    def reset_tau(self):
+        '''
+        Sets the biasing strength to zero, and resets the internal tau mixing state
+        '''
+
+        self.tau = 0
+        self.Fmean = None
+        self.Fbias = None
+        self._tau_delay = self.tau_delay
 
     @abstractmethod
     def get_score(self, atoms=None):

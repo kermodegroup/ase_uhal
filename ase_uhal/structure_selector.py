@@ -58,9 +58,9 @@ class StructureSelector():
         self._atoms = None
         self._peak = False
 
-    def reset_threshold(self):
+    def reset_scoring(self):
         '''
-        Sets threshold to np.inf, resets the internal mixing state and the delay back to self.delay
+        Sets score threshold to np.inf, resets the internal mixing state and the delay back to self.delay
         
         '''
         self._delay = self.delay
