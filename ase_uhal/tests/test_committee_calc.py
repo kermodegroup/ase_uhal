@@ -54,7 +54,7 @@ all_data = mace_data.copy()
 all_data.update(ace_data)
 
 # Also test the ACE1Calculator forces and stresses
-all_data["ACE1Calculator" : (comm.ACE1Calculator, {"pot_json" : "Si_ACE.json"})]
+all_data["ACE1Calculator"] = (comm.ACE1Calculator, {"pot_json" : "Si_ACE.json"})
 
 def set_up_calc(calc_name, required_properties=[]):
     if "MACE" in calc_name:
