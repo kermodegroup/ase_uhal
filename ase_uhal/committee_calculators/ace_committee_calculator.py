@@ -159,7 +159,7 @@ class ACE1Calculator(Calculator):
 
         E, F, V = self.jl.eval_observables(jl_ats, self.acemodel)
 
-        F = np.array(F); V = np.array(V)
+        F = np.array(F).T; V = np.array(V)
 
         S = -V/atoms.get_volume()
 

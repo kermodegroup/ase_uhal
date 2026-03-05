@@ -5,6 +5,9 @@ from ase.build import bulk
 from ase_uhal import committee_calculators as comm
 import numpy as np
 from .utils import finite_difference_forces, finite_difference_stress
+import os
+
+file_root = os.path.dirname(os.path.abspath(__file__))
 
 ref_ats = bulk("Si", cubic=True)
 
@@ -55,7 +58,7 @@ all_data = mace_data.copy()
 all_data.update(ace_data)
 
 # Also test the ACE1Calculator forces and stresses
-all_data["ACE1Calculator"] = (comm.ACE1Calculator, {"pot_json" : "Si_ACE.json"})
+all_data["ACE1Calculator"] = (comm.ACE1Calculator, {"pot_json" : file_root + "/Si_ACE.json"})
 
 def set_up_calc(calc_name, required_properties=[]):
     if "MACE" in calc_name:
@@ -72,7 +75,9 @@ def set_up_calc(calc_name, required_properties=[]):
             pytest.skip(f"{cls.__name__} does not implement {prop}")
 
     calc = cls(**params)
-    calc.resample_committee()
+
+    if issubclass(cls, comm.BaseCommitteeCalculator):
+        calc.resample_committee()
 
     return calc
 
@@ -129,6 +134,9 @@ class TestCommitteeCalcs():
     def test_committee_resample(self, calc_name):
 
         calc = set_up_calc(calc_name)
+
+        if not issubclass(calc.__class__, comm.BaseCommitteeCalculator):
+            pytest.skip(f"{calc_name} is noy a committee calculator.")
 
         if issubclass(calc.__class__, ase_uhal.committee_calculators.TorchCommitteeCalculator):
             def to_numpy(tensor):
