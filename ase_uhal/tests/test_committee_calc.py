@@ -26,7 +26,7 @@ shared_params = {
     "energy_weight" : 10,
     "forces_weight" : 10,
     "stress_weight" : 10,
-    "rng" : 42
+    "random_seed" : 42
 }
 
 
