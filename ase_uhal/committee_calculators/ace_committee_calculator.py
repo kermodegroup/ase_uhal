@@ -43,7 +43,7 @@ class BaseACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
 
         if type(ace_params) == str:
             # assume filename
-            self.model = self.jl.load_ace_model(ace_params)
+            self.model = self.jl.load_ace(ace_params)
         else:
             # assume set of ace hyperparameters
             if type(ace_params) == list:
@@ -116,6 +116,57 @@ class BaseACECalculator(BaseCommitteeCalculator, metaclass=ABCMeta):
 
         if "bias_stress" in properties:
             self.results["bias_stress"] = self._bias_stress(self.results["comm_stress"], self.results["comm_energy"])
+
+
+class ACE1Calculator(Calculator):
+    '''
+    Basic ACE1 ASE calculator interface, assumes json structure similar to the ACEpotentials tutorial example
+
+    NOTE: model_name = "ACE1" added to the hyperparameters dict
+
+    hyperparams = (elements = [:Ti, :Al],
+					order = 3,
+					totaldegree = 6,
+					rcut = 5.5,
+					Eref = [:Ti => -1586.0195, :Al => -105.5954],
+                    model_name = "ACE1"
+                    )
+
+    using JSON
+    open("TiAl_model.json", "w") do f
+        JSON.print(f, Dict("hyperparams" => hyperparams, "params" => model.ps))
+    end
+    
+    '''
+    implemented_properties = ["energy", "forces", "stress"]
+    def __init__(self, pot_json):
+        super().__init__()
+
+        from juliacall import Main as jl
+        self.jl = jl
+        self.jl.seval('include("' + os.path.normpath(file_root + "/../data/_ace_utils.jl") + '")')
+        
+        self.pot_json = pot_json
+
+
+        self.acemodel = jl.load_ace(pot_json, True)
+
+    def calculate(self, atoms, properties, system_changes):
+        super().calculate(atoms, properties, system_changes)
+        self.results = {}
+
+        jl_ats = self.jl.convert_ats(atoms.numbers, atoms.positions, atoms.cell[:, :], atoms.pbc)
+
+        E, F, V = self.jl.eval_observables(jl_ats, self.acemodel)
+
+        F = np.array(F); V = np.array(V)
+
+        S = -V/atoms.get_volume()
+
+        self.results["energy"] = E
+        self.results["forces"] = F
+        self.results["stress"] = S
+
 
 class ACEHALCalculator(HALBiasPotential, BaseACECalculator):
     name = "ACEHALCalculator"

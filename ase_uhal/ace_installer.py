@@ -10,8 +10,10 @@ def install_ace_deps():
         raise ImportError(err_text) from e
     
     juliapkg.resolve() # Initial resolve to make sure general registry exists
+    juliapkg.add("JSON")
     juliapkg.add("Unitful")
     juliapkg.add("AtomsBase")
+    juliapkg.add("AtomsCalculators")
     # juliapkg does not yet seem to support >= specifiers
     # Hack a >= using wildcard version bounds 0.10 - 0.* === [0.10.0, 1.0.0)
     juliapkg.add("ACEpotentials", version="0.10 - 0")

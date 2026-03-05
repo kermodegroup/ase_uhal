@@ -1,7 +1,21 @@
-using ACEpotentials, AtomsBase, Unitful
+using ACEpotentials, AtomsBase, Unitful, AtomsCalculators, JSON
 
-function load_ace_model(model_json)
-    model, meta =  ACEpotentials.load_model(model_json) # load_potential in v0.6 version, load_model in v0.8+
+function load_ace(pot_path, add_weights=false)
+    model_dict = JSON.parsefile(pot_path)
+    model =  ACEpotentials.make_model(model_dict["hyperparams"])
+
+    if add_weights 
+        ps2 = deepcopy(model.ps)
+
+        Wpair = convert.(Base.Float64, stack(model_dict["params"]["Wpair"]))
+        WB = convert.(Base.Float64, stack(model_dict["params"]["WB"]))
+
+        ps2.Wpair[:] = Wpair
+        ps2.WB[:] = WB
+
+        set_parameters!(model, ps2)
+    end
+
     return model
 end
 
@@ -39,6 +53,16 @@ function eval_basis(atoms, model)
 
     F = permutedims(F, (3, 2, 1))
     V = permutedims(V, (3, 1, 2))
+
+    return E, F, V
+end
+
+function eval_observables(atoms, model)
+    E, F, V = AtomsCalculators.energy_forces_virial(atoms, model)
+
+    E = Unitful.ustrip(E)
+    F = stack(Unitful.ustrip.(F))
+    V = stack(Unitful.ustrip.(V))
 
     return E, F, V
 end
