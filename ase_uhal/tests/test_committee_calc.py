@@ -45,7 +45,7 @@ ace_params.update({
 })
 
 mace_calcs = [comm.MACEHALCalculator]
-ace_calcs = [comm.ACEHALCalculator]
+ace_calcs = [comm.ACEHALCalculator, comm.ACE1Calculator]
 
 mace_data = {calc.__name__ : (calc, mace_params) for calc in mace_calcs}
 ace_data = {calc.__name__ : (calc, ace_params) for calc in ace_calcs}
