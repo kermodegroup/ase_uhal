@@ -506,7 +506,7 @@
 
         <span class="n">E</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jl</span><span class="o">.</span><span class="n">eval_observables</span><span class="p">(</span><span class="n">jl_ats</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">acemodel</span><span class="p">)</span>
 
-        <span class="n">F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">F</span><span class="p">);</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">F</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">;</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
 
         <span class="n">S</span> <span class="o">=</span> <span class="o">-</span><span class="n">V</span><span class="o">/</span><span class="n">atoms</span><span class="o">.</span><span class="n">get_volume</span><span class="p">()</span>
 
