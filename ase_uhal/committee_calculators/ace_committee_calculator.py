@@ -139,7 +139,7 @@ class ACE1Calculator(Calculator):
     
     '''
     implemented_properties = ["energy", "forces", "stress"]
-    def __init__(self, pot_json, **kwargs):
+    def __init__(self, pot_json):
         super().__init__()
 
         from juliacall import Main as jl

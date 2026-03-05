@@ -45,13 +45,15 @@ ace_params.update({
 })
 
 mace_calcs = [comm.MACEHALCalculator]
-ace_calcs = [comm.ACEHALCalculator, comm.ACE1Calculator]
+ace_calcs = [comm.ACEHALCalculator]
 
 mace_data = {calc.__name__ : (calc, mace_params) for calc in mace_calcs}
 ace_data = {calc.__name__ : (calc, ace_params) for calc in ace_calcs}
 
 all_data = mace_data.copy()
 all_data.update(ace_data)
+
+all_data["ACE1Calculator" : (comm.ACE1Calculator, {"pot_json" : "Si_ACE.json"})]
 
 def set_up_calc(calc_name, required_properties=[]):
     if "MACE" in calc_name:
