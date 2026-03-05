@@ -407,8 +407,21 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_prev_score</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_peak</span> <span class="o">=</span> <span class="kc">False</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_peak</span> <span class="o">=</span> <span class="kc">False</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection_callbacks</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_selection_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add a function to the list of functions to call whenever a selection event occurs</span>
+<span class="sd">        </span>
+<span class="sd">        The function will be called as f(*args, **kwargs)</span>
+
+<span class="sd">        To access the selected structure, pass the StructureSelector object into the callback function, and access the selector._atoms</span>
+<span class="sd">        attribute. </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">f</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">reset_scoring</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
@@ -447,6 +460,10 @@
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_resample</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bias_calc</span><span class="o">.</span><span class="n">committee_calc</span><span class="o">.</span><span class="n">resample_committee</span><span class="p">()</span>
+
+            <span class="c1"># Callbacks on a selection event</span>
+            <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection_callbacks</span><span class="p">:</span>
+                <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_peak</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span> <span class="o">=</span> <span class="kc">None</span>
