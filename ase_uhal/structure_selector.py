@@ -58,6 +58,19 @@ class StructureSelector():
         self._atoms = None
         self._peak = False
 
+        self.selection_callbacks = []
+
+    def add_selection_callback(self, f, *args, **kwargs):
+        '''
+        Add a function to the list of functions to call whenever a selection event occurs
+        
+        The function will be called as f(*args, **kwargs)
+
+        To access the selected structure, pass the StructureSelector object into the callback function, and access the selector._atoms
+        attribute. 
+        '''
+        self.selection_callbacks.append((f, args, kwargs))
+
     def reset_scoring(self):
         '''
         Sets score threshold to np.inf, resets the internal mixing state and the delay back to self.delay
@@ -95,6 +108,10 @@ class StructureSelector():
 
             if self.auto_resample:
                 self.bias_calc.committee_calc.resample_committee()
+
+            # Callbacks on a selection event
+            for f, args, kwargs in self.selection_callbacks:
+                f(*args, **kwargs)
 
             self._peak = False
             self._atoms = None
