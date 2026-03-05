@@ -1,4 +1,4 @@
-from .base_committee_calculator import BaseCommitteeCalculator, HALBiasPotential
+from .base_committee_calculator import BaseCommitteeCalculator, HALBiasPotential, Calculator
 import os
 import numpy as np
 from abc import ABCMeta, abstractmethod
