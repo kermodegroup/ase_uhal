@@ -62,7 +62,7 @@ class StructureSelector():
 
     def add_selection_callback(self, f, *args, **kwargs):
         '''
-        Add a function to the list of functions to call whenever a selection event occurs
+        Add a function to the list of functions to call whenever a selection event occurs, before the selected structure is added to the internal database.
         
         The function will be called as f(*args, **kwargs)
 
@@ -104,14 +104,15 @@ class StructureSelector():
         elif self._peak:
             # Was at a peak previously, now select that previous structure
 
+            # Callbacks on a selection event
+            for f, args, kwargs in self.selection_callbacks:
+                f(*args, **kwargs)
+                
             self.bias_calc.committee_calc.select_structure(self._atoms)
 
             if self.auto_resample:
                 self.bias_calc.committee_calc.resample_committee()
 
-            # Callbacks on a selection event
-            for f, args, kwargs in self.selection_callbacks:
-                f(*args, **kwargs)
 
             self._peak = False
             self._atoms = None
