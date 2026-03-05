@@ -25,7 +25,8 @@ shared_params = {
     "prior_weight" : 0.1,
     "energy_weight" : 10,
     "forces_weight" : 10,
-    "stress_weight" : 10
+    "stress_weight" : 10,
+    "rng" : 42
 }
 
 
@@ -66,13 +67,11 @@ def set_up_calc(calc_name, required_properties=[]):
 
     cls, params = all_data[calc_name]
 
-    rng = np.random.RandomState(42)
-
     for prop in required_properties:
         if prop not in cls.implemented_properties:
             pytest.skip(f"{cls.__name__} does not implement {prop}")
 
-    calc = cls(**params, rng=rng)
+    calc = cls(**params)
     calc.resample_committee()
 
     return calc
