@@ -148,6 +148,6 @@ class HALBiasCalculator(BaseBiasCalculator):
         
         F = Fbias / (Fmean + self.eps)
 
-        s = np.exp(F) / np.sum(np.exp(F)) # Apply softmax
+        s = np.exp(F) / (np.sum(np.exp(F)) + self.eps) # Apply softmax
 
         return np.max(s)
