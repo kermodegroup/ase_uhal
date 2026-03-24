@@ -30,7 +30,7 @@ def _MPI_gather_distillations(R, rank, target_rank, comm):
     
     '''
     if comm is not None:
-        R_list = comm.Gather(R, root=target_rank)
+        R_list = comm.gather(R, root=target_rank)
         if rank == target_rank:
             B = np.vstack(R_list)
             Q, R = np.linalg.qr(B)
