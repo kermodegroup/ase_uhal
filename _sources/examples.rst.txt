@@ -7,6 +7,7 @@ User Guide
 
    examples/concept_demo
    examples/basic_usage
+   examples/distilling
    examples/MPI
 
 

@@ -1,0 +1,664 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Distilling Existing Datasets into Priors &#8212; ase_uhal  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>window.MathJax = {"chtml": {"displayAlign": "center"}, "tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/distilling';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ase_uhal with MPI4Py" href="MPI.html" />
+    <link rel="prev" title="Basic Usage of ase_uhal" href="basic_usage.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">ase_uhal  documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../theory.html">
+    Theory
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../examples.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api.html">
+    API Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../developer_guide.html">
+    Developer Guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../theory.html">
+    Theory
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../examples.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api.html">
+    API Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../developer_guide.html">
+    Developer Guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../examples.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Distilling Existing Datasets into Priors</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="Distilling-Existing-Datasets-into-Priors">
+<h1>Distilling Existing Datasets into Priors<a class="headerlink" href="#Distilling-Existing-Datasets-into-Priors" title="Link to this heading">#</a></h1>
+<p>In Bayesian Regression, the Prior distribution encodes prior knowledge about the model weights, before that model has been conditioned on the training data.The Prior and training data is then used to form the Posterior distribution, which gives model weights which are compatible with both the training data and the prior.</p>
+<p>Further conditioning a Posterior distribution on a second set of training data is identical to using that Posterior distribution as a Prior for this second Posterior. In this way, we can “distill” existing datasets into good Prior distributions for the committee models used for selection.</p>
+<p>To start, let’s construct a committee calculator in the same manner as the previous example:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Imports</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mace.calculators</span><span class="w"> </span><span class="kn">import</span> <span class="n">mace_mp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase_uhal.committee_calculators</span><span class="w"> </span><span class="kn">import</span> <span class="n">MACEHALCalculator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase_uhal.bias_calculators</span><span class="w"> </span><span class="kn">import</span> <span class="n">HALBiasCalculator</span>
+
+<span class="c1"># normal MACE MPA medium model calculator (from mace_torch)</span>
+<span class="n">mace_calc</span> <span class="o">=</span> <span class="n">mace_mp</span><span class="p">(</span><span class="s2">&quot;medium-mpa-0&quot;</span><span class="p">)</span>
+
+<span class="n">comm_calc</span> <span class="o">=</span> <span class="n">MACEHALCalculator</span><span class="p">(</span>
+                <span class="c1"># MACE architecture to use for descriptor evaluation</span>
+                <span class="n">mace_calc</span><span class="p">,</span>
+                <span class="c1"># Number of committee members to draw</span>
+                <span class="n">committee_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                <span class="c1"># Weight of the prior in the linear system to find committee weights</span>
+                <span class="n">prior_weight</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                <span class="c1"># Weights on energy and force observations when sampling new structures</span>
+                <span class="n">energy_weight</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">forces_weight</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                <span class="c1"># Option to use a lower memory strategy to fit the linear system</span>
+                <span class="n">lowmem</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="c1"># Lower memory overhead by evaluating descriptor forces in batches</span>
+                <span class="c1"># (Specific to MACE-based calculators)</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                <span class="c1"># Seeding for random number generation</span>
+                <span class="n">rng</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
+
+<span class="n">comm_calc</span><span class="o">.</span><span class="n">resample_committee</span><span class="p">()</span> <span class="c1">#Build the initial committee</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/opt/hostedtoolcache/Python/3.12.13/x64/lib/python3.12/site-packages/e3nn/o3/_wigner.py:10: UserWarning: Environment variable TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD detected, since the`weights_only` argument was not explicitly passed to `torch.load`, forcing weights_only=False.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), &#39;constants.pt&#39;))
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/opt/hostedtoolcache/Python/3.12.13/x64/lib/python3.12/site-packages/mace/calculators/mace.py:199: UserWarning: Environment variable TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD detected, since the`weights_only` argument was not explicitly passed to `torch.load`, forcing weights_only=False.
+  torch.load(f=model_path, map_location=device)
+WARNING:root:Default dtype float32 does not match model dtype float64, converting models to float32.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Using medium MPA-0 model as default MACE-MP model, to use previous (before 3.10) default model please specify &#39;medium&#39; as model argument
+Using Materials Project MACE for MACECalculator with /home/runner/.cache/mace/macempa0mediummodel
+Using float32 for MACECalculator, which is faster but less accurate. Recommended for MD. Use float64 for geometry optimization.
+</pre></div></div>
+</div>
+<p>Now, let’s invent some initial training data, by applying strain to a bulk system:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ase.build</span><span class="w"> </span><span class="kn">import</span> <span class="n">bulk</span>
+
+<span class="n">base_ats</span> <span class="o">=</span> <span class="n">bulk</span><span class="p">(</span><span class="s2">&quot;Fe&quot;</span><span class="p">,</span> <span class="n">cubic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">base_cell</span> <span class="o">=</span> <span class="n">base_ats</span><span class="o">.</span><span class="n">cell</span><span class="p">[:,</span> <span class="p">:]</span>
+
+<span class="n">db_strains</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+<span class="n">dataset</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">strain</span> <span class="ow">in</span> <span class="n">db_strains</span><span class="p">:</span>
+    <span class="n">ats</span> <span class="o">=</span> <span class="n">base_ats</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="c1"># Apply volumetric strain</span>
+    <span class="n">cell</span> <span class="o">=</span> <span class="n">base_cell</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="o">*</span> <span class="n">strain</span>
+    <span class="n">ats</span><span class="o">.</span><span class="n">set_cell</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">scale_atoms</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">dataset</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ats</span><span class="p">)</span>
+
+<span class="c1"># Also include the bulk, but let&#39;s put the weights on this 10x higher</span>
+<span class="n">ats</span> <span class="o">=</span> <span class="n">base_ats</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">ats</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;total_weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">dataset</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ats</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>And now let’s use this dataset to produce a prior:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ase_uhal.distillation</span><span class="w"> </span><span class="kn">import</span> <span class="n">distill_dataset</span>
+
+<span class="n">sqrt_prior</span> <span class="o">=</span> <span class="n">distill_dataset</span><span class="p">(</span>
+    <span class="c1"># Dataset to distill</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+    <span class="c1"># Committee calculator to get descriptors from</span>
+    <span class="n">calc</span> <span class="o">=</span> <span class="n">comm_calc</span><span class="p">,</span>
+    <span class="c1"># The distillation process will scan the atoms.info dict for this key,</span>
+    <span class="c1"># and use it as an overall weight multiplier (1 is used when the key is missing)</span>
+    <span class="n">total_weight_key</span><span class="o">=</span><span class="s2">&quot;total_weight&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># We could now save this prior to disk, to save needing to regenerating it each time we want to use the sampling</span>
+<span class="c1"># np.save(&quot;Fe_Prior&quot;, sqrt_prior)</span>
+<span class="c1"># and then load it back with</span>
+<span class="c1"># sqrt_prior = np.load(&quot;Fe_Prior.npz&quot;)</span>
+</pre></div>
+</div>
+</div>
+<p>What gets returned is the square root of the Posterior covariance matrix, which is also the square root of the new Prior matrix. As ase_uhal uses zero-mean committees, we do not need any information about the Posterior mean (which would also need energies and forces).</p>
+<section id="Using-Priors-in-new-Committee-Calculators">
+<h2>Using Priors in new Committee Calculators<a class="headerlink" href="#Using-Priors-in-new-Committee-Calculators" title="Link to this heading">#</a></h2>
+<p>We can now create a new commitee calculator, using this new Prior:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_comm_calc</span> <span class="o">=</span> <span class="n">MACEHALCalculator</span><span class="p">(</span>
+                <span class="c1"># MACE architecture to use for descriptor evaluation</span>
+                <span class="n">mace_calc</span><span class="p">,</span>
+                <span class="c1"># Number of committee members to draw</span>
+                <span class="n">committee_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                <span class="c1"># Weight of the prior in the linear system to find committee weights</span>
+                <span class="n">prior_weight</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                <span class="c1"># Weights on energy and force observations when sampling new structures</span>
+                <span class="n">energy_weight</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">forces_weight</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                <span class="c1"># Option to use a lower memory strategy to fit the linear system</span>
+                <span class="n">lowmem</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="c1"># Lower memory overhead by evaluating descriptor forces in batches</span>
+                <span class="c1"># (Specific to MACE-based calculators)</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                <span class="c1"># Seeding for random number generation</span>
+                <span class="n">rng</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">42</span><span class="p">),</span>
+                <span class="c1"># Now add in the sqrt of the prior</span>
+                <span class="n">sqrt_prior</span><span class="o">=</span><span class="n">sqrt_prior</span><span class="p">)</span>
+
+<span class="n">new_comm_calc</span><span class="o">.</span><span class="n">resample_committee</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>To show the impact of the Prior, let’s compare the bias forces of both committee calculators</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ats</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1"># Very small rattle, to break symmetry</span>
+<span class="n">ats</span><span class="o">.</span><span class="n">rattle</span><span class="p">(</span><span class="mf">1e-4</span><span class="p">)</span>
+
+<span class="n">bulk_bias_force_no_prior</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">comm_calc</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="s2">&quot;bias_forces&quot;</span><span class="p">,</span> <span class="n">ats</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">bulk_bias_force_prior</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">new_comm_calc</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="s2">&quot;bias_forces&quot;</span><span class="p">,</span> <span class="n">ats</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bias Forces for Strained Fe Bulk:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No Prior:  &quot;</span><span class="p">,</span> <span class="n">bulk_bias_force_no_prior</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;With Prior:&quot;</span><span class="p">,</span> <span class="n">bulk_bias_force_prior</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Bias Forces for Strained Fe Bulk:
+No Prior:   0.00031190956
+With Prior: 0.0128207635
+</pre></div></div>
+</div>
+<p>We can see that the distilled prior has increased the bias forces. This means that, assuming that the bias strength tau is constant, the committee with the improved prior will more strongly avoid exploring the minimised bulk configuration, which is already included in our original dataset.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="basic_usage.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Basic Usage of ase_uhal</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="MPI.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">ase_uhal with MPI4Py</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Using-Priors-in-new-Committee-Calculators">Using Priors in new Committee Calculators</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/examples/distilling.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Thomas Rocke. Project structure based on the Computational Molecular Science Python Cookiecutter version 1.11.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
