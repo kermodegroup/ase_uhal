@@ -13,31 +13,41 @@ Using ``ase_uhal.ACEHALCalculator`` with ``ase_uhal.HALBiasCalculator`` provides
 
 See the User Guide for more details on this.
 
-Installation
-------------
+Base Installation
+-----------------
+
+.. Note::
+    This package is intended to always be used in conjunction with additional dependencies, 
+    see following sections for specific installation instructions.
+
 
 Installation of the main module can be achieved using pip:
 
 .. code-block:: bash
     
-    pip install ase_uhal
+    pip install ase-uhal
+
+
+`ase_uhal` supports interfaces to multiple MLIP architectures. 
+To avoid a very large number of mandatory dependencies, specific requirements for each MLIP model are implemented as optional 
+dependencies to this package.
 
 MACE
------
+=======
 For MACE-based biasing, the ``mace-torch`` Python package must be also installed. As a shortcut, this can be done using the ``[mace]`` optional dependancies of this package, e.g.
 
 .. code-block:: bash
 
-    pip install ase_uhal[mace]
+    pip install ase-uhal[mace]
 
 ACE
-----
+=====
 For ACE-based biasing, the ``juliacall`` package must be installed, along with the ACEpotentials, AtomsBase, and Unitful Julia dependencies.
 This can easily be achieved through the following:
 
 .. code-block:: bash
 
-    pip install ase_uhal[ace]
+    pip install ase-uhal[ace]
     python -c "import ase_uhal; ase_uhal.install_ace_deps()"
 
 Customising the Julia Environment
@@ -60,3 +70,11 @@ We can however customise this using environment variables (taken from the ``juli
 .. warning::
     Setting ``PYTHON_JULIAPKG_PROJECT`` to an existing Project.toml and then running ``ase_uhal.install_julia_deps()`` may modify the existing
     environment, if it was not already compatible.
+
+Installing Multiple Optional Dependencies
+===========================================
+Multiple optional dependencies can be installed in one line using comma separation (with no spaces), e.g.
+
+.. code-block:: bash
+
+    pip install ase-uhal[ace,mace]

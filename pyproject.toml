@@ -20,7 +20,7 @@ license-files = ["LICENSE"]
 classifiers = [
     "Programming Language :: Python :: 3",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 # Declare any run-time dependencies that should be installed with the package.
 dependencies = [
     "ase",

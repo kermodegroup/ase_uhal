@@ -11,20 +11,30 @@ Implementation of "Universal HyperActive Learning" compatible with the Atomic Si
 Documentation is available at https://kermodegroup.github.io/ase_uhal/
 
 
-### Installation
+### Base Installation
 Requires:
 - Python >= 3.10
 - Julia >= 1.11 (for ACE descriptor features)
 
-Basic installation can be achieved by Git cloning this repository, and installing via pip:
+**_NOTE:_**  This package is intended to always be used in conjunction with additional dependencies, see the next section for more information.
+
+Basic installation can be achieved via pip
+```bash
+pip install ase-uhal
+
+```
+
+You can also clone the Git repository:
 ```bash
 git clone https://github.com/kermodegroup/ase_uhal.git
 cd ase_uhal
 pip install .
 ```
-Interfaces to MLIP descriptors are handled as optional dependencies to this package. For example, to install the MACE compatibility,
+
+### Extra Dependencies
+`ase_uhal` supports interfaces to multiple MLIP architectures. To avoid a very large number of mandatory dependencies, specific requirements for each MLIP model are implemented as optional dependencies to this package. For example, to install the MACE compatibility,
 ```bash
-pip install .[mace]
+pip install ase-uhal[mace]
 ```
 
 #### ACE Installation
