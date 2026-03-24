@@ -1,8 +1,8 @@
 ase_uhal
 ==============================
 [//]: # (Badges)
-[![GitHub Actions Build Status](https://github.com/thomas-rocke/ase_uhal/workflows/CI/badge.svg)](https://github.com/thomas-rocke/ase_uhal/actions?query=workflow%3ACI)
-[![codecov](https://codecov.io/gh/thomas-rocke/ase_uhal/branch/main/graph/badge.svg)](https://codecov.io/gh/thomas-rocke/ase_uhal/branch/main)
+[![GitHub Actions Build Status](https://github.com/kermodegroup/ase_uhal/workflows/CI/badge.svg)](https://github.com/kermodegroup/ase_uhal/actions?query=workflow%3ACI)
+[![codecov](https://codecov.io/gh/kermodegroup/ase_uhal/branch/main/graph/badge.svg)](https://codecov.io/gh/kermodegroup/ase_uhal/branch/main)
 
 
 Implementation of "Universal HyperActive Learning" compatible with the Atomic Simulation Environment (ASE)
