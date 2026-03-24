@@ -42,7 +42,7 @@ Welcome to ase_uhal's documentation!
          :outline:
          :expand:
 
-         To the Examples
+         To the User Guide
 
     .. grid-item-card:: API Reference
       :margin: 0 3 0 0

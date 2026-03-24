@@ -359,30 +359,37 @@
 Using <code class="docutils literal notranslate"><span class="pre">ase_uhal.ACEHALCalculator</span></code> with <code class="docutils literal notranslate"><span class="pre">ase_uhal.HALBiasCalculator</span></code> provides a close approximation to the original <a class="reference external" href="https://github.com/ACEsuit/ACEHAL/tree/main">ACEHAL</a> approach.</p>
 <p>See the User Guide for more details on this.</p>
 </section>
-<section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
+<section id="base-installation">
+<h2>Base Installation<a class="headerlink" href="#base-installation" title="Link to this heading">#</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This package is intended to always be used in conjunction with additional dependencies,
+see following sections for specific installation instructions.</p>
+</div>
 <p>Installation of the main module can be achieved using pip:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>ase_uhal
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>ase-uhal
 </pre></div>
 </div>
+<p><cite>ase_uhal</cite> supports interfaces to multiple MLIP architectures.
+To avoid a very large number of mandatory dependencies, specific requirements for each MLIP model are implemented as optional
+dependencies to this package.</p>
+</section>
 </section>
 <section id="mace">
-<h2>MACE<a class="headerlink" href="#mace" title="Link to this heading">#</a></h2>
+<h1>MACE<a class="headerlink" href="#mace" title="Link to this heading">#</a></h1>
 <p>For MACE-based biasing, the <code class="docutils literal notranslate"><span class="pre">mace-torch</span></code> Python package must be also installed. As a shortcut, this can be done using the <code class="docutils literal notranslate"><span class="pre">[mace]</span></code> optional dependancies of this package, e.g.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>ase_uhal<span class="o">[</span>mace<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>ase-uhal<span class="o">[</span>mace<span class="o">]</span>
 </pre></div>
 </div>
 </section>
 <section id="ace">
-<h2>ACE<a class="headerlink" href="#ace" title="Link to this heading">#</a></h2>
+<h1>ACE<a class="headerlink" href="#ace" title="Link to this heading">#</a></h1>
 <p>For ACE-based biasing, the <code class="docutils literal notranslate"><span class="pre">juliacall</span></code> package must be installed, along with the ACEpotentials, AtomsBase, and Unitful Julia dependencies.
 This can easily be achieved through the following:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>ase_uhal<span class="o">[</span>ace<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>ase-uhal<span class="o">[</span>ace<span class="o">]</span>
 python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import ase_uhal; ase_uhal.install_ace_deps()&quot;</span>
 </pre></div>
 </div>
-<section id="customising-the-julia-environment">
-<h3>Customising the Julia Environment<a class="headerlink" href="#customising-the-julia-environment" title="Link to this heading">#</a></h3>
 <p>The ACE/Julia compatibility is provided using the <a class="reference external" href="https://github.com/JuliaPy/PyJuliaPkg">juliapkg</a> Python module. This will generally attempt to install the required packages
 as purely as possible (i.e. trying not to generate side effects in existing julia installs and projects), including installing the Julia Project.toml inside a Python
 virtual enviroment, if one exists and is activated when <code class="docutils literal notranslate"><span class="pre">ase_uhal.install_ace_deps()</span></code> is called.</p>
@@ -401,7 +408,12 @@ We can however customise this using environment variables (taken from the <code 
 environment, if it was not already compatible.</p>
 </div>
 </section>
-</section>
+<section id="installing-multiple-optional-dependencies">
+<h1>Installing Multiple Optional Dependencies<a class="headerlink" href="#installing-multiple-optional-dependencies" title="Link to this heading">#</a></h1>
+<p>Multiple optional dependencies can be installed in one line using comma separation (with no spaces), e.g.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>ase-uhal<span class="o">[</span>ace,mace<span class="o">]</span>
+</pre></div>
+</div>
 </section>
 
 
@@ -451,14 +463,16 @@ environment, if it was not already compatible.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Getting Started</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ase-uhal-overview"><code class="docutils literal notranslate"><span class="pre">ase_uhal</span></code> Overview</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mace">MACE</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ace">ACE</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#customising-the-julia-environment">Customising the Julia Environment</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#base-installation">Base Installation</a></li>
 </ul>
 </li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#mace">MACE</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#ace">ACE</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-multiple-optional-dependencies">Installing Multiple Optional Dependencies</a></li>
 </ul>
+
   </nav></div>
 
   <div class="sidebar-secondary-item">
