@@ -78,10 +78,16 @@ jobs:
           import ase_uhal
           ase_uhal.install_ace_deps()"
 
+      - name: Setup MPI
+        uses: mpi4py/setup-mpi@v1
+        with:
+          mpi: 'openmpi'
+
       - name: Run tests
         shell: bash
 
         run: |
+          pip install mpi4py
           python -m pytest -v --cov=ase_uhal --cov-report=xml --color=yes ase_uhal/tests/
 
       - name: CodeCov
