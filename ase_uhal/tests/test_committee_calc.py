@@ -7,6 +7,8 @@ import numpy as np
 from .utils import finite_difference_forces, finite_difference_stress
 import os
 
+COMM_WORLD = comm.base_committee_calculator.COMM_WORLD
+
 file_root = os.path.dirname(os.path.abspath(__file__))
 
 ref_ats = bulk("Si", cubic=True)
@@ -36,6 +38,7 @@ shared_params = {
 mace_params = shared_params.copy()
 mace_params.update({
     "mace_calculator" : mpa,
+    "comm" : COMM_WORLD # Test MACE w/ MPI4PY on, if installed (for test coverage)
 })
 
 ace_params = shared_params.copy()
@@ -45,7 +48,8 @@ ace_params.update({
         "order" : 3,
         "totaldegree" : 10,
         "rcut" : 5.0 
-    }
+    },
+    "comm" : None # Test ACE models with no MPI turned on (for test coverage)
 })
 
 mace_calcs = [comm.MACEHALCalculator]
@@ -60,7 +64,7 @@ all_data.update(ace_data)
 # Also test the ACE1Calculator forces and stresses
 all_data["ACE1Calculator"] = (comm.ACE1Calculator, {"pot_json" : file_root + "/Si_ACE.json"})
 
-def set_up_calc(calc_name, required_properties=[]):
+def set_up_calc(calc_name, lowmem, required_properties=[]):
     if "MACE" in calc_name:
         if mpa is None:
             pytest.skip("mace-torch module is not installed")
@@ -73,8 +77,15 @@ def set_up_calc(calc_name, required_properties=[]):
     for prop in required_properties:
         if prop not in cls.implemented_properties:
             pytest.skip(f"{cls.__name__} does not implement {prop}")
-
-    calc = cls(**params)
+    
+    if calc_name == "ACE1Calculator":
+        if lowmem:
+            pytest.skip(f"{cls.__name__} does not implement lowmem mode")
+        else:
+            # Use lowmem=False branch to test normal ACE1Calculator operation
+            calc = cls(**params)
+    else:
+        calc = cls(**params, lowmem=lowmem)
 
     if issubclass(cls, comm.BaseCommitteeCalculator):
         calc.resample_committee()
@@ -82,9 +93,10 @@ def set_up_calc(calc_name, required_properties=[]):
     return calc
 
 @pytest.mark.parametrize("calc_name", all_data.keys())
+@pytest.mark.parametrize("lowmem", [True, False])
 class TestCommitteeCalcs():    
     @pytest.mark.parametrize("property", ["desc_forces", "comm_forces", "forces", "bias_forces"])
-    def test_force_derivative(self, allclose, calc_name, property):
+    def test_force_derivative(self, allclose, calc_name, property, lowmem):
         # Compare direct force predictions to a finite differences scheme
         p = property.split("_")
         if len(p) > 1:
@@ -99,12 +111,12 @@ class TestCommitteeCalcs():
 
         ats = ref_ats.copy()
         ats.rattle(1e-1, seed=42)
-        calc = set_up_calc(calc_name, required_properties=[energy_prop, force_prop])
+        calc = set_up_calc(calc_name, lowmem, required_properties=[energy_prop, force_prop])
 
         finite_difference_forces(calc, ats, allclose, energy_prop, force_prop, dx=1e-5)
 
     @pytest.mark.parametrize("property", ["desc_stress", "comm_stress", "stress", "bias_stress"])
-    def test_stress_derivative(self, allclose, calc_name, property):
+    def test_stress_derivative(self, allclose, calc_name, property, lowmem):
         # Compare direct force predictions to a finite differences scheme
         p = property.split("_")
         if len(p) > 1:
@@ -127,13 +139,13 @@ class TestCommitteeCalcs():
         ats.set_cell(cell, scale_atoms=True)
         ats.rattle(1e-1, seed=42)
 
-        calc = set_up_calc(calc_name, required_properties=[energy_prop, stress_prop])
+        calc = set_up_calc(calc_name, lowmem, required_properties=[energy_prop, stress_prop])
 
         finite_difference_stress(calc, ats, allclose, energy_prop, stress_prop, dx=1e-6)
 
-    def test_committee_resample(self, calc_name):
+    def test_committee_resample(self, calc_name, lowmem):
 
-        calc = set_up_calc(calc_name)
+        calc = set_up_calc(calc_name, lowmem)
 
         if not issubclass(calc.__class__, comm.BaseCommitteeCalculator):
             pytest.skip(f"{calc_name} is noy a committee calculator.")
@@ -144,6 +156,9 @@ class TestCommitteeCalcs():
         else:
             def to_numpy(arr):
                 return arr
+            
+        ats = ref_ats.copy()
+        calc.select_structure(ats)
 
         calc.resample_committee(10)
         cw = to_numpy(calc.committee_weights)
@@ -153,10 +168,11 @@ class TestCommitteeCalcs():
         cw = to_numpy(calc.committee_weights)
         assert cw.shape[0] == 100
 
+@pytest.mark.parametrize("lowmem", [True, False])
 @pytest.mark.parametrize("calc_name", mace_data.keys())
 @pytest.mark.parametrize("batch_size", [1, 2, 4]) # 8 atom test cell, batch_size=8 is default
-def test_mace_desc_batch_size(calc_name, batch_size, allclose):
-    calc = set_up_calc(calc_name, ["desc_forces"])
+def test_mace_desc_batch_size(calc_name, batch_size, allclose, lowmem):
+    calc = set_up_calc(calc_name, lowmem, ["desc_forces"])
 
     ats = ref_ats.copy()
 
