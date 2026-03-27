@@ -1,4 +1,6 @@
-ase_uhal
+![ase-uhal](./logo.svg)
+
+`ase-uhal`: Universal HyperActive Learning
 ==============================
 [//]: # (Badges)
 [![GitHub Actions Build Status](https://github.com/kermodegroup/ase_uhal/workflows/CI/badge.svg)](https://github.com/kermodegroup/ase_uhal/actions?query=workflow%3ACI)
