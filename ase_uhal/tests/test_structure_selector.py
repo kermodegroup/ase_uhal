@@ -42,7 +42,7 @@ def test_structure_selector():
                                 auto_resample=True,
                                 delay=10,
                                 mixing=0.1,
-                                thresh_mul=1.5)
+                                thresh_mul=0.9) # Use a very low selection threshold to ensure selection occurs
     
     ats.calc = hal_calc
 
