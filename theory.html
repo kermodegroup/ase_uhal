@@ -27,18 +27,18 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
     <script src="_static/documentation_options.js?v=5929fcd5"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
@@ -49,8 +49,9 @@
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>window.MathJax = {"chtml": {"displayAlign": "center"}, "tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'theory';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="User Guide" href="examples.html" />
@@ -58,20 +59,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -97,7 +104,7 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -385,7 +392,7 @@ to obtain a committee of models.</p>
 </section>
 <section id="acehal">
 <h2>ACEHAL<a class="headerlink" href="#acehal" title="Link to this heading">#</a></h2>
-<p>Hyperactive Learning (HAL), developed by Van der Oord et. al. <span id="id2">[<a class="reference internal" href="#id5" title="Cas van der Oord, Matthias Sachs, Dávid Péter Kovács, Christoph Ortner, and Gábor Csányi. Hyperactive learning for data-driven interatomic potentials. npj Computational Materials, 9(1):168, Sep 2023. URL: https://doi.org/10.1038/s41524-023-01104-6, doi:10.1038/s41524-023-01104-6.">1</a>]</span>, forms the basis of the approach used here.
+<p>Hyperactive Learning (HAL), developed by Van der Oord et. al. <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id5" title="Cas van der Oord, Matthias Sachs, Dávid Péter Kovács, Christoph Ortner, and Gábor Csányi. Hyperactive learning for data-driven interatomic potentials. npj Computational Materials, 9(1):168, Sep 2023. URL: https://doi.org/10.1038/s41524-023-01104-6, doi:10.1038/s41524-023-01104-6.">1</a>]</span>, forms the basis of the approach used here.
 Their ACE-specific implimentation can be found on the <a class="reference external" href="https://github.com/ACEsuit/ACEHAL/tree/main">ACEHAL GitHub</a>.</p>
 <p>The basis of ACEHAL is to first form a committee of ACE models based on some dataset, and then define a biasing potential energy based
 on the standard deviation of the committee energy predictions. This gives a modified energy of</p>
@@ -450,7 +457,7 @@ to a file for reuse. In this way, we are able to “distill” foundation model 
 We can therefore describe the result after each transformation (i.e. the set of node values at a hidden layer) as some new descriptor vector. We can then generate linear surrogate models based on MACE descriptor vectors, where
 we cleave the MACE architecture at some layer (by default, we cleave just before the energy readouts), and utilise a committee of such linear models to describe a HAL-style biasing potential.</p>
 <p>Unlike the ACE descriptor, these descriptor functions are model-dependent (and not just hyperparameter-dependent) which means the descriptor space is not conserved when the model is retrained. One solution to this is to freeze model weights
-during training (e.g. the MACE freeze approach <span id="id3">[<a class="reference internal" href="#id6" title="Mariia Radova, Wojciech G. Stark, Connor S. Allen, Reinhard J. Maurer, and Albert P. Bartók. Fine-tuning foundation models of materials interatomic potentials with frozen transfer learning. npj Computational Materials, 11(1):237, Jul 2025. URL: https://doi.org/10.1038/s41524-025-01727-x, doi:10.1038/s41524-025-01727-x.">2</a>]</span>)</p>
+during training (e.g. the MACE freeze approach <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id6" title="Mariia Radova, Wojciech G. Stark, Connor S. Allen, Reinhard J. Maurer, and Albert P. Bartók. Fine-tuning foundation models of materials interatomic potentials with frozen transfer learning. npj Computational Materials, 11(1):237, Jul 2025. URL: https://doi.org/10.1038/s41524-025-01727-x, doi:10.1038/s41524-025-01727-x.">2</a>]</span>)</p>
 <p class="rubric">References</p>
 <div class="docutils container" id="id4">
 <div role="list" class="citation-list">
@@ -513,8 +520,8 @@ during training (e.g. the MACE freeze approach <span id="id3">[<a class="referen
     class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-mlips-bayesian-regression">Linear MLIPs &amp; Bayesian Regression</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#acehal">ACEHAL</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approximating-acehal">Approximating ACEHAL</a><ul class="nav section-nav flex-column">
@@ -526,13 +533,13 @@ during training (e.g. the MACE freeze approach <span id="id3">[<a class="referen
   </nav></div>
 
   <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/theory.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/theory.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
 
 </div></div>
               
@@ -547,8 +554,8 @@ during training (e.g. the MACE freeze approach <span id="id3">[<a class="referen
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -582,7 +589,7 @@ during training (e.g. the MACE freeze approach <span id="id3">[<a class="referen
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
 </p></div>
       
     </div>
