@@ -164,8 +164,8 @@ class BaseMACECalculator(TorchCommitteeCalculator, metaclass=ABCMeta):
         return self._descriptor_base(*args)
     
     def _comm_energy(self, *args):
-
-        return self.committee_weights @ self._descriptor_base(*args)
+        desc = self._descriptor_base(*args)
+        return self.committee_weights.to(desc.dtype) @ desc
 
     def _energy(self, *args):
         comm_energy = self._comm_energy(*args)
